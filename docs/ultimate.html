@@ -63,14 +63,14 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 .back .t{font-size:13px;color:var(--muted)}
 .back a{color:var(--purple2);text-decoration:none;font-size:13px}
 
-.layout{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 .sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);padding:20px 14px;background:var(--bg)}
 .sidebar .brand{font-size:13px;color:var(--purple2);font-weight:700;letter-spacing:2px;margin-bottom:14px;padding:0 8px}
 .sidebar a{display:block;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:8px;font-size:13px;border-left:2px solid transparent;margin-bottom:2px}
 .sidebar a:hover{color:var(--text);background:rgba(255,255,255,.03)}
 .sidebar a.active{color:var(--purple2);background:rgba(124,58,237,.1);border-left-color:var(--purple2)}
 .sidebar .sb-back{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12px}
-.main{padding:20px 32px 60px;max-width:960px}
+.main{padding:24px 48px 80px;max-width:1200px}
 .main section{scroll-margin-top:20px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}}
 </style>
@@ -574,9 +574,10 @@ const links=document.querySelectorAll('.sidebar a[href^="#"]');
 const sections=['top','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
 window.addEventListener('scroll',()=>{
 let cur='top';
+const probe=window.innerHeight*0.33;
 for(const id of sections){
 const el=document.getElementById(id);
-if(el && el.getBoundingClientRect().top<200) cur=id;
+if(el && el.getBoundingClientRect().top<probe) cur=id;
 }
 links.forEach(a=>{
 a.classList.toggle('active', a.getAttribute('href')==='#'+cur);
