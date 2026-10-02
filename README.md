@@ -8,7 +8,7 @@
 
 ## 效果预览
 
-![示例报告](preview.jpg)
+![示例报告](https://raw.githubusercontent.com/liucheshang/wechat-relationship-analyzer/main/preview.jpg)
 
 ---
 
