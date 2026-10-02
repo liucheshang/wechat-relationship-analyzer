@@ -9,6 +9,9 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"Microsoft YaHei",sans-serif}
 .wrap{max-width:1000px;margin:0 auto;padding:40px 24px}
+.back{background:#1a1d24;border-radius:12px;padding:14px 20px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
+.back .t{font-size:14px;color:#b0b8c8}
+.back a{color:#a78bfa;text-decoration:none;font-size:13px}
 h1{font-size:32px;margin-bottom:6px}
 .sub{color:#8a93a6;font-size:14px;margin-bottom:30px}
 .badge{display:inline-block;background:#f59e0b;color:#000;padding:4px 14px;border-radius:20px;font-size:13px;margin-bottom:24px}
@@ -29,11 +32,18 @@ h1{font-size:32px;margin-bottom:6px}
 .tier b{color:#e9eef4}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 .row2 .sec{margin-bottom:0}
+.more{background:#1a1d24;border-radius:12px;padding:18px;margin-bottom:16px;border-left:4px solid #60a5fa}
+.more h3{font-size:14px;color:#60a5fa;margin-bottom:8px}
+.more p{font-size:13px;color:#8a93a6;line-height:1.7}
 @media(max-width:768px){.cards{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
+<div class="back">
+<div class="t">本页 = 详细版全部指标 + LLM 逐条读句子</div>
+<a href="index.html">← 返回详细版</a>
+</div>
 <h1>你们的关系体检报告</h1>
 <p class="sub">2024-01-01 至 2025-01-01 · 365 天 · 58,000 条消息 · 示例数据</p>
 <div class="badge">终极版：LLM 逐条读句子 · 好事回应率 · 冲突原文归因</div>
@@ -43,6 +53,11 @@ h1{font-size:32px;margin-bottom:6px}
   <div class="card"><div class="num r">44%</div><div class="label">不接话 (PD)</div></div>
   <div class="card"><div class="num o">24%</div><div class="label">泼冷水 (AD)</div></div>
   <div class="card"><div class="num g">4.5%</div><div class="label">一起开心 (AC)</div></div>
+</div>
+
+<div class="more">
+<h3>详细版已包含的内容（不重复展示）</h3>
+<p>谁更主动 · Gottman 比率趋势 · 回复速度对比 · 吵架后恢复曲线 · 深夜聊天比例 · 四骑士堆叠图 · 话题聚类条形图 · 爱情三角趋势 · 称呼变化时间线 · AI 药方。以上 10 个模块均已跑完，本页只展示终极版新增的部分。</p>
 </div>
 
 <div class="sec">
