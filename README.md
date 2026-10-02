@@ -1,14 +1,26 @@
 # wechat-relationship-analyzer
 
-用数据科学的方法分析你的微信私聊记录，输出亲密关系深度报告。
+用数据科学的方法分析你的私聊记录，输出亲密关系深度报告。
 
 **全本地运行，不上传任何数据。**
 
 ---
 
+## 效果预览
+
+### 判词三联：一眼看清你们的关系
+
+![判词三联](docs/preview_verdict.jpg)
+
+### 心理学指标：Gottman / Capitalization / 话题聚类
+
+![心理学框架](docs/preview_frameworks.jpg)
+
+---
+
 ## 这是什么
 
-把你和某个人的微信聊天记录导出成 JSON，然后这个工具会从 40+ 个维度量化分析你们的关系：
+把你和某个人的聊天记录导出成 JSON，然后这个工具会从 40+ 个维度量化分析你们的关系：
 
 - 谁更主动、谁更爱谁
 - Gottman 比率（积极 vs 消极互动，预测关系稳定性）
@@ -17,7 +29,7 @@
 - Capitalization（回应好消息的方式，Gable 2004）
 - Bids for Connection（微小信号的接住率）
 - Critical Slowing（关系稳定性的早期预警信号）
-- 话题聚类（你们到底在聊什么）
+- 话题聚类（embedding + KMeans，你们到底在聊什么）
 - 回复延迟、连发长度、关心次数、称呼变化时间线
 - 冲突后修复模式（事件研究法）
 
@@ -29,7 +41,7 @@
 
 ### 1. 准备数据
 
-你需要先把微信聊天记录导出成 JSON。格式：
+你需要先把聊天记录导出成 JSON。格式：
 
 ```json
 [
@@ -57,13 +69,13 @@ pip install -r requirements.txt
 
 ```bash
 # 基础版（规则统计，秒出结果）
-python run.py --input wechat_messages.json --output ./output/
+python run.py --input messages.json --output ./output/
 
 # 完整版（加话题聚类，需要 sentence-transformers）
-python run.py --input wechat_messages.json --output ./output/ --with-cluster
+python run.py --input messages.json --output ./output/ --with-cluster
 
 # 终极版（加 LLM 判断，需要本地跑 Ollama + qwen2.5:3b）
-python run.py --input wechat_messages.json --output ./output/ --with-cluster --with-llm
+python run.py --input messages.json --output ./output/ --with-cluster --with-llm
 ```
 
 ### 4. 看结果
@@ -73,7 +85,7 @@ python run.py --input wechat_messages.json --output ./output/ --with-cluster --w
 - `clusters.json` — 话题聚类（如果开了 --with-cluster）
 - `capitalization.json` — LLM 判断的回应类型分布（如果开了 --with-llm）
 
-把这些 JSON 喂给任意大模型，用下面这个提示词生成报告：
+把这些 JSON 喂给任意大模型生成报告：
 
 ```
 你是亲密关系分析师。请根据以下聊天记录统计数据，生成一份深度分析报告，
@@ -109,7 +121,7 @@ python run.py --input wechat_messages.json --output ./output/ --with-cluster --w
 - 本工具只做数据描述，不提供心理咨询
 - 所有结论都是统计学推断，不是读心术
 - 关系问题请找专业心理咨询师
-- 导出自己的微信聊天记录可能违反微信用户协议，风险自担
+- 导出自己的聊天记录可能违反相关软件用户协议，风险自担
 
 ---
 
