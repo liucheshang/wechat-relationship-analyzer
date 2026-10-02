@@ -10,13 +10,15 @@
 
 ## 效果预览
 
-### 基础版
+### 基础版（点一下看大图）
 
 ![基础版](https://cdn.jsdelivr.net/gh/liucheshang/wechat-relationship-analyzer@main/preview.png)
 
-### 详细版
+### 详细版 · 在线体验
 
-![详细版](https://cdn.jsdelivr.net/gh/liucheshang/wechat-relationship-analyzer@main/preview_detail.png)
+👉 **[点这里看完整交互式报告](https://liucheshang.github.io/wechat-relationship-analyzer/)**
+
+包含：判词三联 · Gottman 趋势 · 事件研究 · 四骑士 · 话题聚类 · AI 药方
 
 ---
 
