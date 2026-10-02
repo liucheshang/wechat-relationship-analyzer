@@ -18,6 +18,10 @@
 
 👉 **[点这里看完整交互式报告](https://liucheshang.github.io/wechat-relationship-analyzer/)**
 
+### 终极版 · 在线体验
+
+👉 **[点这里看终极版（AI 逐条读句子）](https://liucheshang.github.io/wechat-relationship-analyzer/ultimate.html)**
+
 ---
 
 ## 三个版本，按需选
@@ -27,6 +31,7 @@
 | 装什么 | `pip install -r requirements.txt` | + `pip install sentence-transformers scikit-learn` | + 装 Ollama 拉模型 |
 | 跑多久 | 几秒钟 | 1-2 分钟 | 5-10 分钟 |
 | 依赖大模型 | 否 | 否 | 是（本地 Ollama） |
+| 包含关系 | — | = 基础版 + 话题聚类 | = 详细版 + LLM 语义判断 |
 
 ### 基础版测什么（规则统计）
 
@@ -56,6 +61,7 @@
 - **好事回应率**：TA 分享好事时，你是真开心（AC）、敷衍（PC）、泼冷水（AD）、还是不接话（PD）
 - 这是 Gable 2004 研究里最能预测关系满意度的指标
 - 词典法会误判，必须让 AI 真正读句子才准
+- **冲突原文归因**：每次吵架到底因为什么，AI 读完原话自动归类
 
 ---
 
@@ -81,9 +87,9 @@
 
 1. 先检查我电脑上有没有装 Python，版本够不够 3.10
 2. 把这个项目 clone 到我电脑上
-3. 告诉我我电脑上微信的版本号，根据版本推荐合适的提取工具
-   - 微信 3.x → 用 WeChatMsg
-   - 微信 4.x → 用 chatlog-keeper
+3. 告诉我我电脑上微信的版本号，然后帮我选一个最合适的聊天记录提取工具
+   - 你自己上网搜一下最新能用的提取工具，看哪个支持我这个微信版本
+   - 推荐几个候选，让我选一个
 4. 帮我下载并安装那个提取工具
 5. 一步步指导我提取我和某个人的聊天记录
    - 需要扫码/确认的步骤提醒我手动操作
@@ -97,7 +103,7 @@
 - 遇到需要我手动操作的步骤（扫码、点确认），停下来告诉我
 ```
 
-> WorkBuddy 会自己判断你电脑环境、装依赖、跑脚本。你只需要在需要扫码确认的时候手动点一下。
+> WorkBuddy 会自己判断你电脑环境、装依赖、跑脚本、选提取工具。你只需要在需要扫码确认的时候手动点一下。
 
 ---
 
@@ -107,13 +113,7 @@
 
 > ⚠️ **本项目只做分析，不做提取。** 你需要先自己把微信聊天记录导出。
 
-推荐几个提取工具（GitHub 上搜名字就能找到）：
-
-| 工具 | 支持版本 | 特点 |
-|---|---|---|
-| WeChatMsg（留痕） | 微信 3.x | 老牌，社区活跃，导出 CSV/HTML |
-| chatlog-keeper | 微信 4.x | 支持最新版，本地解密，导出 JSON |
-| WeLive | 微信 4.x | 命令行，速度快 |
+GitHub 上搜「微信聊天记录导出」「WeChatMsg」「chatlog」「WeLive」等关键词，挑一个最近还在更新、支持你微信版本的工具就行。微信版本更新很快，具体哪个工具当前能用，**建议直接问 AI 帮你选**，别照着网上的旧教程硬装。
 
 **提取注意事项：**
 
@@ -134,7 +134,7 @@
 python convert_input.py --input 你导出的文件.csv --output messages.json
 ```
 
-自动识别 WeChatMsg 的 CSV/JSON、WeLive 的 JSONL、chatlog-keeper 的标准 JSON。
+脚本会自动识别常见导出格式（CSV / JSON / JSONL），不用你手动调。
 
 ### 第三步：装环境
 
@@ -149,10 +149,10 @@ pip install -r requirements.txt
 # 基础版（几秒钟）
 python run.py --input messages.json --output ./output/
 
-# 详细版（+ 话题聚类）
+# 详细版（+ 话题聚类，包含基础版全部内容）
 python run.py --input messages.json --output ./output/ --with-cluster
 
-# 终极版（+ AI 语义判断）
+# 终极版（+ AI 语义判断，包含详细版全部内容）
 python run.py --input messages.json --output ./output/ --with-cluster --with-llm
 ```
 
@@ -177,7 +177,7 @@ python run.py --input messages.json --output ./output/ --with-cluster --with-llm
 ## 它看了哪些心理学指标？
 
 | 指标 | 大白话 | 健康参考 |
-|---|---|---|
+|---|---|---|---|
 | Gottman 比率 | 夸对方多还是骂对方多 | 健康关系 5:1 |
 | 四骑士 | 批评/防御/蔑视/筑墙频率 | 越少越好 |
 | 爱情三角 | 亲密/激情/承诺三条线 | 长期关系都要稳 |
