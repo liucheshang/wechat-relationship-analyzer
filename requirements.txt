@@ -1,1 +1,10 @@
+# ===== 基础版（必装）=====
 jieba>=0.42.1
+pandas>=2.0.0
+numpy>=1.24.0
+
+# ===== 详细版（可选，话题聚类）=====
+# pip install sentence-transformers scikit-learn
+
+# ===== 终极版（可选，AI 语义判断）=====
+# 需另装 Ollama 软件：https://ollama.com  然后 ollama pull qwen2.5:3b
