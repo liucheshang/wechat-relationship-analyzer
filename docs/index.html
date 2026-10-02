@@ -40,7 +40,7 @@ h1{font-size:32px;margin-bottom:6px}
 <body>
 <div class="wrap">
 <h1>你们的关系体检报告</h1>
-<p class="sub">基于 743 天 · 58,000 条消息 · 示例数据</p>
+<p class="sub">2024-01-01 至 2025-01-01 · 365 天 · 58,000 条消息 · 示例数据</p>
 <div class="badge">详细版：判词 · 趋势 · 事件研究 · 四骑士 · 话题聚类 · 爱情三角 · AI 药方</div>
 
 <div class="cards">
@@ -70,14 +70,14 @@ h1{font-size:32px;margin-bottom:6px}
 
 <div class="sec">
   <h3>① 谁更主动？谁更爱谁？</h3>
-  <p class="d">TA 主动开场 72.7% 的天数。语音消息 TA 803 条，你 238 条。最近 3 个月 TA 主动率从 75% 跌到 40%。</p>
+  <p class="d">TA 主动开场 72.7% 的天数。语音消息 TA 803 条，你 238 条。下半年 TA 主动率从 80% 跌到 50%。</p>
   <div id="c1" class="chart"></div>
 </div>
 
 <div class="row2">
 <div class="sec">
   <h3>② Gottman 比率趋势</h3>
-  <p class="d">积极/消极。健康 > 5:1，警戒线 1:1。最近跌到 0.6。</p>
+  <p class="d">积极/消极。健康 > 5:1，警戒线 1:1。年底跌到 0.8。</p>
   <div id="c2" class="chart" style="height:220px"></div>
 </div>
 <div class="sec">
@@ -89,7 +89,7 @@ h1{font-size:32px;margin-bottom:6px}
 
 <div class="sec">
   <h3>④ 吵架后你们怎么和好的？</h3>
-  <p class="d">46 次冲突：平时 238 条/天 → 吵完 24h 跳到 351 条（+48%）。用"刷屏"修复，不是真正解决。</p>
+  <p class="d">38 次冲突：平时 238 条/天 → 吵完 24h 跳到 351 条（+48%）。用"刷屏"修复，不是真正解决。</p>
   <div id="c4" class="chart" style="height:200px"></div>
 </div>
 
@@ -101,14 +101,14 @@ h1{font-size:32px;margin-bottom:6px}
 </div>
 <div class="sec">
   <h3>⑥ 深夜聊天比例</h3>
-  <p class="d">0-5 点聊天占比：8%。深夜倾诉=信任，但最近在减少。</p>
+  <p class="d">0-5 点聊天占比：8%。深夜倾诉=信任，但年底在减少。</p>
   <div id="c6" class="chart" style="height:230px"></div>
 </div>
 </div>
 
 <div class="sec">
   <h3>⑦ 危险信号：四骑士在累积</h3>
-  <p class="d">批评/防御/蔑视/筑墙。2026-08 蔑视 26 次——头号离婚预测指标。</p>
+  <p class="d">批评/防御/蔑视/筑墙。12 月蔑视 22 次——头号离婚预测指标。</p>
   <div id="c7" class="chart"></div>
 </div>
 
@@ -126,7 +126,7 @@ h1{font-size:32px;margin-bottom:6px}
 </div>
 <div class="sec">
   <h3>⑩ 称呼变化时间线</h3>
-  <p class="d">从全名→昵称→爱称，最近称呼又变生分了。</p>
+  <p class="d">从全名→昵称→爱称，年底称呼又变生分了。</p>
   <div id="c10" class="chart" style="height:220px"></div>
 </div>
 </div>
@@ -142,29 +142,29 @@ h1{font-size:32px;margin-bottom:6px}
   </ul>
 </div>
 
-<div class="tier">详细版到此结束 · <b>终极版</b> 额外加：LLM 逐条读句子判断好事回应率 + 每条冲突原文归因（需要 Ollama）</div>
+<div class="tier">详细版到此结束 · <a href="ultimate.html" style="color:#a78bfa">点这里看终极版 →</a></div>
 
 </div>
 <script>
-var m=['2025-01','2025-02','2025-03','2025-04','2025-05','2025-06','2025-07','2025-08','2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08'];
+var m=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 var c1=echarts.init(document.getElementById('c1'));
-c1.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 主动','你主动'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6',fontSize:10}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'TA 主动',type:'line',smooth:true,data:[72,68,75,65,70,78,73,60,55,68,72,75,78,70,65,50,48,45,42,40],lineStyle:{color:'#f472b6',width:2},itemStyle:{color:'#f472b6'}},{name:'你主动',type:'line',smooth:true,data:[28,32,25,35,30,22,27,40,45,32,28,25,22,30,35,50,52,55,58,60],lineStyle:{color:'#60a5fa',width:2},itemStyle:{color:'#60a5fa'}}]});
+c1.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 主动','你主动'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'TA 主动',type:'line',smooth:true,data:[82,80,78,75,72,70,68,65,60,55,52,50],lineStyle:{color:'#f472b6',width:2},itemStyle:{color:'#f472b6'}},{name:'你主动',type:'line',smooth:true,data:[18,20,22,25,28,30,32,35,40,45,48,50],lineStyle:{color:'#60a5fa',width:2},itemStyle:{color:'#60a5fa'}}]});
 var c2=echarts.init(document.getElementById('c2'));
-c2.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6',fontSize:10}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'line',data:[4.2,3.8,4.5,3.2,2.8,3.5,4.1,2.1,1.8,2.5,3.0,3.8,4.2,3.5,2.8,1.5,1.2,0.9,0.8,0.6],smooth:true,lineStyle:{color:'#f472b6',width:2.5},itemStyle:{color:'#f472b6'},markLine:{data:[{yAxis:1,label:{formatter:'警戒线',color:'#f87171'},lineStyle:{color:'#f87171',type:'dashed'}}]}}]});
+c2.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'line',data:[5.2,4.8,4.5,4.2,3.8,3.5,3.2,2.8,2.5,2.0,1.5,0.8],smooth:true,lineStyle:{color:'#f472b6',width:2.5},itemStyle:{color:'#f472b6'},markLine:{data:[{yAxis:1,label:{formatter:'警戒线',color:'#f87171'},lineStyle:{color:'#f87171',type:'dashed'}}]}}]});
 var c3=echarts.init(document.getElementById('c3'));
-c3.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 回复','你回复'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m.slice(-8),axisLabel:{color:'#8a93a6',fontSize:10}},yAxis:{type:'value',name:'分钟',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'TA 回复',type:'bar',data:[8,10,12,15,18,22,28,35],itemStyle:{color:'#f472b6',borderRadius:[4,4,0,0]}},{name:'你回复',type:'bar',data:[30,35,40,45,50,55,60,65],itemStyle:{color:'#60a5fa',borderRadius:[4,4,0,0]}}]});
+c3.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 回复','你回复'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'分钟',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'TA 回复',type:'bar',data:[8,9,10,11,12,13,14,16,18,20,24,30],itemStyle:{color:'#f472b6',borderRadius:[4,4,0,0]}},{name:'你回复',type:'bar',data:[25,28,30,33,36,38,40,43,46,50,55,60],itemStyle:{color:'#60a5fa',borderRadius:[4,4,0,0]}}]});
 var c4=echarts.init(document.getElementById('c4'));
 c4.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:50,right:20,top:15,bottom:25},xAxis:{type:'category',data:['平时一天','吵完 24h','吵完 72h 累计'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'bar',data:[238,351,765],itemStyle:{color:'#fbbf24',borderRadius:[4,4,0,0]},barWidth:'40%',label:{show:true,position:'top',color:'#e9eef4',fontSize:12}}]});
 var c5=echarts.init(document.getElementById('c5'));
 c5.setOption({tooltip:{trigger:'item',triggerOn:'click',confine:true},series:[{type:'pie',radius:['40%','70%'],center:['50%','55%'],label:{color:'#e9eef4',fontSize:11,formatter:'{b}\n{d}%'},data:[{value:5,name:'一起开心',itemStyle:{color:'#4ade80'}},{value:28,name:'哦挺好',itemStyle:{color:'#6b7280'}},{value:22,name:'泼冷水',itemStyle:{color:'#fbbf24'}},{value:45,name:'不接话',itemStyle:{color:'#f87171'}}]}]});
 var c6=echarts.init(document.getElementById('c6'));
-c6.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6',fontSize:10}},yAxis:{type:'value',name:'%',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'line',data:[15,14,16,12,10,8,9,7,6,8,7,6,5,4,5,4,3,3,2,2],smooth:true,lineStyle:{color:'#a78bfa',width:2},itemStyle:{color:'#a78bfa'},areaStyle:{opacity:0.2}}]});
+c6.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'%',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'line',data:[12,13,11,10,9,8,9,7,6,5,4,3],smooth:true,lineStyle:{color:'#a78bfa',width:2},itemStyle:{color:'#a78bfa'},areaStyle:{opacity:0.2}}]});
 var c7=echarts.init(document.getElementById('c7'));
-c7.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['批评','防御','蔑视','筑墙'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m.slice(-12),axisLabel:{color:'#8a93a6',fontSize:10}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'批评',type:'bar',stack:'a',data:[5,8,6,10,12,8,15,18,14,10,12,15],itemStyle:{color:'#60a5fa'}},{name:'防御',type:'bar',stack:'a',data:[3,5,4,8,10,6,12,14,10,8,10,16],itemStyle:{color:'#fbbf24'}},{name:'蔑视',type:'bar',stack:'a',data:[0,0,1,2,3,2,5,8,12,18,22,26],itemStyle:{color:'#f87171'}},{name:'筑墙',type:'bar',stack:'a',data:[10,12,15,18,20,15,22,25,20,18,22,25],itemStyle:{color:'#6b7280',borderRadius:[0,4,4,0]}}]});
+c7.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['批评','防御','蔑视','筑墙'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'批评',type:'bar',stack:'a',data:[5,6,7,8,9,10,12,14,15,16,18,20],itemStyle:{color:'#60a5fa'}},{name:'防御',type:'bar',stack:'a',data:[3,4,5,6,7,8,9,10,11,12,14,16],itemStyle:{color:'#fbbf24'}},{name:'蔑视',type:'bar',stack:'a',data:[0,0,0,1,2,3,5,8,12,16,20,22],itemStyle:{color:'#f87171'}},{name:'筑墙',type:'bar',stack:'a',data:[8,9,10,12,14,15,18,20,22,24,26,28],itemStyle:{color:'#6b7280',borderRadius:[0,4,4,0]}}]});
 var c8=echarts.init(document.getElementById('c8'));
 c8.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 发的','你发的'],textStyle:{color:'#8a93a6'}},grid:{left:100,right:30,top:30,bottom:25},xAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},yAxis:{type:'category',data:['讲道理分析','亲密日常','TA 问你情况','时间安排','吃饭日常','出行计划','TA 的工作日常','吵架时你的情绪','你单方面发亲密','TA 说不满'],axisLabel:{color:'#8a93a6',fontSize:11}},series:[{name:'TA 发的',type:'bar',stack:'a',data:[890,50,400,620,710,990,830,820,610,450],itemStyle:{color:'#f472b6'}},{name:'你发的',type:'bar',stack:'a',data:[310,740,910,530,640,710,760,450,690,850],itemStyle:{color:'#60a5fa',borderRadius:[0,4,4,0]}}]});
 var c9=echarts.init(document.getElementById('c9'));
-c9.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['亲密','激情','承诺'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6',fontSize:10}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'亲密',type:'line',smooth:true,data:[6,6.5,7,7.2,7.5,7.8,8,8.2,8.5,8.5,8.5,8.5,8.5,8.5,8.5,8.5,8.5,8.5,8.5,8.5],lineStyle:{color:'#4ade80',width:2}},{name:'激情',type:'line',smooth:true,data:[9,9,8.5,8,7.5,7,6.5,6,5.5,5,4.5,4,3.5,3.5,3.5,3.5,3.5,3.5,3.5,3.5],lineStyle:{color:'#f472b6',width:2}},{name:'承诺',type:'line',smooth:true,data:[5,5,5.5,6,6.5,7,7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5,7.5],lineStyle:{color:'#60a5fa',width:2}}]});
+c9.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['亲密','激情','承诺'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'亲密',type:'line',smooth:true,data:[6,6.5,7,7.5,7.8,8,8.2,8.3,8.5,8.5,8.5,8.5],lineStyle:{color:'#4ade80',width:2}},{name:'激情',type:'line',smooth:true,data:[9,8.5,8,7.5,7,6.5,6,5.5,5,4.5,4,3.5],lineStyle:{color:'#f472b6',width:2}},{name:'承诺',type:'line',smooth:true,data:[5,5.5,6,6.5,7,7.2,7.5,7.5,7.5,7.5,7.5,7.5],lineStyle:{color:'#60a5fa',width:2}}]});
 var c10=echarts.init(document.getElementById('c10'));
 c10.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:['全名','昵称','爱称','宝宝','亲爱的','回到昵称'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'次数/月',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'bar',data:[120,80,40,25,10,60],itemStyle:{color:'#a78bfa',borderRadius:[4,4,0,0]},barWidth:'50%'}]});
 </script>
