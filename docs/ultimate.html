@@ -7,69 +7,63 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0d1117;color:#e6edf3;font-family:-apple-system,"Microsoft YaHei",sans-serif;line-height:1.6}
+body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"Microsoft YaHei",sans-serif;line-height:1.6}
 .wrap{max-width:900px;margin:0 auto;padding:0 24px 60px}
-.back{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px 18px;margin:24px 0;display:flex;justify-content:space-between;align-items:center}
-.back .t{font-size:13px;color:#8b949e}
-.back a{color:#58a6ff;text-decoration:none;font-size:13px}
-.hero{text-align:center;padding:50px 0 30px;border-bottom:1px solid #21262d}
+.back{background:#1a1d24;border:1px solid #2a2d35;border-radius:12px;padding:14px 18px;margin:24px 0;display:flex;justify-content:space-between;align-items:center}
+.back .t{font-size:13px;color:#8a93a6}
+.back a{color:#a78bfa;text-decoration:none;font-size:13px}
+.hero{text-align:center;padding:50px 0 30px;border-bottom:1px solid #1a1d24}
 .hero h1{font-size:26px;font-weight:700;margin-bottom:8px}
-.hero .sub{color:#8b949e;font-size:14px}
-.badge{display:inline-block;background:rgba(210,153,34,.15);color:#d29922;padding:4px 14px;border-radius:20px;font-size:12px;margin:16px 0}
+.hero .sub{color:#8a93a6;font-size:14px}
+.badge{display:inline-block;background:rgba(124,58,237,.15);color:#a78bfa;padding:4px 14px;border-radius:20px;font-size:12px;margin:16px 0}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:24px 0}
-.stat{background:#161b22;border-radius:8px;padding:18px 14px;text-align:center}
+.stat{background:#1a1d24;border-radius:12px;padding:18px 14px;text-align:center}
 .stat .num{font-size:26px;font-weight:700}
-.stat .label{font-size:12px;color:#8b949e;margin-top:4px}
-.sec{background:#161b22;border-radius:8px;padding:24px;margin-bottom:14px}
+.stat .label{font-size:12px;color:#8a93a6;margin-top:4px}
+.sec{background:#1a1d24;border-radius:12px;padding:24px;margin-bottom:14px}
 .sec h3{font-size:16px;font-weight:600;margin-bottom:4px}
-.sec .d{font-size:13px;color:#8b949e;margin-bottom:14px;line-height:1.6}
+.sec .d{font-size:13px;color:#8a93a6;margin-bottom:14px;line-height:1.6}
 .chart{width:100%;height:250px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .row2 .sec{margin-bottom:0}
-.case{background:#161b22;border-radius:8px;padding:16px 18px;margin-bottom:10px;border-left:3px solid #d29922}
-.case .meta{font-size:12px;color:#8b949e;margin-bottom:6px}
-.case .quote{font-size:14px;color:#e6edf3;line-height:1.7;margin-bottom:4px}
-.case .judge{font-size:13px;color:#d29922;margin-top:6px}
-.more{background:#161b22;border-radius:8px;padding:16px 18px;margin-bottom:14px;border-left:4px solid #58a6ff}
-.more h3{font-size:14px;color:#58a6ff;margin-bottom:6px}
-.more p{font-size:13px;color:#8b949e;line-height:1.7}
-.tier{text-align:center;padding:14px;background:#161b22;border-radius:8px;margin:20px 0;color:#8b949e;font-size:13px}
-.tier a{color:#58a6ff;text-decoration:none}
+.case{background:#1a1d24;border-radius:12px;padding:16px 18px;margin-bottom:10px;border-left:3px solid #a78bfa}
+.case .meta{font-size:12px;color:#8a93a6;margin-bottom:6px}
+.case .quote{font-size:14px;color:#e9eef4;line-height:1.7;margin-bottom:4px}
+.case .judge{font-size:13px;color:#a78bfa;margin-top:6px}
+.more{background:#1a1d24;border-radius:12px;padding:16px 18px;margin-bottom:14px;border-left:4px solid #7c3aed}
+.more h3{font-size:14px;color:#a78bfa;margin-bottom:6px}
+.more p{font-size:13px;color:#8a93a6;line-height:1.7}
+.tier{text-align:center;padding:14px;background:#1a1d24;border-radius:8px;margin:20px 0;color:#8a93a6;font-size:13px}
+.tier a{color:#a78bfa;text-decoration:none}
 @media(max-width:768px){.stats{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
-
 <div class="back">
 <div class="t">本页 = 详细版全部指标 + LLM 抽样读句子</div>
 <a href="index.html">← 返回详细版</a>
 </div>
-
 <div class="hero">
 <h1>AI 抽样读完了 200 段对话</h1>
 <p class="sub">2024-01-01 至 2025-01-01 · 365 天 · 58,000 条消息 · 示例数据</p>
 <div class="badge">终极版：LLM 抽样判断 · 好事回应率 · 冲突原文归因</div>
 </div>
-
 <div class="stats">
-<div class="stat"><div class="num" style="color:#d29922">200</div><div class="label">AI 分析句子数</div></div>
-<div class="stat"><div class="num" style="color:#f85149">44%</div><div class="label">不接话 PD</div></div>
-<div class="stat"><div class="num" style="color:#d29922">24%</div><div class="label">泼冷水 AD</div></div>
-<div class="stat"><div class="num" style="color:#3fb950">4.5%</div><div class="label">一起开心 AC</div></div>
+<div class="stat"><div class="num" style="color:#a78bfa">200</div><div class="label">AI 分析句子数</div></div>
+<div class="stat"><div class="num" style="color:#f87171">44%</div><div class="label">不接话 PD</div></div>
+<div class="stat"><div class="num" style="color:#fbbf24">24%</div><div class="label">泼冷水 AD</div></div>
+<div class="stat"><div class="num" style="color:#4ade80">4.5%</div><div class="label">一起开心 AC</div></div>
 </div>
-
 <div class="more">
 <h3>详细版已包含的内容（不重复展示）</h3>
 <p>谁更主动 · Gottman 比率趋势 · 回复速度对比 · 吵架后恢复曲线 · 深夜聊天比例 · 四骑士堆叠图 · 话题聚类条形图 · 爱情三角趋势 · 称呼变化时间线 · AI 药方。以上 10 个模块均已跑完，本页只展示终极版新增的部分。</p>
 </div>
-
 <div class="sec">
 <h3>① LLM 判断：好事回应率</h3>
 <p class="d">Gable 2004：从 200 段"TA 分享好事"对话中，AI 逐条判断你的回应类型。AC=主动建设性（真开心），PC=被动建设性（哦挺好），AD=主动破坏性（泼冷水），PD=被动破坏性（不接话）。</p>
 <div id="c1" class="chart" style="height:260px"></div>
 </div>
-
 <div class="row2">
 <div class="sec">
 <h3>② 回应率月度趋势</h3>
@@ -82,12 +76,10 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,"Microsoft YaHei
 <div id="c3" class="chart" style="height:220px"></div>
 </div>
 </div>
-
 <div class="sec">
 <h3>④ 典型案例（AI 逐条判断）</h3>
 <p class="d">从 200 段对话中挑出 3 段，展示 AI 怎么判断。</p>
 </div>
-
 <div class="case">
 <div class="meta">2024-03-15 14:22 · TA 说</div>
 <div class="quote">"今天答辩过了！老师夸我 PPT 做得好！"</div>
@@ -95,7 +87,6 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,"Microsoft YaHei
 <div class="quote">"嗯，挺好。那晚上吃什么？"</div>
 <div class="judge">判定：PD（被动破坏性）—— 不接话，直接跳到自己的需求</div>
 </div>
-
 <div class="case">
 <div class="meta">2024-06-20 20:15 · TA 说</div>
 <div class="quote">"我涨工资了！下个月多 2000！"</div>
@@ -103,7 +94,6 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,"Microsoft YaHei
 <div class="quote">"2000 够干嘛的，你那同事不是涨了 5000 吗？"</div>
 <div class="judge">判定：AD（主动破坏性）—— 泼冷水，拿别人对比</div>
 </div>
-
 <div class="case">
 <div class="meta">2024-09-08 11:30 · TA 说</div>
 <div class="quote">"项目终于上线了！熬了三个月！"</div>
@@ -111,31 +101,24 @@ body{background:#0d1117;color:#e6edf3;font-family:-apple-system,"Microsoft YaHei
 <div class="quote">"哇！！太好了吧！你那个项目熬了那么久终于有回报了！晚上必须庆祝一下！"</div>
 <div class="judge">判定：AC（主动建设性）—— 真开心，有细节，有行动</div>
 </div>
-
 <div class="sec">
 <h3>⑤ 冲突模式月度分布</h3>
 <p class="d">38 次冲突，AI 归类后的月度走势。</p>
 <div id="c4" class="chart" style="height:220px"></div>
 </div>
-
 <div class="tier">终极版到此结束 · <a href="index.html">← 返回详细版</a></div>
-
 </div>
 <script>
 var m=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-var C_GREEN='#3fb950',C_AMBER='#d29922',C_RED='#f85149',C_GRAY='#6e7681',C_PINK='#f778ba',C_BLUE='#58a6ff';
-
+var C_GREEN='#4ade80',C_AMBER='#fbbf24',C_RED='#f87171',C_GRAY='#6b7280',C_PINK='#f778ba',C_BLUE='#60a5fa';
 var c1=echarts.init(document.getElementById('c1'));
-c1.setOption({tooltip:{trigger:'item',triggerOn:'click',confine:true},series:[{type:'pie',radius:['40%','70%'],center:['50%','55%'],label:{color:'#e6edf3',fontSize:13,formatter:'{b}\n{d}%'},data:[{value:4.5,name:'一起开心 AC',itemStyle:{color:C_GREEN}},{value:27.5,name:'哦挺好 PC',itemStyle:{color:C_GRAY}},{value:24,name:'泼冷水 AD',itemStyle:{color:C_AMBER}},{value:44,name:'不接话 PD',itemStyle:{color:C_RED}}]}]});
-
+c1.setOption({tooltip:{trigger:'item',triggerOn:'click',confine:true},series:[{type:'pie',radius:['40%','70%'],center:['50%','55%'],label:{color:'#e9eef4',fontSize:13,formatter:'{b}\n{d}%'},data:[{value:4.5,name:'一起开心 AC',itemStyle:{color:C_GREEN}},{value:27.5,name:'哦挺好 PC',itemStyle:{color:C_GRAY}},{value:24,name:'泼冷水 AD',itemStyle:{color:C_AMBER}},{value:44,name:'不接话 PD',itemStyle:{color:C_RED}}]}]});
 var c2=echarts.init(document.getElementById('c2'));
-c2.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['AC 率','PD 率'],textStyle:{color:'#8b949e'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8b949e'}},yAxis:{type:'value',name:'%',nameTextStyle:{color:'#8b949e'},axisLabel:{color:'#8b949e'},splitLine:{lineStyle:{color:'#21262d'}}},series:[{name:'AC 率',type:'line',smooth:true,data:[15,14,12,10,8,7,6,5,4,3,2.5,2],lineStyle:{color:C_GREEN,width:2}},{name:'PD 率',type:'line',smooth:true,data:[30,32,35,38,40,42,44,45,46,47,48,50],lineStyle:{color:C_RED,width:2}}]});
-
+c2.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['AC 率','PD 率'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'%',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'AC 率',type:'line',smooth:true,data:[15,14,12,10,8,7,6,5,4,3,2.5,2],lineStyle:{color:C_GREEN,width:2}},{name:'PD 率',type:'line',smooth:true,data:[30,32,35,38,40,42,44,45,46,47,48,50],lineStyle:{color:C_RED,width:2}}]});
 var c3=echarts.init(document.getElementById('c3'));
-c3.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:120,right:30,top:15,bottom:25},xAxis:{type:'value',axisLabel:{color:'#8b949e'},splitLine:{lineStyle:{color:'#21262d'}}},yAxis:{type:'category',data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦','未来规划分歧','其他'],axisLabel:{color:'#8b949e'}},series:[{type:'bar',data:[12,10,8,5,3],itemStyle:{color:C_AMBER,borderRadius:[0,4,4,0]},barWidth:'50%',label:{show:true,position:'right',color:'#e6edf3'}}]});
-
+c3.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:120,right:30,top:15,bottom:25},xAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},yAxis:{type:'category',data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦','未来规划分歧','其他'],axisLabel:{color:'#8a93a6'}},series:[{type:'bar',data:[12,10,8,5,3],itemStyle:{color:C_AMBER,borderRadius:[0,4,4,0]},barWidth:'50%',label:{show:true,position:'right',color:'#e9eef4'}}]});
 var c4=echarts.init(document.getElementById('c4'));
-c4.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦'],textStyle:{color:'#8b949e'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8b949e'}},yAxis:{type:'value',axisLabel:{color:'#8b949e'},splitLine:{lineStyle:{color:'#21262d'}}},series:[{name:'你觉得被忽略',type:'line',smooth:true,data:[0,1,1,2,1,2,1,2,1,2,1,2],lineStyle:{color:C_BLUE,width:2}},{name:'TA 觉得被否定',type:'line',smooth:true,data:[0,0,1,1,2,1,2,1,2,1,2,2],lineStyle:{color:C_PINK,width:2}},{name:'生活习惯摩擦',type:'line',smooth:true,data:[1,0,1,0,1,0,1,0,1,0,1,0],lineStyle:{color:C_AMBER,width:2}}]});
+c4.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'你觉得被忽略',type:'line',smooth:true,data:[0,1,1,2,1,2,1,2,1,2,1,2],lineStyle:{color:C_BLUE,width:2}},{name:'TA 觉得被否定',type:'line',smooth:true,data:[0,0,1,1,2,1,2,1,2,1,2,2],lineStyle:{color:C_PINK,width:2}},{name:'生活习惯摩擦',type:'line',smooth:true,data:[1,0,1,0,1,0,1,0,1,0,1,0],lineStyle:{color:C_AMBER,width:2}}]});
 </script>
 </body>
 </html>
