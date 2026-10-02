@@ -1,127 +1,115 @@
-# wechat-relationship-analyzer
+# 💬 wechat-relationship-analyzer
 
-用数据科学的方法分析你的私聊记录，输出亲密关系深度报告。
+**把你和 TA 的聊天记录喂给它，它告诉你这段关系到底怎么样。**
 
-**全本地运行，不上传任何数据。**
+全本地运行，你的聊天记录一个字都不会上传。
+
+---
+
+## 它能干什么？
+
+简单说：它读你的聊天记录，然后告诉你——
+
+- 谁更主动？谁更爱谁？
+- 你们最近是在变热还是变冷？
+- 吵架之后你们是怎么和好的？
+- TA 分享好事的时候，你是真的在听，还是在敷衍？
+- 你们这段关系有没有危险信号？
+- 你们到底都在聊些什么？
+
+它用的是心理学家研究了几十年的指标（Gottman 婚姻实验室、Sternberg 爱情三角理论等），但结论是大白话。
 
 ---
 
 ## 效果预览
 
-### 判词三联：一眼看清你们的关系
+### 一眼看清你们是什么组合
 
 ![判词三联](docs/preview_verdict.jpg)
 
-### 心理学指标：Gottman / Capitalization / 话题聚类
+### 她分享好事时你怎么回？（这个最反直觉）
 
-![心理学框架](docs/preview_frameworks.jpg)
+![Capitalization](docs/preview_cap.jpg)
 
----
+### 你们到底都在聊什么？
 
-## 这是什么
-
-把你和某个人的聊天记录导出成 JSON，然后这个工具会从 40+ 个维度量化分析你们的关系：
-
-- 谁更主动、谁更爱谁
-- Gottman 比率（积极 vs 消极互动，预测关系稳定性）
-- Four Horsemen（批评/防御/蔑视/筑墙，Gottman 的离婚预测指标）
-- Sternberg 爱情三角（亲密/激情/承诺）
-- Capitalization（回应好消息的方式，Gable 2004）
-- Bids for Connection（微小信号的接住率）
-- Critical Slowing（关系稳定性的早期预警信号）
-- 话题聚类（embedding + KMeans，你们到底在聊什么）
-- 回复延迟、连发长度、关心次数、称呼变化时间线
-- 冲突后修复模式（事件研究法）
-
-输出一份单文件 HTML 报告，20+ 张 ECharts 图表。
+![话题聚类](docs/preview_topics.jpg)
 
 ---
 
-## 快速开始
+## 怎么用？
 
-### 1. 准备数据
+### 第一步：导出聊天记录
 
-你需要先把聊天记录导出成 JSON。格式：
+把你和某个人的聊天记录导出成一个 JSON 文件。格式长这样：
 
 ```json
 [
   {
     "ts": 1700000000.0,
-    "sender": "对方昵称",
-    "sender_wxid": "wxid_xxx",
-    "content": "消息文本",
+    "sender": "TA的昵称",
+    "content": "今天吃到一家特别好吃的火锅！",
     "msg_type": 1,
-    "is_self": false,
-    "is_group_chat": false
+    "is_self": false
   }
 ]
 ```
 
-`msg_type`：1=文本 3=图片 34=语音 43=视频 47=表情 49=链接 50=通话
+（`msg_type`：1=文字 3=图片 34=语音 43=视频 47=表情 50=通话）
 
-### 2. 安装
+### 第二步：跑分析
 
 ```bash
 pip install -r requirements.txt
-```
 
-### 3. 跑分析
-
-```bash
-# 基础版（规则统计，秒出结果）
+# 基础版（几秒钟出结果）
 python run.py --input messages.json --output ./output/
 
-# 完整版（加话题聚类，需要 sentence-transformers）
+# 完整版（加话题分析，需要装 sentence-transformers）
 python run.py --input messages.json --output ./output/ --with-cluster
 
-# 终极版（加 LLM 判断，需要本地跑 Ollama + qwen2.5:3b）
+# 终极版（加 AI 判断，需要本地跑 Ollama）
 python run.py --input messages.json --output ./output/ --with-cluster --with-llm
 ```
 
-### 4. 看结果
+### 第三步：看结果
 
-`output/` 目录下：
-- `stats.json` — 所有规则统计指标
-- `clusters.json` — 话题聚类（如果开了 --with-cluster）
-- `capitalization.json` — LLM 判断的回应类型分布（如果开了 --with-llm）
-
-把这些 JSON 喂给任意大模型生成报告：
+`output/` 里会生成几个 JSON 文件，把它们喂给任意 AI 大模型，用下面这个提示词就能生成一份漂亮的报告：
 
 ```
-你是亲密关系分析师。请根据以下聊天记录统计数据，生成一份深度分析报告，
-包含：互动模式、情感动态、关系稳定性、性格冲突、改进建议。
-数据：{stats.json 内容}
+你是亲密关系分析师。根据下面的聊天记录统计数据，
+生成一份报告：你们的互动模式、情感状态、关系稳定性、
+性格冲突、以及改进建议。
 ```
 
 ---
 
-## 指标参考
+## 它看了哪些指标？
 
-| 指标 | 理论来源 | 健康值 |
+| 它看什么 | 大白话解释 | 健康参考 |
 |---|---|---|
-| Gottman 比率 | Gottman Institute | > 5:1 |
-| Bids 接住率 | Gottman Love Lab | > 86% |
-| Capitalization AC 占比 | Gable 2004 | 30-50% |
-| Four Horsemen 频率 | Gottman | 越低越好 |
-| Sternberg 承诺线 | Sternberg 1986 | 长期关系应稳定上升 |
-| Critical Slowing variance | Scheffer 2012 | 突然翻倍 = 预警 |
+| Gottman 比率 | 你们夸对方多还是骂对方多 | 健康关系是 5:1 |
+| 四骑士 | 批评/防御/蔑视/冷战出现的频率 | 越少越好 |
+| 爱情三角 | 亲密感/激情/未来承诺三条线 | 长期关系三条线都要稳 |
+| 好事回应率 | TA 说好事时你是真开心还是敷衍 | 一起开心应占 30%+ |
+| 接住率 | TA 发的小信号你有没有接住 | 86% 以上才健康 |
+| 系统稳定性 | 吵架前系统有没有预警 | 突然波动 = 危险信号 |
 
 ---
 
 ## 隐私
 
-- 全流程本地运行，无任何网络请求（除了 Ollama 本地推理）
-- 不上传聊天记录、不上传昵称、不上传任何个人信息
-- 你导出的 JSON 和生成的报告都在你自己的磁盘上
+- 所有计算都在你自己电脑上跑
+- 你的聊天记录不会发到任何服务器
+- 不联网、不上传、不注册
 
 ---
 
-## 免责声明
+## 注意
 
-- 本工具只做数据描述，不提供心理咨询
-- 所有结论都是统计学推断，不是读心术
-- 关系问题请找专业心理咨询师
-- 导出自己的聊天记录可能违反相关软件用户协议，风险自担
+- 它不是心理咨询，只是帮你从数据里看见模式
+- 结论是统计学推断，不是读心术
+- 真有问题还是找专业咨询师
 
 ---
 
