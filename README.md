@@ -10,7 +10,7 @@
 
 ## 效果预览
 
-### 基础版（点一下看大图）
+### 基础版
 
 ![基础版](https://cdn.jsdelivr.net/gh/liucheshang/wechat-relationship-analyzer@main/preview.png)
 
@@ -18,24 +18,44 @@
 
 👉 **[点这里看完整交互式报告](https://liucheshang.github.io/wechat-relationship-analyzer/)**
 
-包含：判词三联 · Gottman 趋势 · 事件研究 · 四骑士 · 话题聚类 · AI 药方
-
 ---
 
-## 它能干什么？
+## 三个版本，按需选
 
-简单说：它读你的聊天记录，然后告诉你——
+| | 基础版 | 详细版 | 终极版 |
+|---|---|---|---|
+| 装什么 | `pip install -r requirements.txt` | + `pip install sentence-transformers scikit-learn` | + 装 Ollama 拉模型 |
+| 跑多久 | 几秒钟 | 1-2 分钟 | 5-10 分钟 |
+| 依赖大模型 | 否 | 否 | 是（本地 Ollama） |
 
-| 你想知道的 | 它怎么回答 |
-|---|---|
-| 谁更主动？谁更爱谁？ | 统计谁先开口、谁发语音、谁关心谁多 |
-| 最近变热还是变冷？ | Gottman 积极/消极比率趋势线 |
-| 吵架后怎么和好的？ | 事件研究：吵完消息量暴增说明什么 |
-| TA 分享好事时你在听吗？ | Capitalization 四种回应方式占比 |
-| 有没有危险信号？ | 四骑士（批评/防御/蔑视/筑墙）趋势 |
-| 你们都在聊什么？ | AI 自动聚类成 10 个话题 |
+### 基础版测什么（规则统计）
 
-它用的是心理学家研究了几十年的指标（Gottman 婚姻实验室、Sternberg 爱情三角、Gable 2004 好事回应等），但结论是大白话。
+纯关键词 + 时间戳数数，几秒钟出结果：
+
+- **谁更主动**：谁先开场、谁发语音、谁打电话
+- **回复速度**：双方中位数回复延迟
+- **Gottman 比率**：积极词÷消极词，月度趋势
+- **四骑士**：批评/防御/蔑视/筑墙出现频率
+- **爱情三角**：亲密感/激情/承诺词频趋势
+- **关心次数**：谁问谁吃得好睡得好
+- **称呼变化**：老公/老婆/宝宝出现次数
+- **最长连发**：谁更爱刷屏
+
+### 详细版多测什么（+ 话题聚类）
+
+在基础版之上，AI 把几万条消息自动聚成 10 个话题：
+
+- 你们到底都在聊什么？（工作日常/吃饭/吵架/亲密/未来计划…）
+- 谁在主动分享生活，谁在单方面输出情绪
+- 哪个话题是你们的雷区
+
+### 终极版多测什么（+ LLM 语义判断）
+
+在详细版之上，本地大模型逐条读句子：
+
+- **好事回应率**：TA 分享好事时，你是真开心（AC）、敷衍（PC）、泼冷水（AD）、还是不接话（PD）
+- 这是 Gable 2004 研究里最能预测关系满意度的指标
+- 词典法会误判，必须让 AI 真正读句子才准
 
 ---
 
@@ -72,7 +92,7 @@
 python convert_input.py --input 你导出的文件.csv --output messages.json
 ```
 
-自动识别 WeChatMsg 的 CSV/JSON、WeLive 的 JSONL、chatlog-keeper 的标准 JSON，不用手动改。
+自动识别 WeChatMsg 的 CSV/JSON、WeLive 的 JSONL、chatlog-keeper 的标准 JSON。
 
 ### 第三步：装环境
 
@@ -81,19 +101,16 @@ python convert_input.py --input 你导出的文件.csv --output messages.json
 pip install -r requirements.txt
 ```
 
-> 详细版还需：`pip install sentence-transformers scikit-learn`
-> 终极版还需：安装 [Ollama](https://ollama.com) 并 `ollama pull qwen2.5:3b`
-
 ### 第四步：跑分析
 
 ```bash
-# 基础版（几秒钟出结果）
+# 基础版（几秒钟）
 python run.py --input messages.json --output ./output/
 
-# 详细版（加话题聚类）
+# 详细版（+ 话题聚类）
 python run.py --input messages.json --output ./output/ --with-cluster
 
-# 终极版（加 AI 语义判断）
+# 终极版（+ AI 语义判断）
 python run.py --input messages.json --output ./output/ --with-cluster --with-llm
 ```
 
