@@ -62,17 +62,38 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 .back{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:24px 0;display:flex;justify-content:space-between;align-items:center}
 .back .t{font-size:13px;color:var(--muted)}
 .back a{color:var(--purple2);text-decoration:none;font-size:13px}
+
+.layout{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);padding:20px 14px;background:var(--bg)}
+.sidebar .brand{font-size:13px;color:var(--purple2);font-weight:700;letter-spacing:2px;margin-bottom:14px;padding:0 8px}
+.sidebar a{display:block;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:8px;font-size:13px;border-left:2px solid transparent;margin-bottom:2px}
+.sidebar a:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.sidebar a.active{color:var(--purple2);background:rgba(124,58,237,.1);border-left-color:var(--purple2)}
+.sidebar .sb-back{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12px}
+.main{padding:20px 32px 60px;max-width:960px}
+.main section{scroll-margin-top:20px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}}
 </style>
 </head>
 <body>
 
-<div class="wrap">
-<div class="back">
-<a href="https://github.com/liucheshang/wechat-relationship-analyzer">← 返回项目主页</a>
-<div class="t">终极版 = 基础版 + 详细版 + AI 抽样 + 心理学框架</div>
-<a href="index.html">详细版 →</a>
-</div>
-</div>
+<div class="layout">
+<aside class="sidebar">
+<div class="brand">关系体检报告</div>
+<a href="#top" class="active">概览</a>
+<a href="#s1">01 · 两个人的画像</a>
+<a href="#s2">02 · 同一句话两种语言</a>
+<a href="#s3">03 · 谁在推谁在接</a>
+<a href="#s4">04 · 感情波动</a>
+<a href="#s5">05 · 吵架怎么结束</a>
+<a href="#s6">06 · 节奏与逐月变化</a>
+<a href="#s7">07 · 数据会讲故事</a>
+<a href="#s8">08 · 心理学框架</a>
+<a href="#s9">09 · 谁更爱谁</a>
+<a href="#s10">10 · 最终药方</a>
+<div class="sb-back"><a href="https://github.com/liucheshang/wechat-relationship-analyzer" style="border:none;padding:4px 0">← 返回项目主页</a></div>
+</aside>
+<main class="main" id="top">
 
 <!-- HERO -->
 <section style="padding-top:30px">
@@ -86,23 +107,6 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="kpi"><div class="v hl-green">63.5%</div><div class="l">TA 主动开启对话的日子</div></div>
 <div class="kpi"><div class="v hl-gold">23天</div><div class="l">最长一次完全断联</div></div>
 </div>
-<!-- 目录 -->
-<div class="card" style="margin-top:24px;padding:22px 24px">
-<div style="font-size:12px;color:var(--purple2);letter-spacing:4px;font-weight:700;margin-bottom:14px">目 录 · CONTENTS</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 20px">
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">01</b>两个人的画像<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">依恋、性格、情绪结构</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">02</b>同一句话，两种语言<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">语气词、人称、表情策略</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">03</b>谁在推，谁在接<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">对话开启、回复速度、连发</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">04</b>感情波动<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">两个深谷，一个峰值</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">05</b>吵架是怎么结束的<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">修复率、静默时长演化</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">06</b>节奏与逐月变化<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">生物钟、理性、挑错、情绪</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">07</b>数据会讲故事<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">断联回放、冲突时间线</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--gold);margin-right:8px">08</b>心理学框架<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">Gottman/Gable/Sternberg</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">09</b>谁更爱谁<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">你最想知道的那个问题</div></div>
-<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px"><b style="color:var(--purple2);margin-right:8px">10</b>最终药方<div style="font-size:11.5px;color:var(--dim);margin-top:2px;padding-left:30px">TA 改 / 你改 / 互相谅解</div></div>
-</div>
-</div>
-
 <div class="verdict">
 <b>一句话结论：</b>这不是一段「平平淡淡跑了一年」的关系——而是「烧到最热 → 彻底断掉 → 又比任何时候更热」的 V 型。TA 是发动机，你是稳定器；TA 更用力地推进、也更多地宣泄，而你负责接住与保温。真正没被解决的，是那些吵架里没说完的话。
 </div>
@@ -134,7 +138,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 
 
 <!-- 01 两个人的画像 -->
-<section>
+<section id="s1">
 <div class="wrap">
 <span class="sec-no">01 · 两个人的画像</span>
 <h2>两个依恋系统，靠得很近又各执一端</h2>
@@ -160,7 +164,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 02 同一句话两种语言 -->
-<section>
+<section id="s2">
 <div class="wrap">
 <span class="sec-no">02 · 同一句话，两种语言</span>
 <h2>同一句话，两种语言</h2>
@@ -199,7 +203,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 03 谁在推谁在接 -->
-<section>
+<section id="s3">
 <div class="wrap">
 <span class="sec-no">03 · 谁在推，谁在接</span>
 <h2>谁在推，谁在接</h2>
@@ -241,7 +245,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 04 感情波动 -->
-<section>
+<section id="s4">
 <div class="wrap">
 <span class="sec-no">04 · 感情波动</span>
 <h2>一年只有两个深谷：一次断联，一次复燃前的余震</h2>
@@ -275,7 +279,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 05 吵架怎么结束 -->
-<section>
+<section id="s5">
 <div class="wrap">
 <span class="sec-no">05 · 吵架是怎么结束的</span>
 <h2>你们吵得更频繁了，但吵完之后，好得更快了</h2>
@@ -299,7 +303,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 06 节奏与逐月变化 -->
-<section>
+<section id="s6">
 <div class="wrap">
 <span class="sec-no">06 · 节奏与逐月变化</span>
 <h2>节奏、理性与情绪的逐月变化</h2>
@@ -320,7 +324,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 07 数据会讲故事 -->
-<section>
+<section id="s7">
 <div class="wrap">
 <span class="sec-no">07 · 数据会讲故事</span>
 <h2>数据会讲故事：几个让人愣住的时刻</h2>
@@ -373,7 +377,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 08 心理学框架 -->
-<section>
+<section id="s8">
 <div class="wrap">
 <span class="sec-no">08 · 心理学框架补完</span>
 <h2>把聊天记录放到关系科学的尺子上<span class="pro-tag">终极版核心</span></h2>
@@ -428,7 +432,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 09 谁更爱谁 -->
-<section>
+<section id="s9">
 <div class="wrap">
 <span class="sec-no">09 · 谁更爱谁</span>
 <h2>证据显示：TA 比你更用力，你比 TA 更稳定</h2>
@@ -456,7 +460,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <!-- 10 最终药方 -->
-<section>
+<section id="s10">
 <div class="wrap">
 <span class="sec-no">10 · 最终药方</span>
 <h2>TA 要改什么，你要改什么，你们要一起改什么</h2>
@@ -499,6 +503,8 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 模拟示例数据 · 2024-03-01 至 2025-03-01 · 42,000 条消息<br>
 本报告由 wechat-relationship-analyzer 生成 · 全部分析在本地完成
 </footer>
+</main>
+</div>
 
 </div>
 
@@ -561,6 +567,21 @@ mk('c_event',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',c
 
 window.addEventListener('resize',function(){charts.forEach(function(c){c.resize()})});
 })();
+</script>
+
+<script>
+const links=document.querySelectorAll('.sidebar a[href^="#"]');
+const sections=['top','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
+window.addEventListener('scroll',()=>{
+let cur='top';
+for(const id of sections){
+const el=document.getElementById(id);
+if(el && el.getBoundingClientRect().top<200) cur=id;
+}
+links.forEach(a=>{
+a.classList.toggle('active', a.getAttribute('href')==='#'+cur);
+});
+});
 </script>
 </body>
 </html>
