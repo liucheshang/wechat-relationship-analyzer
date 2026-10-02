@@ -1,0 +1,9 @@
+output/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.json
+!examples/*.json
+.DS_Store
