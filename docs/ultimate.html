@@ -12,73 +12,150 @@ body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"Microsoft YaHei
 .back{background:#1a1d24;border:1px solid #2a2d35;border-radius:12px;padding:14px 18px;margin:24px 0;display:flex;justify-content:space-between;align-items:center}
 .back .t{font-size:13px;color:#8a93a6}
 .back a{color:#a78bfa;text-decoration:none;font-size:13px}
-.hero{text-align:center;padding:50px 0 30px;border-bottom:1px solid #1a1d24}
-.hero h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.hero{text-align:center;padding:60px 0 40px;border-bottom:1px solid #1a1d24}
+.hero h1{font-size:28px;font-weight:700;margin-bottom:8px}
 .hero .sub{color:#8a93a6;font-size:14px}
 .badge{display:inline-block;background:rgba(124,58,237,.15);color:#a78bfa;padding:4px 14px;border-radius:20px;font-size:12px;margin:16px 0}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:24px 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:28px 0}
 .stat{background:#1a1d24;border-radius:12px;padding:18px 14px;text-align:center}
 .stat .num{font-size:26px;font-weight:700}
 .stat .label{font-size:12px;color:#8a93a6;margin-top:4px}
+.verdict{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:28px 0}
+.v{background:#1a1d24;border-radius:12px;padding:22px 18px;text-align:center}
+.v h4{font-size:11px;color:#8a93a6;margin-bottom:8px;letter-spacing:1px}
+.v p.title{font-size:16px;font-weight:700;margin-bottom:8px}
+.v p.desc{font-size:13px;color:#8a93a6;line-height:1.7}
 .sec{background:#1a1d24;border-radius:12px;padding:24px;margin-bottom:14px}
 .sec h3{font-size:16px;font-weight:600;margin-bottom:4px}
 .sec .d{font-size:13px;color:#8a93a6;margin-bottom:14px;line-height:1.6}
 .chart{width:100%;height:250px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .row2 .sec{margin-bottom:0}
+.advice{background:#1a1d24;border-radius:12px;padding:24px;margin-bottom:14px;border-left:3px solid #a78bfa}
+.advice h3{font-size:16px;margin-bottom:12px}
+.advice ul{list-style:none;padding:0}
+.advice li{font-size:14px;color:#c9d1d9;line-height:2;padding-left:18px;position:relative}
+.advice li::before{content:"→";position:absolute;left:0;color:#a78bfa}
 .case{background:#1a1d24;border-radius:12px;padding:16px 18px;margin-bottom:10px;border-left:3px solid #a78bfa}
 .case .meta{font-size:12px;color:#8a93a6;margin-bottom:6px}
 .case .quote{font-size:14px;color:#e9eef4;line-height:1.7;margin-bottom:4px}
 .case .judge{font-size:13px;color:#a78bfa;margin-top:6px}
-.more{background:#1a1d24;border-radius:12px;padding:16px 18px;margin-bottom:14px;border-left:4px solid #7c3aed}
-.more h3{font-size:14px;color:#a78bfa;margin-bottom:6px}
-.more p{font-size:13px;color:#8a93a6;line-height:1.7}
+.pro-tag{display:inline-block;background:rgba(124,58,237,.15);color:#a78bfa;font-size:11px;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle}
 .tier{text-align:center;padding:14px;background:#1a1d24;border-radius:8px;margin:20px 0;color:#8a93a6;font-size:13px}
 .tier a{color:#a78bfa;text-decoration:none}
-@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
+@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}.verdict{grid-template-columns:1fr}.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <div class="back">
-<div class="t">本页 = 详细版全部指标 + LLM 抽样读句子</div>
+<div class="t">终极版 = 基础版 + 详细版全部指标 + AI 抽样读句子</div>
 <a href="index.html">← 返回详细版</a>
 </div>
 <div class="hero">
-<h1>AI 抽样读完了 200 段对话</h1>
+<h1>追逃型配对 · 累而不散</h1>
 <p class="sub">2024-01-01 至 2025-01-01 · 365 天 · 58,000 条消息 · 示例数据</p>
-<div class="badge">终极版：LLM 抽样判断 · 好事回应率 · 冲突原文归因</div>
+<div class="badge">终极版：规则统计 + AI 抽样判断 200 句</div>
 </div>
 <div class="stats">
-<div class="stat"><div class="num" style="color:#a78bfa">200</div><div class="label">AI 分析句子数</div></div>
-<div class="stat"><div class="num" style="color:#f87171">44%</div><div class="label">不接话 PD</div></div>
-<div class="stat"><div class="num" style="color:#fbbf24">24%</div><div class="label">泼冷水 AD</div></div>
-<div class="stat"><div class="num" style="color:#4ade80">4.5%</div><div class="label">一起开心 AC</div></div>
+<div class="stat"><div class="num">58,000</div><div class="label">总消息数</div></div>
+<div class="stat"><div class="num" style="color:#f778ba">72.7%</div><div class="label">TA 主动开场</div></div>
+<div class="stat"><div class="num" style="color:#fbbf24">2.1</div><div class="label">Gottman 比率</div></div>
+<div class="stat"><div class="num" style="color:#f87171">4.5%</div><div class="label">一起开心 AC</div></div>
 </div>
-<div class="more">
-<h3>详细版已包含的内容（不重复展示）</h3>
-<p>谁更主动 · Gottman 比率趋势 · 回复速度对比 · 吵架后恢复曲线 · 深夜聊天比例 · 四骑士堆叠图 · 话题聚类条形图 · 爱情三角趋势 · 称呼变化时间线 · AI 药方。以上 10 个模块均已跑完，本页只展示终极版新增的部分。</p>
+<div class="verdict">
+  <div class="v">
+    <h4>关系总评</h4>
+    <p class="title">追逃型配对</p>
+    <p class="desc">TA 想说话时你在听，你想说话时 TA 在逃。越追越逃，越逃越追，但谁都没走。</p>
+  </div>
+  <div class="v">
+    <h4>TA</h4>
+    <p class="title" style="color:#f778ba">情绪明牌者</p>
+    <p class="desc">开心就说开心，生气就说生气。需要被看见，不喜欢憋。爱得直接，走得也直接。</p>
+  </div>
+  <div class="v">
+    <h4>你</h4>
+    <p class="title" style="color:#60a5fa">情绪缓冲者</p>
+    <p class="desc">习惯自己消化，不太会表达需求。表面稳，内心积。你不说，TA 以为你不在意。</p>
+  </div>
 </div>
 <div class="sec">
-<h3>① LLM 判断：好事回应率</h3>
-<p class="d">Gable 2004：从 200 段"TA 分享好事"对话中，AI 逐条判断你的回应类型。AC=主动建设性（真开心），PC=被动建设性（哦挺好），AD=主动破坏性（泼冷水），PD=被动破坏性（不接话）。</p>
-<div id="c1" class="chart" style="height:260px"></div>
+  <h3>① 谁更主动？谁更爱谁？</h3>
+  <p class="d">TA 主动开场 72.7% 的天数。语音消息 TA 803 条，你 238 条。下半年 TA 主动率从 80% 跌到 50%。</p>
+  <div id="c1" class="chart"></div>
 </div>
 <div class="row2">
 <div class="sec">
-<h3>② 回应率月度趋势</h3>
-<p class="d">AC 率从 15% 跌到 2%，PD 从 30% 涨到 50%。</p>
-<div id="c2" class="chart" style="height:220px"></div>
+  <h3>② Gottman 比率趋势</h3>
+  <p class="d">积极/消极。健康 > 5:1，警戒线 1:1。年底跌到 0.8。</p>
+  <div id="c2" class="chart" style="height:220px"></div>
 </div>
 <div class="sec">
-<h3>③ 冲突原文归因</h3>
-<p class="d">38 次冲突中 AI 识别出 3 个核心模式。</p>
-<div id="c3" class="chart" style="height:220px"></div>
+  <h3>③ 回复速度对比</h3>
+  <p class="d">TA 中位数 12 分钟，你 47 分钟。你越回越慢，TA 越来越急。</p>
+  <div id="c3" class="chart" style="height:220px"></div>
 </div>
 </div>
 <div class="sec">
-<h3>④ 典型案例（AI 逐条判断）</h3>
-<p class="d">从 200 段对话中挑出 3 段，展示 AI 怎么判断。</p>
+  <h3>④ 吵架后你们怎么和好的？</h3>
+  <p class="d">38 次冲突：平时 238 条/天 → 吵完 24h 跳到 351 条（+48%）。用"刷屏"修复，不是真正解决。</p>
+  <div id="c4" class="chart" style="height:200px"></div>
+</div>
+<div class="row2">
+<div class="sec">
+  <h3>⑤ TA 分享好事时，你怎么回？<span class="pro-tag">终极版AI判定</span></h3>
+  <p class="d">Gable 2004：AI 从 200 段对话逐条判断。一起开心应占 30%+，你们只有 5%。</p>
+  <div id="c5" class="chart" style="height:230px"></div>
+</div>
+<div class="sec">
+  <h3>⑥ 深夜聊天比例</h3>
+  <p class="d">0-5 点聊天占比：8%。深夜倾诉=信任，但年底在减少。</p>
+  <div id="c6" class="chart" style="height:230px"></div>
+</div>
+</div>
+<div class="sec">
+  <h3>⑦ 危险信号：四骑士在累积</h3>
+  <p class="d">批评/防御/蔑视/筑墙。12 月蔑视 22 次——头号离婚预测指标。</p>
+  <div id="c7" class="chart"></div>
+</div>
+<div class="sec">
+  <h3>⑧ 你们到底在聊什么？</h3>
+  <p class="d">AI 把 24,000 条消息聚成 10 个话题。粉色=TA，蓝色=你。</p>
+  <div id="c8" class="chart" style="height:300px"></div>
+</div>
+<div class="row2">
+<div class="sec">
+  <h3>⑨ 爱情三角趋势</h3>
+  <p class="d">亲密感在升，激情在降，承诺停滞。</p>
+  <div id="c9" class="chart" style="height:220px"></div>
+</div>
+<div class="sec">
+  <h3>⑩ 称呼变化时间线</h3>
+  <p class="d">从全名→昵称→爱称，年底称呼又变生分了。</p>
+  <div id="c10" class="chart" style="height:220px"></div>
+</div>
+</div>
+<div class="sec" style="border:1px solid #7c3aed">
+  <h3>⑪ 好事回应率月度趋势 <span class="pro-tag">终极版新增</span></h3>
+  <p class="d">AC 率从 15% 跌到 2%，PD 从 30% 涨到 50%——你越来越不愿意接 TA 的好消息。</p>
+  <div id="c11" class="chart" style="height:220px"></div>
+</div>
+<div class="row2">
+<div class="sec" style="border:1px solid #7c3aed">
+  <h3>⑫ 冲突原文归因 <span class="pro-tag">终极版新增</span></h3>
+  <p class="d">38 次冲突中 AI 识别出 5 个核心模式。</p>
+  <div id="c12" class="chart" style="height:220px"></div>
+</div>
+<div class="sec" style="border:1px solid #7c3aed">
+  <h3>⑬ 冲突模式月度分布 <span class="pro-tag">终极版新增</span></h3>
+  <p class="d">"你觉得被忽略"和"TA 觉得被否定"在交替上升。</p>
+  <div id="c13" class="chart" style="height:220px"></div>
+</div>
+</div>
+<div class="sec" style="border:1px solid #7c3aed">
+  <h3>⑭ 典型案例（AI 逐条判断）<span class="pro-tag">终极版新增</span></h3>
+  <p class="d">从 200 段对话中挑出 3 段，展示 AI 怎么判断你的回应。</p>
 </div>
 <div class="case">
 <div class="meta">2024-03-15 14:22 · TA 说</div>
@@ -101,24 +178,47 @@ body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"Microsoft YaHei
 <div class="quote">"哇！！太好了吧！你那个项目熬了那么久终于有回报了！晚上必须庆祝一下！"</div>
 <div class="judge">判定：AC（主动建设性）—— 真开心，有细节，有行动</div>
 </div>
-<div class="sec">
-<h3>⑤ 冲突模式月度分布</h3>
-<p class="d">38 次冲突，AI 归类后的月度走势。</p>
-<div id="c4" class="chart" style="height:220px"></div>
+<div class="advice">
+  <h3>AI 药方</h3>
+  <ul>
+    <li>TA 分享好事时，先一起开心 30 秒，再分析问题</li>
+    <li>吵架后不要"刷屏修复"，给对方 2 小时再谈</li>
+    <li>你每周主动说 1 次真实感受，不要只回应</li>
+    <li>把"你总是…"换成"我觉得…"</li>
+    <li>TA 需要的不是解决方案，是"我懂你"</li>
+  </ul>
 </div>
-<div class="tier">终极版到此结束 · <a href="index.html">← 返回详细版</a></div>
+<div class="tier">终极版 = 基础+详细全部内容 + AI 抽样读 200 句 · <a href="index.html">← 返回详细版</a></div>
 </div>
 <script>
 var m=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-var C_GREEN='#4ade80',C_AMBER='#fbbf24',C_RED='#f87171',C_GRAY='#6b7280',C_PINK='#f778ba',C_BLUE='#60a5fa';
+var C_PINK='#f778ba',C_BLUE='#60a5fa',C_AMBER='#fbbf24',C_RED='#f87171',C_GREEN='#4ade80',C_GRAY='#6b7280',C_PURPLE='#a78bfa';
 var c1=echarts.init(document.getElementById('c1'));
-c1.setOption({tooltip:{trigger:'item',triggerOn:'click',confine:true},series:[{type:'pie',radius:['40%','70%'],center:['50%','55%'],label:{color:'#e9eef4',fontSize:13,formatter:'{b}\n{d}%'},data:[{value:4.5,name:'一起开心 AC',itemStyle:{color:C_GREEN}},{value:27.5,name:'哦挺好 PC',itemStyle:{color:C_GRAY}},{value:24,name:'泼冷水 AD',itemStyle:{color:C_AMBER}},{value:44,name:'不接话 PD',itemStyle:{color:C_RED}}]}]});
+c1.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 主动','你主动'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'TA 主动',type:'line',smooth:true,data:[82,80,78,75,72,70,68,65,60,55,52,50],lineStyle:{color:C_PINK,width:2},itemStyle:{color:C_PINK}},{name:'你主动',type:'line',smooth:true,data:[18,20,22,25,28,30,32,35,40,45,48,50],lineStyle:{color:C_BLUE,width:2},itemStyle:{color:C_BLUE}}]});
 var c2=echarts.init(document.getElementById('c2'));
-c2.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['AC 率','PD 率'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'%',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'AC 率',type:'line',smooth:true,data:[15,14,12,10,8,7,6,5,4,3,2.5,2],lineStyle:{color:C_GREEN,width:2}},{name:'PD 率',type:'line',smooth:true,data:[30,32,35,38,40,42,44,45,46,47,48,50],lineStyle:{color:C_RED,width:2}}]});
+c2.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'line',data:[5.2,4.8,4.5,4.2,3.8,3.5,3.2,2.8,2.5,2.0,1.5,0.8],smooth:true,lineStyle:{color:C_AMBER,width:2.5},itemStyle:{color:C_AMBER},markLine:{data:[{yAxis:1,label:{formatter:'警戒线',color:C_RED},lineStyle:{color:C_RED,type:'dashed'}}]}}]});
 var c3=echarts.init(document.getElementById('c3'));
-c3.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:120,right:30,top:15,bottom:25},xAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},yAxis:{type:'category',data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦','未来规划分歧','其他'],axisLabel:{color:'#8a93a6'}},series:[{type:'bar',data:[12,10,8,5,3],itemStyle:{color:C_AMBER,borderRadius:[0,4,4,0]},barWidth:'50%',label:{show:true,position:'right',color:'#e9eef4'}}]});
+c3.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 回复','你回复'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'分钟',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'TA 回复',type:'bar',data:[8,9,10,11,12,13,14,16,18,20,24,30],itemStyle:{color:C_PINK,borderRadius:[4,4,0,0]}},{name:'你回复',type:'bar',data:[25,28,30,33,36,38,40,43,46,50,55,60],itemStyle:{color:C_BLUE,borderRadius:[4,4,0,0]}}]});
 var c4=echarts.init(document.getElementById('c4'));
-c4.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'你觉得被忽略',type:'line',smooth:true,data:[0,1,1,2,1,2,1,2,1,2,1,2],lineStyle:{color:C_BLUE,width:2}},{name:'TA 觉得被否定',type:'line',smooth:true,data:[0,0,1,1,2,1,2,1,2,1,2,2],lineStyle:{color:C_PINK,width:2}},{name:'生活习惯摩擦',type:'line',smooth:true,data:[1,0,1,0,1,0,1,0,1,0,1,0],lineStyle:{color:C_AMBER,width:2}}]});
+c4.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:50,right:20,top:15,bottom:25},xAxis:{type:'category',data:['平时一天','吵完 24h','吵完 72h 累计'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'bar',data:[238,351,765],itemStyle:{color:C_AMBER,borderRadius:[4,4,0,0]},barWidth:'40%',label:{show:true,position:'top',color:'#e9eef4',fontSize:12}}]});
+var c5=echarts.init(document.getElementById('c5'));
+c5.setOption({tooltip:{trigger:'item',triggerOn:'click',confine:true},series:[{type:'pie',radius:['40%','70%'],center:['50%','55%'],label:{color:'#e9eef4',fontSize:11,formatter:'{b}\n{d}%'},data:[{value:4.5,name:'一起开心 AC',itemStyle:{color:C_GREEN}},{value:27.5,name:'哦挺好 PC',itemStyle:{color:C_GRAY}},{value:24,name:'泼冷水 AD',itemStyle:{color:C_AMBER}},{value:44,name:'不接话 PD',itemStyle:{color:C_RED}}]}]});
+var c6=echarts.init(document.getElementById('c6'));
+c6.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'%',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'line',data:[12,13,11,10,9,8,9,7,6,5,4,3],smooth:true,lineStyle:{color:C_PURPLE,width:2},itemStyle:{color:C_PURPLE},areaStyle:{opacity:0.2}}]});
+var c7=echarts.init(document.getElementById('c7'));
+c7.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['批评','防御','蔑视','筑墙'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'批评',type:'bar',stack:'a',data:[5,6,7,8,9,10,12,14,15,16,18,20],itemStyle:{color:C_BLUE}},{name:'防御',type:'bar',stack:'a',data:[3,4,5,6,7,8,9,10,11,12,14,16],itemStyle:{color:C_AMBER}},{name:'蔑视',type:'bar',stack:'a',data:[0,0,0,1,2,3,5,8,12,16,20,22],itemStyle:{color:C_RED}},{name:'筑墙',type:'bar',stack:'a',data:[8,9,10,12,14,15,18,20,22,24,26,28],itemStyle:{color:C_GRAY,borderRadius:[0,4,4,0]}}]});
+var c8=echarts.init(document.getElementById('c8'));
+c8.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['TA 发的','你发的'],textStyle:{color:'#8a93a6'}},grid:{left:100,right:30,top:30,bottom:25},xAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},yAxis:{type:'category',data:['讲道理分析','亲密日常','TA 问你情况','时间安排','吃饭日常','出行计划','TA 的工作日常','吵架时你的情绪','你单方面发亲密','TA 说不满'],axisLabel:{color:'#8a93a6',fontSize:11}},series:[{name:'TA 发的',type:'bar',stack:'a',data:[890,50,400,620,710,990,830,820,610,450],itemStyle:{color:C_PINK}},{name:'你发的',type:'bar',stack:'a',data:[310,740,910,530,640,710,760,450,690,850],itemStyle:{color:C_BLUE,borderRadius:[0,4,4,0]}}]});
+var c9=echarts.init(document.getElementById('c9'));
+c9.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['亲密','激情','承诺'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'亲密',type:'line',smooth:true,data:[6,6.5,7,7.5,7.8,8,8.2,8.3,8.5,8.5,8.5,8.5],lineStyle:{color:C_GREEN,width:2}},{name:'激情',type:'line',smooth:true,data:[9,8.5,8,7.5,7,6.5,6,5.5,5,4.5,4,3.5],lineStyle:{color:C_PINK,width:2}},{name:'承诺',type:'line',smooth:true,data:[5,5.5,6,6.5,7,7.2,7.5,7.5,7.5,7.5,7.5,7.5],lineStyle:{color:C_BLUE,width:2}}]});
+var c10=echarts.init(document.getElementById('c10'));
+c10.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:40,right:20,top:15,bottom:25},xAxis:{type:'category',data:['全名','昵称','爱称','宝宝','亲爱的','回到昵称'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'次数/月',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{type:'bar',data:[120,80,40,25,10,60],itemStyle:{color:C_PURPLE,borderRadius:[4,4,0,0]},barWidth:'50%'}]});
+var c11=echarts.init(document.getElementById('c11'));
+c11.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['AC 率','PD 率'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'%',nameTextStyle:{color:'#8a93a6'},axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'AC 率',type:'line',smooth:true,data:[15,14,12,10,8,7,6,5,4,3,2.5,2],lineStyle:{color:C_GREEN,width:2}},{name:'PD 率',type:'line',smooth:true,data:[30,32,35,38,40,42,44,45,46,47,48,50],lineStyle:{color:C_RED,width:2}}]});
+var c12=echarts.init(document.getElementById('c12'));
+c12.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:120,right:30,top:15,bottom:25},xAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},yAxis:{type:'category',data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦','未来规划分歧','其他'],axisLabel:{color:'#8a93a6'}},series:[{type:'bar',data:[12,10,8,5,3],itemStyle:{color:C_PURPLE,borderRadius:[0,4,4,0]},barWidth:'50%',label:{show:true,position:'right',color:'#e9eef4'}}]});
+var c13=echarts.init(document.getElementById('c13'));
+c13.setOption({tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你觉得被忽略','TA 觉得被否定','生活习惯摩擦'],textStyle:{color:'#8a93a6'}},grid:{left:40,right:20,top:30,bottom:25},xAxis:{type:'category',data:m,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'},splitLine:{lineStyle:{color:'#2a2d35'}}},series:[{name:'你觉得被忽略',type:'line',smooth:true,data:[0,1,1,2,1,2,1,2,1,2,1,2],lineStyle:{color:C_BLUE,width:2}},{name:'TA 觉得被否定',type:'line',smooth:true,data:[0,0,1,1,2,1,2,1,2,1,2,2],lineStyle:{color:C_PINK,width:2}},{name:'生活习惯摩擦',type:'line',smooth:true,data:[1,0,1,0,1,0,1,0,1,0,1,0],lineStyle:{color:C_AMBER,width:2}}]});
 </script>
 </body>
 </html>
