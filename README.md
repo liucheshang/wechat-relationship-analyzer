@@ -14,13 +14,15 @@
 
 ![基础版](https://cdn.jsdelivr.net/gh/liucheshang/wechat-relationship-analyzer@main/preview.png)
 
-### 详细版 · 在线体验
+### 详细版 · 示例报告
 
-👉 **[点这里看完整交互式报告](https://liucheshang.github.io/wechat-relationship-analyzer/)**
+> ⚠️ 以下链接展示的是**模拟数据生成的示例报告**，写死在页面里，不是真实用户数据。点进去只是让你看看报告长什么样。
 
-### 终极版 · 在线体验
+👉 **[查看详细版示例报告（模拟数据）](https://liucheshang.github.io/wechat-relationship-analyzer/)**
 
-👉 **[点这里看终极版（AI 逐条读句子）](https://liucheshang.github.io/wechat-relationship-analyzer/ultimate.html)**
+### 终极版 · 示例报告
+
+👉 **[查看终极版示例报告（模拟数据）](https://liucheshang.github.io/wechat-relationship-analyzer/ultimate.html)**
 
 ---
 
@@ -58,12 +60,13 @@
 
 ### 终极版多测什么（+ LLM 语义判断）
 
-在详细版之上，本地大模型逐条读句子：
+在详细版之上，本地大模型抽样读句子（默认 200 条，可调）：
 
 - **好事回应率**：TA 分享好事时，你是真开心（AC）、敷衍（PC）、泼冷水（AD）、还是不接话（PD）
 - 这是 Gable 2004 研究里最能预测关系满意度的指标
 - 词典法会误判，必须让 AI 真正读句子才准
 - **并发 + 断点续跑**：中途关了重跑不丢进度
+- **抽样机制**：不会真的逐条读几万条（太慢），而是从关键句（吵架/关心/好事）里抽样，结果标注覆盖率
 
 ---
 
