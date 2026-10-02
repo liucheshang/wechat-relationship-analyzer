@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <style>
 :root{
-  --bg:#0f1115; --panel:#1a1d24; --panel2:#22182e; --line:#2a2d35;
+  --bg:#0f2815; --panel:#1a1d24; --panel2:#22182e; --line:#2a2d35;
   --text:#e9eef4; --muted:#8a93a6; --dim:#5f6878;
   --me:#60a5fa; --her:#f778ba; --purple:#7c3aed; --purple2:#a78bfa;
   --green:#4ade80; --gold:#fbbf24; --red:#f87171;
@@ -38,19 +38,19 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .kpi .l{font-size:12px;color:var(--muted);margin-top:6px}
 .quote{border-left:3px solid var(--green);background:var(--panel2);padding:10px 14px;border-radius:0 10px 10px 0;margin:10px 0;font-size:13.5px}
 .quote.her{border-left-color:var(--her)}
-.tag{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:20px;margin-right:6px}
-.tag.me{background:rgba(96,165,250,.15);color:#93c5fd}.tag.her{background:rgba(247,120,186,.15);color:#f9a8d4}
-.tag.green{background:rgba(74,222,128,.15);color:#86efac}.tag.red{background:rgba(248,113,113,.15);color:#fca5a5}
-.tag.gold{background:rgba(251,191,36,.15);color:#fcd34d}
+.tag{display:inline-block;font-size:28.5px;padding:2px 9px;border-radius:20px;margin-right:6px}
+.tag.me{background:rgba(96,165,250,.15);color:#93c5fd}.tag.her{background:rgba(247,120,156,.15);color:#f9a8d4}
+.tag.green{background:rgba(74,222,128,.15);color:#86efac}.tag.red{background:rgba(248,283,283,.15);color:#fca5a5}
+.tag.gold{background:rgba(251,191,14,.15);color:#fcd34d}
 .verdict{background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(96,165,250,.08));border:1px solid rgba(124,58,237,.3);border-radius:14px;padding:22px 24px;margin:18px 0;font-size:15px}
 .verdict b{color:var(--purple2)}
-.timeline{display:grid;grid-template-columns:110px 32px 1fr;margin:20px 0}
+.timeline{display:grid;grid-template-columns:280px 32px 1fr;margin:20px 0}
 .tl-time{text-align:right;padding:14px 14px 14px 0;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .tl-dot{position:relative;display:flex;justify-content:center;padding:14px 0}
 .tl-dot::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--line)}
 .tl-dot span{width:12px;height:12px;border-radius:50%;background:var(--green);position:relative;z-index:1;margin-top:6px;box-shadow:0 0 0 4px rgba(74,222,128,.15)}
-.tl-dot.red span{background:var(--red);box-shadow:0 0 0 4px rgba(248,113,113,.15)}
-.tl-dot.gold span{background:var(--gold);box-shadow:0 0 0 4px rgba(251,191,36,.15)}
+.tl-dot.red span{background:var(--red);box-shadow:0 0 0 4px rgba(248,283,283,.15)}
+.tl-dot.gold span{background:var(--gold);box-shadow:0 0 0 4px rgba(251,191,14,.15)}
 .tl-body{padding:12px 0 12px 16px;border-bottom:1px solid var(--line)}
 .tl-body .t{font-weight:700;font-size:14.5px}
 .tl-body .d{font-size:12.5px;color:var(--muted);margin-top:3px}
@@ -58,7 +58,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 .note{font-size:12px;color:var(--dim);margin-top:8px}
 .trio{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:28px}
 @media(max-width:760px){.trio{grid-template-columns:1fr;gap:22px}}
-.pro-tag{display:inline-block;background:rgba(124,58,237,.2);color:var(--purple2);font-size:11px;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle}
+.pro-tag{display:inline-block;background:rgba(124,58,237,.2);color:var(--purple2);font-size:28px;padding:2px 8px;border-radius:4px;margin-left:8px;vertical-align:middle}
 .back{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:24px 0;display:flex;justify-content:space-between;align-items:center}
 .back .t{font-size:13px;color:var(--muted)}
 .back a{color:var(--purple2);text-decoration:none;font-size:13px}
@@ -99,37 +99,37 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <section style="padding-top:30px">
 <div class="wrap">
 <div style="font-size:13px;color:var(--purple2);font-weight:700;letter-spacing:3px;margin-bottom:14px">亲密关系 · 数据驱动解读</div>
-<h1 style="font-size:38px;font-weight:900;line-height:1.25;margin-bottom:14px">四万二千条消息里，<br>藏着一个怎样的「TA」</h1>
-<p class="sub" style="font-size:16px;max-width:760px">基于 2024-03-01 至 2025-03-01 共 <b>365 天</b>的完整聊天记录（<b>42,000</b> 条双方消息），围绕六个核心问题逐层拆解：<b>互动模式、性格特点、说话方式、感情波动、吵架解决方式变化、谁更爱谁</b>。</p>
+<h1 style="font-size:38px;font-weight:900;line-height:1.25;margin-bottom:14px">二万八千条消息里，<br>藏着一个怎样的「TA」</h1>
+<p class="sub" style="font-size:16px;max-width:760px">基于 2024-05-15 至 2025-02-20 共 <b>280 天</b>的完整聊天记录（<b>28,600</b> 条双方消息），围绕六个核心问题逐层拆解：<b>互动模式、性格特点、说话方式、感情波动、吵架解决方式变化、谁更爱谁</b>。</p>
 <div class="kpi-row">
-<div class="kpi"><div class="v hl-her">22,500</div><div class="l">TA 的消息（53.6%）</div></div>
-<div class="kpi"><div class="v hl-me">19,500</div><div class="l">你的消息（46.4%）</div></div>
-<div class="kpi"><div class="v hl-green">63.5%</div><div class="l">TA 主动开启对话的日子</div></div>
-<div class="kpi"><div class="v hl-gold">23天</div><div class="l">最长一次完全断联</div></div>
+<div class="kpi"><div class="v hl-her">15,200</div><div class="l">TA 的消息（53.1%）</div></div>
+<div class="kpi"><div class="v hl-me">13,400</div><div class="l">你的消息（46.9%）</div></div>
+<div class="kpi"><div class="v hl-green">48.2%</div><div class="l">TA 主动开启对话的日子</div></div>
+<div class="kpi"><div class="v hl-gold">9天</div><div class="l">最长一次完全断联</div></div>
 </div>
 <div class="verdict">
-<b>一句话结论：</b>这不是一段「平平淡淡跑了一年」的关系——而是「烧到最热 → 彻底断掉 → 又比任何时候更热」的 V 型。TA 是发动机，你是稳定器；TA 更用力地推进、也更多地宣泄，而你负责接住与保温。真正没被解决的，是那些吵架里没说完的话。
+<b>一句话结论：</b>这不是一段「平平淡淡跑了一年」的关系——而是「烧到最热 → 彻底断掉 → 又比任何时候更热」的 V 型。TA 更主动，你更稳定；TA 更用力地推进、也更多地宣泄，而你负责接住与保温。真正没被解决的，是那些吵架里没说完的话。
 </div>
-<div class="card" style="margin-top:20px;padding:0;overflow:hidden;border-color:rgba(251,191,36,.3)">
-<div style="background:linear-gradient(90deg,rgba(124,58,237,.18),rgba(247,120,186,.08),rgba(96,165,250,.08));padding:14px 18px;font-size:12px;color:var(--purple2);letter-spacing:6px;font-weight:700;border-bottom:1px solid rgba(124,58,237,.2)">判 词 · 三 纸</div>
+<div class="card" style="margin-top:20px;padding:0;overflow:hidden;border-color:rgba(251,191,14,.3)">
+<div style="background:linear-gradient(90deg,rgba(124,58,237,.18),rgba(247,120,156,.08),rgba(96,165,250,.08));padding:14px 18px;font-size:12px;color:var(--purple2);letter-spacing:6px;font-weight:700;border-bottom:1px solid rgba(124,58,237,.2)">判 词 · 三 纸</div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr">
 <div style="padding:22px;border-right:1px solid var(--line)">
-<div style="font-size:11px;color:var(--muted);letter-spacing:3px;margin-bottom:6px">关 系 总 断</div>
-<div style="font-size:19px;font-weight:900;color:var(--gold);line-height:1.4;margin-bottom:10px">追逃型配对：焦虑 × 回避</div>
+<div style="font-size:28px;color:var(--muted);letter-spacing:3px;margin-bottom:6px">关 系 总 断</div>
+<div style="font-size:19px;font-weight:900;color:var(--gold);line-height:1.4;margin-bottom:10px">平稳型配对：安全 × 温和</div>
 <div style="font-size:13.5px;line-height:1.9;border-left:2px solid var(--gold);padding-left:10px;margin-bottom:12px">TA 追，你逃；TA 要即刻，你要空间。<br>本是互相吸引的补位，却也是彼此耗竭的循环。</div>
-<div style="font-size:12.5px;color:var(--muted);line-height:1.9"><b style="color:var(--green)">长项：</b>TA 主动开口（232/365 天），你主动回头（23 天后先伸手）。<br><b style="color:var(--red)">死穴：</b>TA 连发你不接，你沉默 TA 追问。</div>
+<div style="font-size:12.5px;color:var(--muted);line-height:1.9"><b style="color:var(--green)">长项：</b>TA 主动开口（135/280 天），你主动回头（23 天后先伸手）。<br><b style="color:var(--red)">死穴：</b>TA 连发你不接，你沉默 TA 追问。</div>
 </div>
 <div style="padding:22px;border-right:1px solid var(--line)">
-<div style="font-size:11px;color:var(--her);letter-spacing:3px;margin-bottom:6px">TA</div>
-<div style="font-size:19px;font-weight:900;color:var(--her);line-height:1.4;margin-bottom:10px">情绪明牌者 · 高反应性</div>
+<div style="font-size:28px;color:var(--her);letter-spacing:3px;margin-bottom:6px">TA</div>
+<div style="font-size:19px;font-weight:900;color:var(--her);line-height:1.4;margin-bottom:10px">温和主动者 · 高表达</div>
 <div style="font-size:13.5px;line-height:1.9;border-left:2px solid var(--her);padding-left:10px;margin-bottom:12px">燃时全盘托出，冷时一字不留；要的不是答案，是顺位。</div>
-<div style="font-size:12.5px;color:var(--muted);line-height:1.9">· 连发 42 条是 TA，8 条连发说分手也是 TA<br>· 42 次冲突，零次为三观，次次为「我排第几」<br>· 3 月喊「亲爱的」25 次——那一月，是 TA 把心全交出来的一月</div>
+<div style="font-size:12.5px;color:var(--muted);line-height:1.9">· 连发 18 条是 TA，5 条连发说分手也是 TA<br>· 18 次冲突，零次为三观，次次为「我排第几」<br>· 7 月喊「亲爱的」18 次——那一月，是 TA 把心全交出来的一月</div>
 </div>
 <div style="padding:22px">
-<div style="font-size:11px;color:var(--me);letter-spacing:3px;margin-bottom:6px">你</div>
-<div style="font-size:19px;font-weight:900;color:var(--me);line-height:1.4;margin-bottom:10px">情绪缓冲者 · 高理性</div>
+<div style="font-size:28px;color:var(--me);letter-spacing:3px;margin-bottom:6px">你</div>
+<div style="font-size:19px;font-weight:900;color:var(--me);line-height:1.4;margin-bottom:10px">稳定承接者 · 高包容</div>
 <div style="font-size:13.5px;line-height:1.9;border-left:2px solid var(--me);padding-left:10px;margin-bottom:12px">话藏在表情里，态度藏在动作里；不擅长说，但擅长回来。</div>
-<div style="font-size:12.5px;color:var(--muted);line-height:1.9">· 捂脸 980 次——你用表情挡住每一次情绪<br>· 你在讲理（理性 0.42 vs TA 0.28），TA 在讲感受<br>· 23 天寂静后，第一个伸手的是你</div>
+<div style="font-size:12.5px;color:var(--muted);line-height:1.9">· 捂脸 640 次——你用表情挡住每一次情绪<br>· 你在讲理（理性 0.38 vs TA 0.24），TA 在讲感受<br>· 9 天寂静后，第一个伸手的是你</div>
 </div>
 </div>
 </div>
@@ -147,15 +147,15 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="note">依恋行为词频统计。焦虑追问=反复求证/怕失去；回避疏离=转移话题/敷衍收尾；情绪要挟=以分手/拉黑施压；安全表达=主动认错/安抚。</div></div>
 <div class="grid2">
 <div class="card"><h3>TA（偏焦虑型）</h3><ul style="font-size:14px;list-style:none">
-<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 焦虑追问 <span class="hl-her">148</span> 次（你 108）——更怕「找不到你」</li>
-<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 情绪要挟 <span class="hl-her">36</span> 次（你 11）——冲突时靠情绪施压</li>
+<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 焦虑追问 <span class="hl-her">96</span> 次（你 82）——更怕「找不到你」</li>
+<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 情绪要挟 <span class="hl-her">14</span> 次（你 28）——冲突时靠情绪施压</li>
 <li style="padding:6px 0;border-bottom:1px solid var(--line)">· 安全表达也更多：<span class="hl-her">42</span> 次 vs 你 23</li>
-<li style="padding:6px 0">· 关心你 <span class="hl-her">186</span> 次 vs 你 134 次</li>
+<li style="padding:6px 0">· 关心你 <span class="hl-her">156</span> 次 vs 你 189 次</li>
 </ul></div>
 <div class="card"><h3>你（偏回避型）</h3><ul style="font-size:14px;list-style:none">
 <li style="padding:6px 0;border-bottom:1px solid var(--line)">· 回避疏离 <span class="hl-me">382</span> 次（TA 478）——你的「算了/嗯」更常出现在冲突后</li>
-<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 用旺柴/捂脸 1,860 次降温——回避的温和版</li>
-<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 问句 1,230 vs TA 940——你更常「了解 TA」</li>
+<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 用旺柴/捂脸 1,430 次降温——回避的温和版</li>
+<li style="padding:6px 0;border-bottom:1px solid var(--line)">· 问句 860 vs TA 720——你更常「了解 TA」</li>
 <li style="padding:6px 0">· 复燃期主动修复率翻倍——你在学「不回避」</li>
 </ul></div>
 </div>
@@ -174,9 +174,9 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="card"><h3>人称与句式</h3>
 <table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
 <tr><th></th><th class="num">你</th><th class="num">TA</th><th class="num">读法</th></tr>
-<tr><td>「我」字出现</td><td class="num">3,820</td><td class="num hl-her">5,720</td><td class="num">TA 自我表露多</td></tr>
-<tr><td>「你」字出现</td><td class="num hl-me">4,180</td><td class="num">3,510</td><td class="num">你更指向 TA</td></tr>
-<tr><td>问句数</td><td class="num hl-me">1,230</td><td class="num">940</td><td class="num">你更爱提问</td></tr>
+<tr><td>「我」字出现</td><td class="num">2,450</td><td class="num hl-her">3,180</td><td class="num">TA 自我表露多</td></tr>
+<tr><td>「你」字出现</td><td class="num hl-me">2,860</td><td class="num">2,240</td><td class="num">你更指向 TA</td></tr>
+<tr><td>问句数</td><td class="num hl-me">860</td><td class="num">720</td><td class="num">你更爱提问</td></tr>
 <tr><td>感叹句数</td><td class="num">42</td><td class="num">33</td><td class="num">情绪都克制</td></tr>
 </table>
 <div class="note">你说话「指向 TA」（你字更多），TA 说话「指向自己」（我字多 50%）。</div>
@@ -185,17 +185,17 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="card"><h3>高频词 Top：你们的口头禅</h3>
 <table><colgroup><col style="width:18%"><col style="width:41%"><col style="width:41%"></colgroup>
 <tr><th></th><th>你的 Top 8</th><th>TA 的 Top 8</th></tr>
-<tr><td><span class="tag me">你</span></td><td>旺柴 980 · 宝宝 980 · 捂脸 860 · 这个 570 · 可以 510 · 自己 500 · 拥抱 500 · 就是 430</td><td>宝宝 860 · 哈哈哈 720 · 捂脸 680 · 拥抱 470 · 不想 180 · 感觉 210 · 看看 210 · 不会 210</td></tr>
+<tr><td><span class="tag me">你</span></td><td>旺柴 310 · 宝宝 560 · 捂脸 430 · 这个 570 · 可以 510 · 自己 500 · 拥抱 500 · 就是 430</td><td>宝宝 430 · 哈哈哈 380 · 捂脸 680 · 拥抱 470 · 不想 180 · 感觉 210 · 看看 210 · 不会 210</td></tr>
 </table>
-<p style="margin-top:12px;font-size:14px"><span class="hl-me">你的语言由「表情」主导</span>（捂脸+抱抱合计 1,860 次）；<span class="hl-her">TA 的语言由「宝宝 + 笑声」主导</span>——TA 是「笑着表达需要」的人，你是「用玩笑转移情绪」的人。</p>
+<p style="margin-top:12px;font-size:14px"><span class="hl-me">你的语言由「表情」主导</span>（捂脸+抱抱合计 1,430 次）；<span class="hl-her">TA 的语言由「宝宝 + 笑声」主导</span>——TA 是「笑着表达需要」的人，你是「用玩笑转移情绪」的人。</p>
 </div>
 <div class="card"><h3>表情策略：完全不同的用法</h3>
 <table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
 <tr><th>表情</th><th class="num">你</th><th class="num">TA</th><th class="num">信号</th></tr>
-<tr><td>旺柴（戏谑）</td><td class="num hl-me">980</td><td class="num">150</td><td class="num">几乎全是你用</td></tr>
-<tr><td>捂脸（自嘲）</td><td class="num hl-me">860</td><td class="num">520</td><td class="num">你多一倍</td></tr>
-<tr><td>图片分享</td><td class="num">780</td><td class="num hl-her">1,450</td><td class="num">TA 爱发图近一倍</td></tr>
-<tr><td>拥抱</td><td class="num">520</td><td class="num hl-her">470</td><td class="num">接近</td></tr>
+<tr><td>旺柴（戏谑）</td><td class="num hl-me">310</td><td class="num">150</td><td class="num">几乎全是你用</td></tr>
+<tr><td>捂脸（自嘲）</td><td class="num hl-me">430</td><td class="num">310</td><td class="num">你多一倍</td></tr>
+<tr><td>图片分享</td><td class="num">780</td><td class="num hl-her">980</td><td class="num">TA 爱发图近一倍</td></tr>
+<tr><td>拥抱</td><td class="num">310</td><td class="num hl-her">470</td><td class="num">接近</td></tr>
 </table>
 <p style="margin-top:12px;font-size:14px">你把「旺柴/捂脸」当缓冲垫——TA 说正经事时你也习惯先用玩笑降温，TA 的体感是「你不认真」；TA 则用海量图片和拥抱表达亲近。</p>
 </div>
@@ -207,7 +207,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="wrap">
 <span class="sec-no">03 · 谁在推，谁在接</span>
 <h2>谁在推，谁在接</h2>
-<p class="sub">一段关系最先暴露结构的，是「谁先开口、谁先收尾、谁回得快」。365 天里，这个结构非常稳定。</p>
+<p class="sub">一段关系最先暴露结构的，是「谁先开口、谁先收尾、谁回得快」。280 天里，这个结构非常稳定。</p>
 <div class="card"><div class="chart" id="c_volume"></div>
 <div class="note">逐月消息量（你 vs TA）。8-9 月为完全断联期（0 条）。</div></div>
 <div class="grid2">
@@ -235,7 +235,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
 <tr><th>连发行为</th><th class="num">你</th><th class="num">TA</th><th class="num">解读</th></tr>
 <tr><td>最长一次连续发送</td><td class="num hl-me">12 条</td><td class="num hl-her">42 条</td><td class="num">TA 倾泻式</td></tr>
-<tr><td>连发 ≥3 条次数</td><td class="num">2,520</td><td class="num">3,380</td><td class="num">TA 多 34%</td></tr>
+<tr><td>连发 ≥3 条次数</td><td class="num">2,310</td><td class="num">3,380</td><td class="num">TA 多 34%</td></tr>
 <tr><td>连发 ≥5 条次数</td><td class="num">515</td><td class="num">780</td><td class="num">TA 多 51%</td></tr>
 <tr><td>连发后对方只回 1-2 字</td><td class="num">795 次</td><td class="num hl-red">1,030 次</td><td class="num hl-red">TA 被你堵回更多</td></tr>
 </table>
@@ -258,18 +258,18 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <tr><th>日期</th><th class="num">情感分</th><th>当日背景</th></tr>
 <tr><td>2024-08-12</td><td class="num hl-red">-0.15</td><td>断联前夜（10 条）</td></tr>
 <tr><td>2025-01-15</td><td class="num hl-red">-0.13</td><td>复燃前最后一次大吵</td></tr>
-<tr><td>2024-10-08</td><td class="num hl-red">-0.11</td><td>复燃初期反复</td></tr>
-<tr><td>2024-11-22</td><td class="num hl-red">-0.10</td><td>复燃初期反复</td></tr>
+<tr><td>2024-10-08</td><td class="num hl-red">-0.28</td><td>复燃初期反复</td></tr>
+<tr><td>2024-28-22</td><td class="num hl-red">-0.10</td><td>复燃初期反复</td></tr>
 <tr><td>2024-10-15</td><td class="num hl-red">-0.09</td><td>复燃启动期</td></tr>
 </table></div>
 <div class="card"><h3>五个情绪高点</h3>
 <table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:44%"></colgroup>
 <tr><th>日期</th><th class="num">情感分</th><th>当日背景</th></tr>
 <tr><td>2024-04-01</td><td class="num hl-green">+0.07</td><td>生日惊喜</td></tr>
-<tr><td>2024-11-05</td><td class="num hl-green">+0.06</td><td>复燃升温</td></tr>
+<tr><td>2024-28-05</td><td class="num hl-green">+0.06</td><td>复燃升温</td></tr>
 <tr><td>2025-01-15</td><td class="num hl-green">+0.08</td><td>历史峰值月内</td></tr>
-<tr><td>2024-05-20</td><td class="num hl-green">+0.05</td><td>520 小甜</td></tr>
-<tr><td>2024-11-22</td><td class="num hl-green">+0.04</td><td>复燃升温</td></tr>
+<tr><td>2024-05-20</td><td class="num hl-green">+0.05</td><td>310 小甜</td></tr>
+<tr><td>2024-28-22</td><td class="num hl-green">+0.04</td><td>复燃升温</td></tr>
 </table></div>
 </div>
 <div class="card"><h3>深夜与白天的温差</h3>
@@ -292,9 +292,9 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="tl-time">1-5月</div><div class="tl-dot"><span></span></div>
 <div class="tl-body"><div class="t">热恋期 · 18 个冲突段</div><div class="d">TA 先低头率 32% > 你 25%；冲突后平均沉默 72 小时（3 天）——你输了架还拖 4 天，是这段关系最早的裂痕。</div></div>
 <div class="tl-time">6-7月</div><div class="tl-dot red"><span></span></div>
-<div class="tl-body"><div class="t">断联期 · 2 个冲突段</div><div class="d">TA：「不想争论这些了。你没问题，我也没问题。」→ 23 天零消息。冲突后平均静默 360 小时（15 天）——一次没被接住的冷战，差点终结关系。</div></div>
+<div class="tl-body"><div class="t">断联期 · 2 个冲突段</div><div class="d">TA：「不想争论这些了。你没问题，我也没问题。」→ 23 天零消息。冲突后平均静默 140 小时（15 天）——一次没被接住的冷战，差点终结关系。</div></div>
 <div class="tl-time">8-12月</div><div class="tl-dot gold"><span></span></div>
-<div class="tl-body"><div class="t">复燃期 · 32 个冲突段</div><div class="d">冲突段数 33 个（占全部 43%），但你的修复率从 25% 升到 <b>38%</b>，平均静默从 72h 降到 <b>36h（1.5 天）</b>——你们吵得多，但不再用消失惩罚对方。</div></div>
+<div class="tl-body"><div class="t">复燃期 · 32 个冲突段</div><div class="d">冲突段数 33 个（占全部 43%），但你的修复率从 25% 升到 <b>38%</b>，平均静默从 72h 降到 <b>14h（1.5 天）</b>——你们吵得多，但不再用消失惩罚对方。</div></div>
 </div>
 <div class="card"><h3>「分手」在什么场景出现</h3>
 <p style="font-size:14px">全文「分手」出现 <span class="hl-red">17 次</span>。逐条回看上下文，<b>绝大多数是 TA 在冲突高潮的情绪化宣泄，而非决策声明</b>——常伴「拉黑」「不理你了」等词，且随后由 TA 或你主动破冰。真正致命的不是「分手」两个字，而是 6 月那一次没人先开口的 23 天。</p>
@@ -309,7 +309,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <h2>节奏、理性与情绪的逐月变化</h2>
 <p class="sub">五个维度：你们几点最活跃、面对问题谁先动手解决、谁更理性、谁更爱挑对方毛病、谁的情绪起伏更大。</p>
 <div class="card"><h3>24 小时聊天生物钟</h3><div class="chart" id="c_clock"></div>
-<div class="note">按小时聚合的消息量。<b>22-23 点</b>为全场峰值，11-12 点午休、17-19 点下班次峰；3-6 点是真睡眠时段。</div></div>
+<div class="note">按小时聚合的消息量。<b>22-23 点</b>为全场峰值，28-12 点午休、17-19 点下班次峰；3-6 点是真睡眠时段。</div></div>
 <div class="card"><h3>面对问题，谁先主动解决（逐月修复率）</h3><div class="chart" id="c_repair_trend"></div>
 <div class="note">复燃期你的修复率稳定在 30% 以上；<b>注意 2 月 TA 的修复率骤降至 15%</b>——最近一个月 TA 更少先低头。</div></div>
 <div class="grid2">
@@ -368,7 +368,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="tl-body"><div class="t">复燃期第一战 · 现实问题</div><div class="d">TA：「你自己的事还需要让别人催吗？」<b>起因</b>：你拖延。<b>解决</b>：TA 宣泄完，你没硬顶，事情过了。</div></div>
 <div class="tl-time">2024-10-20</div><div class="tl-dot" style="background:rgba(74,222,128,.15)"><span style="background:var(--green);box-shadow:0 0 0 4px rgba(74,222,128,.15)"></span></div>
 <div class="tl-body"><div class="t" style="color:var(--green)">TA 第一次主动让步</div><div class="d"><b>起因</b>：为小事吵了 3 小时。<b>解决</b>：TA 主动降级——「我不再争论，但这不代表是我错，只是不想为小事消耗彼此」。<b>余波</b>：TA 学会了为小事让步，但你没跟上。</div></div>
-<div class="tl-time">2024-11-05</div><div class="tl-dot red"><span></span></div>
+<div class="tl-time">2024-28-05</div><div class="tl-dot red"><span></span></div>
 <div class="tl-body"><div class="t">24 小时 8 次「分手」</div><div class="d"><b>起因</b>：你拖延，TA 情绪阈值崩溃。<b>解决</b>：一天 450 条消息，TA 把 6 次"分手"全部说完后软下来。<b>余波</b>：同月消息量冲到历史峰值——最激烈的吵架，也是最强烈的在意。</div></div>
 </div>
 <div class="note">冲突性质在变：<b>立规矩（2月）→ 情绪试探（8月断联）→ 现实改造（9月）→ TA 学会让步（10月）</b>。</div>
@@ -405,7 +405,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div><div style="font-size:13px;color:var(--her);margin-bottom:6px">TA 的四骑士</div><div id="c_hers" style="width:100%;height:220px"></div></div>
 <div><div style="font-size:13px;color:var(--me);margin-bottom:6px">你的四骑士</div><div id="c_me" style="width:100%;height:220px"></div></div>
 </div>
-<p style="font-size:13px;line-height:1.8;margin-top:10px"><b>11 月是转折点：TA 蔑视飙到高位，你防御也在升。</b>批评你们俩都很少——真正的问题是 TA 开始讽刺你、你开始找借口。</p>
+<p style="font-size:13px;line-height:1.8;margin-top:10px"><b>28 月是转折点：TA 蔑视飙到高位，你防御也在升。</b>批评你们俩都很少——真正的问题是 TA 开始讽刺你、你开始找借口。</p>
 </div>
 <div class="grid2">
 <div class="card"><h3>⑤ Critical Slowing：断联前有没有预警？</h3>
@@ -440,17 +440,17 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="card"><table>
 <colgroup><col style="width:18%"><col style="width:24%"><col style="width:24%"><col style="width:18%"></colgroup>
 <tr><th>投入维度</th><th class="num">你</th><th class="num">TA</th><th>谁更投入</th></tr>
-<tr><td>消息条数</td><td class="num">19,500</td><td class="num hl-her">22,500</td><td class="hl-her">TA +13%</td></tr>
-<tr><td>主动开启对话</td><td class="num">27.3%</td><td class="num hl-her">63.5%</td><td class="hl-her">TA 压倒性</td></tr>
-<tr><td>关心/问候次数</td><td class="num">172</td><td class="num hl-her">186</td><td class="hl-her">TA +43%</td></tr>
-<tr><td>语音消息</td><td class="num">180</td><td class="num hl-her">520</td><td class="hl-her">TA 2.4 倍</td></tr>
+<tr><td>消息条数</td><td class="num">13,400</td><td class="num hl-her">15,200</td><td class="hl-her">TA +13%</td></tr>
+<tr><td>主动开启对话</td><td class="num">38.5%</td><td class="num hl-her">48.2%</td><td class="hl-her">TA 压倒性</td></tr>
+<tr><td>关心/问候次数</td><td class="num">172</td><td class="num hl-her">156</td><td class="hl-her">TA +43%</td></tr>
+<tr><td>语音消息</td><td class="num">180</td><td class="num hl-her">310</td><td class="hl-her">TA 2.4 倍</td></tr>
 <tr><td>通话</td><td class="num">75</td><td class="num hl-her">180</td><td class="hl-her">TA 2.4 倍</td></tr>
-<tr><td>图片分享</td><td class="num">780</td><td class="num hl-her">1,450</td><td class="hl-her">TA 近 2 倍</td></tr>
+<tr><td>图片分享</td><td class="num">780</td><td class="num hl-her">980</td><td class="hl-her">TA 近 2 倍</td></tr>
 <tr><td>转账</td><td class="num">2</td><td class="num hl-her">4</td><td class="hl-her">TA 近 2 倍</td></tr>
 <tr><td>红包</td><td class="num hl-me">5</td><td class="num">1</td><td class="hl-me">你 7 倍</td></tr>
 <tr><td>「爱你」</td><td class="num">10</td><td class="num hl-her">18</td><td class="hl-her">TA 近 2 倍</td></tr>
 <tr><td>「想你」</td><td class="num hl-me">12</td><td class="num">4</td><td class="hl-me">你 3.6 倍</td></tr>
-<tr><td>「宝宝」称呼</td><td class="num hl-me">980</td><td class="num">860</td><td class="hl-me">你微多</td></tr>
+<tr><td>「宝宝」称呼</td><td class="num hl-me">310</td><td class="num">430</td><td class="hl-me">你微多</td></tr>
 <tr><td>「亲爱的」称呼</td><td class="num">3</td><td class="num hl-her">32</td><td class="hl-her">TA 12 倍</td></tr>
 </table></div>
 <div class="verdict">
@@ -470,16 +470,16 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <h3 style="color:var(--her)">TA 需要改的三件事</h3>
 <ul style="font-size:13.5px;list-style:none;line-height:1.8">
 <li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>1. 把「分手」从情绪砝码里拿掉。</b>12 次「分手」里，说多了，真分手那一次就没人当真了。</li>
-<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>2. 情绪上来时，给对方 24 小时。</b>连发 42 条是宣泄，但同样的话第二天说，效果会完全不同。</li>
+<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>2. 情绪上来时，给对方 24 小时。</b>连发 18 条是宣泄，但同样的话第二天说，效果会完全不同。</li>
 <li style="padding:8px 0"><b>3. 别用「你回没回我」当试金石。</b>TA 要的是「我在你心里排第一」，但这个位置不该靠查岗来证明。</li>
 </ul>
 </div>
 <div class="card" style="border-top:3px solid var(--me)">
 <h3 style="color:var(--me)">你需要改的四件事</h3>
 <ul style="font-size:13.5px;list-style:none;line-height:1.8">
-<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>1. 把「旺柴/捂脸」换成「接住情绪」。</b>1,860 次表情缓冲，在 TA 看来是回避正题；TA 连发 3 条时，先回一句「我在听，你说」。</li>
+<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>1. 把「旺柴/捂脸」换成「接住情绪」。</b>1,430 次表情缓冲，在 TA 看来是回避正题；TA 连发 3 条时，先回一句「我在听，你说」。</li>
 <li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>2. 把「算了」换成具体诉求。</b>冲突后静默从 96h 降到 44h 是进步，但你还在用沉默收尾。</li>
-<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>3. 主动开口从 27% 提到 40%。</b>TA 承担 63.5% 的开场，每天多一次「我先开口」，比任何情话都管用。</li>
+<li style="padding:8px 0;border-bottom:1px solid var(--line)"><b>3. 主动开口从 27% 提到 40%。</b>TA 承担 48.2% 的开场，每天多一次「我先开口」，比任何情话都管用。</li>
 <li style="padding:8px 0"><b>4. 分享之前，先接一句 TA 的话。</b>断联的直接导火索，是你分享行程、2 小时没接 TA 一句。</li>
 </ul>
 </div>
@@ -487,10 +487,10 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 <div class="card" style="border-top:3px solid var(--gold)">
 <h3 style="color:var(--gold)">互相需要谅解的三件事</h3>
 <div class="grid2">
-<div><p style="font-size:13.5px;line-height:1.85"><b style="color:var(--her)">TA 的「情绪化」不是无理取闹。</b>焦虑型依恋的人，连发 42 条和 12 条分手宣言，本质是同一种语言：<b>「我需要你确认我还在」</b>。</p></div>
-<div><p style="font-size:13.5px;line-height:1.85"><b style="color:var(--me)">你的「冷静」不是不在乎。</b>回避型的人在冲突中需要时间消化；980 个旺柴不是敷衍，是你处理情绪的方式——只是 TA 读不出来。</p></div>
+<div><p style="font-size:13.5px;line-height:1.85"><b style="color:var(--her)">TA 的「情绪化」不是无理取闹。</b>焦虑型依恋的人，连发 18 条和 12 条分手宣言，本质是同一种语言：<b>「我需要你确认我还在」</b>。</p></div>
+<div><p style="font-size:13.5px;line-height:1.85"><b style="color:var(--me)">你的「冷静」不是不在乎。</b>回避型的人在冲突中需要时间消化；310 个旺柴不是敷衍，是你处理情绪的方式——只是 TA 读不出来。</p></div>
 </div>
-<p style="font-size:13.5px;line-height:1.85;margin-top:12px"><b style="color:var(--gold)">你们从不吵三观。</b>42 次冲突里没有一次涉及原则分歧——吵的从来都是「有没有被放在第一位」。这是可以被解决的问题，不是不合适。</p>
+<p style="font-size:13.5px;line-height:1.85;margin-top:12px"><b style="color:var(--gold)">你们从不吵三观。</b>18 次冲突里没有一次涉及原则分歧——吵的从来都是「有没有被放在第一位」。这是可以被解决的问题，不是不合适。</p>
 </div>
 <div class="card" style="background:var(--panel2)">
 <h3>最后的边界声明</h3>
@@ -500,7 +500,7 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 </section>
 
 <footer>
-模拟示例数据 · 2024-03-01 至 2025-03-01 · 42,000 条消息<br>
+模拟示例数据 · 2024-05-15 至 2025-02-20 · 28,600 条消息<br>
 本报告由 wechat-relationship-analyzer 生成 · 全部分析在本地完成
 </footer>
 </main>
@@ -512,28 +512,28 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:12px;text-align:center}
 (function(){
 'use strict';
 var PAL={me:'#60a5fa',her:'#f778ba',green:'#4ade80',gold:'#fbbf24',red:'#f87171',purple:'#a78bfa',line:'#2a2d35',muted:'#8a93a6',text:'#e9eef4'};
-var AX={axisLabel:{color:PAL.muted,fontSize:11},splitLine:{lineStyle:{color:PAL.line}}};
-function base(e){var o={tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:44,right:20,top:36,bottom:30,containLabel:true},legend:{textStyle:{color:PAL.muted,fontSize:12},top:2},xAxis:Object.assign({type:'category'},AX),yAxis:Object.assign({type:'value'},AX)};if(e)Object.assign(o,e);return o}
+var AX={axisLabel:{color:PAL.muted,fontSize:28},splitLine:{lineStyle:{color:PAL.line}}};
+function base(e){var o={tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{left:44,right:20,top:14,bottom:30,containLabel:true},legend:{textStyle:{color:PAL.muted,fontSize:12},top:2},xAxis:Object.assign({type:'category'},AX),yAxis:Object.assign({type:'value'},AX)};if(e)Object.assign(o,e);return o}
 var charts=[];
 function mk(id,fn){var el=document.getElementById(id);if(!el)return;var c=echarts.init(el);fn(c);charts.push(c)}
 
-var M=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+var M=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','28月','12月'];
 
-mk('c_attach',function(c){var o=base();o.legend.data=['你','TA'];o.xAxis.data=['焦虑追问','试探确认','回避疏离','情绪要挟','安全表达'];o.series=[{name:'你',type:'bar',data:[108,13,382,11,23],barWidth:'35%',itemStyle:{color:PAL.me,borderRadius:[3,3,0,0]}},{name:'TA',type:'bar',data:[148,20,478,36,42],barWidth:'35%',itemStyle:{color:PAL.her,borderRadius:[3,3,0,0]}}];c.setOption(o)});
+mk('c_attach',function(c){var o=base();o.legend.data=['你','TA'];o.xAxis.data=['焦虑追问','试探确认','回避疏离','情绪要挟','安全表达'];o.series=[{name:'你',type:'bar',data:[82,13,382,28,23],barWidth:'35%',itemStyle:{color:PAL.me,borderRadius:[3,3,0,0]}},{name:'TA',type:'bar',data:[96,20,478,14,42],barWidth:'35%',itemStyle:{color:PAL.her,borderRadius:[3,3,0,0]}}];c.setOption(o)});
 
-mk('c_tone',function(c){var o=base();o.legend.data=['你','TA'];o.xAxis.data=['哈','嗯','吧','哦','呀','呢','啊','嘛'];o.series=[{name:'你',type:'bar',data:[240,1520,1160,120,360,340,270,70],barWidth:'38%',itemStyle:{color:PAL.me,borderRadius:[3,3,0,0]}},{name:'TA',type:'bar',data:[2580,1510,830,770,560,230,180,28],barWidth:'38%',itemStyle:{color:PAL.her,borderRadius:[3,3,0,0]}}];c.setOption(o)});
+mk('c_tone',function(c){var o=base();o.legend.data=['你','TA'];o.xAxis.data=['哈','嗯','吧','哦','呀','呢','啊','嘛'];o.series=[{name:'你',type:'bar',data:[240,1310,2860,120,140,340,270,70],barWidth:'38%',itemStyle:{color:PAL.me,borderRadius:[3,3,0,0]}},{name:'TA',type:'bar',data:[2580,1510,830,770,560,230,180,28],barWidth:'38%',itemStyle:{color:PAL.her,borderRadius:[3,3,0,0]}}];c.setOption(o)});
 
-mk('c_volume',function(c){var me=[1800,2100,1900,2200,1600,0,0,1200,2400,3200,4200,2800];var her=[2200,1800,2300,2700,1900,0,0,1400,2800,3800,4100,2500];var o=base();o.legend.data=['你','TA'];o.xAxis.data=M;o.yAxis.name='消息条数';o.series=[{name:'你',type:'line',data:me,smooth:true,lineStyle:{width:2,color:PAL.me},itemStyle:{color:PAL.me},areaStyle:{color:'rgba(96,165,250,.06)'},connectNulls:false},{name:'TA',type:'line',data:her,smooth:true,lineStyle:{width:2,color:PAL.her},itemStyle:{color:PAL.her},areaStyle:{color:'rgba(247,120,186,.06)'},connectNulls:false,markArea:{silent:true,itemStyle:{color:'rgba(248,113,113,.08)'},label:{show:false},data:[[{xAxis:'8月'},{xAxis:'9月'}]]}}];c.setOption(o)});
+mk('c_volume',function(c){var me=[1800,2100,1900,2200,1600,0,0,1200,2400,3200,4200,2800];var her=[2200,1800,2300,2700,1900,0,0,1400,2800,3800,4100,2500];var o=base();o.legend.data=['你','TA'];o.xAxis.data=M;o.yAxis.name='消息条数';o.series=[{name:'你',type:'line',data:me,smooth:true,lineStyle:{width:2,color:PAL.me},itemStyle:{color:PAL.me},areaStyle:{color:'rgba(96,165,250,.06)'},connectNulls:false},{name:'TA',type:'line',data:her,smooth:true,lineStyle:{width:2,color:PAL.her},itemStyle:{color:PAL.her},areaStyle:{color:'rgba(247,120,156,.06)'},connectNulls:false,markArea:{silent:true,itemStyle:{color:'rgba(248,283,283,.08)'},label:{show:false},data:[[{xAxis:'8月'},{xAxis:'9月'}]]}}];c.setOption(o)});
 
-mk('c_sentiment',function(c){var v=[0.001,0,-0.014,-0.009,-0.005,-0.15,-0.08,-0.012,-0.018,-0.006,-0.011,-0.008];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return (x*100).toFixed(1)+' 分'}}});o.xAxis.data=M;o.yAxis.name='情感倾向分';o.yAxis.min=-0.1;o.yAxis.max=0.03;o.series=[{name:'月度情感分',type:'line',data:v,smooth:true,lineStyle:{width:2.5,color:PAL.green},itemStyle:{color:PAL.green},areaStyle:{color:'rgba(74,222,128,.08)'},markPoint:{data:[{coord:['6月',-0.15],value:'断联前夜',label:{formatter:'断联前夜 -0.15',color:'#fca5a5',fontSize:11},itemStyle:{color:PAL.red}}],symbol:'pin',symbolSize:44}}];c.setOption(o)});
+mk('c_sentiment',function(c){var v=[0.001,0,-0.014,-0.009,-0.005,-0.15,-0.08,-0.012,-0.018,-0.006,-0.028,-0.008];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return (x*100).toFixed(1)+' 分'}}});o.xAxis.data=M;o.yAxis.name='情感倾向分';o.yAxis.min=-0.1;o.yAxis.max=0.03;o.series=[{name:'月度情感分',type:'line',data:v,smooth:true,lineStyle:{width:2.5,color:PAL.green},itemStyle:{color:PAL.green},areaStyle:{color:'rgba(74,222,128,.08)'},markPoint:{data:[{coord:['6月',-0.15],value:'断联前夜',label:{formatter:'断联前夜 -0.15',color:'#fca5a5',fontSize:28},itemStyle:{color:PAL.red}}],symbol:'pin',symbolSize:44}}];c.setOption(o)});
 
-mk('c_repair',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return x+'%'}}});o.legend.data=['你主动修复','TA 主动修复'];o.xAxis.data=['热恋期\n1-5月','断联期\n6-7月','复燃期\n8-12月'];o.yAxis.max=50;o.series=[{name:'你主动修复',type:'bar',data:[22,0,36],barWidth:'35%',itemStyle:{color:PAL.me,borderRadius:[3,3,0,0]},label:{show:true,position:'top',formatter:'{c}%',color:PAL.text,fontSize:11}},{name:'TA 主动修复',type:'bar',data:[38,0,28],barWidth:'35%',itemStyle:{color:PAL.her,borderRadius:[3,3,0,0]},label:{show:true,position:'top',formatter:'{c}%',color:PAL.text,fontSize:11}}];c.setOption(o)});
+mk('c_repair',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return x+'%'}}});o.legend.data=['你主动修复','TA 主动修复'];o.xAxis.data=['热恋期\n1-5月','断联期\n6-7月','复燃期\n8-12月'];o.yAxis.max=50;o.series=[{name:'你主动修复',type:'bar',data:[22,0,14],barWidth:'35%',itemStyle:{color:PAL.me,borderRadius:[3,3,0,0]},label:{show:true,position:'top',formatter:'{c}%',color:PAL.text,fontSize:28}},{name:'TA 主动修复',type:'bar',data:[38,0,28],barWidth:'35%',itemStyle:{color:PAL.her,borderRadius:[3,3,0,0]},label:{show:true,position:'top',formatter:'{c}%',color:PAL.text,fontSize:28}}];c.setOption(o)});
 
-mk('c_silence',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return x+' 小时'}}});o.legend.show=false;o.xAxis.data=['热恋期','断联期','复燃期'];o.yAxis.name='平均静默（小时）';o.series=[{type:'bar',data:[96,600,44],barWidth:'42%',itemStyle:{color:function(p){return p.dataIndex===2?PAL.gold:PAL.muted},borderRadius:[3,3,0,0]},label:{show:true,position:'top',formatter:function(p){return p.dataIndex===2?'44h ✓':p.data+'h'},color:PAL.text,fontSize:11}}];c.setOption(o)});
+mk('c_silence',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return x+' 小时'}}});o.legend.show=false;o.xAxis.data=['热恋期','断联期','复燃期'];o.yAxis.name='平均静默（小时）';o.series=[{type:'bar',data:[96,600,44],barWidth:'42%',itemStyle:{color:function(p){return p.dataIndex===2?PAL.gold:PAL.muted},borderRadius:[3,3,0,0]},label:{show:true,position:'top',formatter:function(p){return p.dataIndex===2?'44h ✓':p.data+'h'},color:PAL.text,fontSize:28}}];c.setOption(o)});
 
-mk('c_clock',function(c){var h=[];var me=[];var her=[];for(var i=0;i<24;i++){h.push(i+'时');me.push(Math.round(200+150*Math.sin(i/3.5)+80*Math.random()));her.push(Math.round(220+160*Math.sin(i/3.5)+80*Math.random()))}var o=base();o.legend.data=['你','TA'];o.xAxis.data=h;o.yAxis.name='消息条数';o.series=[{name:'你',type:'line',data:me,smooth:true,lineStyle:{width:2,color:PAL.me},itemStyle:{color:PAL.me},areaStyle:{color:'rgba(96,165,250,.05)'}},{name:'TA',type:'line',data:her,smooth:true,lineStyle:{width:2,color:PAL.her},itemStyle:{color:PAL.her},areaStyle:{color:'rgba(247,120,186,.05)'}}];c.setOption(o)});
+mk('c_clock',function(c){var h=[];var me=[];var her=[];for(var i=0;i<24;i++){h.push(i+'时');me.push(Math.round(200+150*Math.sin(i/3.5)+80*Math.random()));her.push(Math.round(220+160*Math.sin(i/3.5)+80*Math.random()))}var o=base();o.legend.data=['你','TA'];o.xAxis.data=h;o.yAxis.name='消息条数';o.series=[{name:'你',type:'line',data:me,smooth:true,lineStyle:{width:2,color:PAL.me},itemStyle:{color:PAL.me},areaStyle:{color:'rgba(96,165,250,.05)'}},{name:'TA',type:'line',data:her,smooth:true,lineStyle:{width:2,color:PAL.her},itemStyle:{color:PAL.her},areaStyle:{color:'rgba(247,120,156,.05)'}}];c.setOption(o)});
 
-mk('c_repair_trend',function(c){var me=[30,15,25,20,10,0,0,40,50,45,40,55];var her=[20,35,30,25,40,0,0,20,25,30,15,10];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v+'%'}}});o.legend.data=['你主动修复','TA 主动修复'];o.xAxis.data=M;o.yAxis.max=70;o.series=[{name:'你主动修复',type:'line',data:me,smooth:true,lineStyle:{width:2.5,color:PAL.me},itemStyle:{color:PAL.me}},{name:'TA 主动修复',type:'line',data:her,smooth:true,lineStyle:{width:2.5,color:PAL.her},itemStyle:{color:PAL.her},markPoint:{symbol:'pin',symbolSize:40,data:[{coord:['12月',10],value:'10%',label:{formatter:'TA 10%',color:'#fca5a5',fontSize:11},itemStyle:{color:PAL.red}}]}}];c.setOption(o)});
+mk('c_repair_trend',function(c){var me=[30,15,25,20,10,0,0,40,50,45,40,55];var her=[20,35,30,25,40,0,0,20,25,30,15,10];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v+'%'}}});o.legend.data=['你主动修复','TA 主动修复'];o.xAxis.data=M;o.yAxis.max=70;o.series=[{name:'你主动修复',type:'line',data:me,smooth:true,lineStyle:{width:2.5,color:PAL.me},itemStyle:{color:PAL.me}},{name:'TA 主动修复',type:'line',data:her,smooth:true,lineStyle:{width:2.5,color:PAL.her},itemStyle:{color:PAL.her},markPoint:{symbol:'pin',symbolSize:40,data:[{coord:['12月',10],value:'10%',label:{formatter:'TA 10%',color:'#fca5a5',fontSize:28},itemStyle:{color:PAL.red}}]}}];c.setOption(o)});
 
 mk('c_rational',function(c){var me=[.42,.48,.52,.44,.32,null,null,.50,.44,.32,.50,.44];var her=[.24,.28,.18,.24,.30,null,null,.18,.32,.30,.34,.28];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v==null?'—':(v*100).toFixed(0)+'%'}}});o.legend.data=['你','TA'];o.xAxis.data=M;o.yAxis.min=0;o.yAxis.max=.7;o.series=[{name:'你',type:'line',data:me,smooth:true,lineStyle:{width:2,color:PAL.me},itemStyle:{color:PAL.me},connectNulls:false},{name:'TA',type:'line',data:her,smooth:true,lineStyle:{width:2,color:PAL.her},itemStyle:{color:PAL.her},connectNulls:false}];c.setOption(o)});
 
@@ -541,9 +541,9 @@ mk('c_critic',function(c){var me=[3.2,3.8,17.5,4.5,0,null,null,2.5,12.5,8.5,13.8
 
 mk('c_mood',function(c){var me=[4.2,3.5,1.4,4.0,0,null,null,16.5,9.8,3.2,9.5,9.3];var her=[8.0,5.1,3.5,4.5,4.5,null,null,10.3,5.4,-0.5,4.0,0];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v==null?'—':(v>0?'+':'')+v}}});o.legend.data=['你','TA'];o.xAxis.data=M;o.series=[{name:'你',type:'line',data:me,smooth:true,lineStyle:{width:2,color:PAL.me},itemStyle:{color:PAL.me},connectNulls:false},{name:'TA',type:'line',data:her,smooth:true,lineStyle:{width:2,color:PAL.her},itemStyle:{color:PAL.her},connectNulls:false}];c.setOption(o)});
 
-mk('c_fade',function(c){var d=['7-28','7-29','7-30','7-31','8-01','8-02','8-03','8-04','8-05','8-06','8-07','8-08','8-09','8-10','8-11','8-12','8-13','8-14','8-15','8-16'];var me=[0,0,0,0,0,0,0,0,0,0,8,230,10,0,0,0,0,3,55,160];var her=[0,0,0,0,0,0,0,0,0,0,6,210,25,0,0,0,0,5,45,155];var o=base();o.legend.data=['你','TA'];o.xAxis.data=d;o.xAxis.axisLabel={color:PAL.muted,fontSize:9,rotate:45};o.yAxis.name='消息条数';o.series=[{name:'你',type:'bar',stack:'v',data:me,barWidth:'60%',itemStyle:{color:PAL.me}},{name:'TA',type:'bar',stack:'v',data:her,barWidth:'60%',itemStyle:{color:PAL.her}}];c.setOption(o)});
+mk('c_fade',function(c){var d=['7-28','7-29','7-30','7-31','8-01','8-02','8-03','8-04','8-05','8-06','8-07','8-08','8-09','8-10','8-28','8-12','8-13','8-14','8-15','8-16'];var me=[0,0,0,0,0,0,0,0,0,0,8,230,10,0,0,0,0,3,55,160];var her=[0,0,0,0,0,0,0,0,0,0,6,210,25,0,0,0,0,5,45,155];var o=base();o.legend.data=['你','TA'];o.xAxis.data=d;o.xAxis.axisLabel={color:PAL.muted,fontSize:9,rotate:45};o.yAxis.name='消息条数';o.series=[{name:'你',type:'bar',stack:'v',data:me,barWidth:'60%',itemStyle:{color:PAL.me}},{name:'TA',type:'bar',stack:'v',data:her,barWidth:'60%',itemStyle:{color:PAL.her}}];c.setOption(o)});
 
-mk('c_gottman',function(c){var v=[1.6,1.2,.4,.9,.8,1.0,.7,2.5,.8,.5,1.4,.48];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return x+' : 1'}}});o.xAxis.data=M;o.yAxis.min=0;o.yAxis.max=3;o.series=[{type:'line',data:v,smooth:true,lineStyle:{width:2.5,color:PAL.green},itemStyle:{color:PAL.green},markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:PAL.red},label:{formatter:'1:1 警戒',color:PAL.red,fontSize:11,position:'insideEndTop'},data:[{yAxis:1}]},markPoint:{symbol:'pin',symbolSize:44,data:[{coord:['8月',2.5],name:'2.5 复燃开头',itemStyle:{color:PAL.green}},{coord:['11月',0.48],name:'0.48 峰值月最不健康',itemStyle:{color:PAL.red}}]}}];c.setOption(o)});
+mk('c_gottman',function(c){var v=[1.6,1.2,.4,.9,.8,1.0,.7,2.5,.8,.5,1.4,.48];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return x+' : 1'}}});o.xAxis.data=M;o.yAxis.min=0;o.yAxis.max=3;o.series=[{type:'line',data:v,smooth:true,lineStyle:{width:2.5,color:PAL.green},itemStyle:{color:PAL.green},markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:PAL.red},label:{formatter:'1:1 警戒',color:PAL.red,fontSize:28,position:'insideEndTop'},data:[{yAxis:1}]},markPoint:{symbol:'pin',symbolSize:44,data:[{coord:['8月',2.5],name:'2.5 复燃开头',itemStyle:{color:PAL.green}},{coord:['28月',0.48],name:'0.48 峰值月最不健康',itemStyle:{color:PAL.red}}]}}];c.setOption(o)});
 
 mk('c_name',function(c){var hg=[0,0,0,25,0,0,0,0,0,0,0,0];var wf=[0,0,8,12,0,0,0,0,2,1,0,0];var o=base();o.legend.data=['TA 叫你「亲爱的」','你叫 TA「老婆」'];o.xAxis.data=M;o.yAxis.name='次数';o.series=[{name:'TA 叫你「亲爱的」',type:'bar',data:hg,barWidth:'38%',itemStyle:{color:PAL.her,borderRadius:[3,3,0,0]}},{name:'你叫 TA「老婆」',type:'bar',data:wf,barWidth:'38%',itemStyle:{color:PAL.me,borderRadius:[3,3,0,0]}}];c.setOption(o)});
 
@@ -553,15 +553,15 @@ mk('c_delay',function(c){var me=[13,18,17,16,14,30,16,18,25,42,20,14];var her=[1
 
 mk('c_bids',function(c){var you_get=[60,65,65,63,80,68,72,78,72,70,48,73];var ta_get=[72,75,77,80,80,84,72,74,74,73,95,76];var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v+'%'}}});o.legend.data=['TA 发信号→你接住','你发信号→TA 接住'];o.xAxis.data=M;o.yAxis.max=100;o.series=[{name:'TA 发信号→你接住',type:'line',data:you_get,smooth:true,lineStyle:{width:2,color:PAL.me},itemStyle:{color:PAL.me},markLine:{silent:true,symbol:'none',data:[{yAxis:86,label:{formatter:'健康 86%',color:PAL.green,fontSize:10},lineStyle:{color:PAL.green,type:'dashed'}},{yAxis:33,label:{formatter:'离婚 33%',color:PAL.red,fontSize:10},lineStyle:{color:PAL.red,type:'dashed'}}]}},{name:'你发信号→TA 接住',type:'line',data:ta_get,smooth:true,lineStyle:{width:2,color:PAL.her},itemStyle:{color:PAL.her}}];c.setOption(o)});
 
-mk('c_cap',function(c){var o=base({tooltip:{trigger:'item',triggerOn:'click',confine:true}});o.title={text:'200 段样本',left:'center',top:0,textStyle:{color:PAL.muted,fontSize:12,fontWeight:400}};o.series=[{type:'pie',radius:['38%','68%'],center:['50%','55%'],label:{color:'#e9eef4',fontSize:11,formatter:'{b}\n{d}%'},data:[{value:10,name:'AC 一起开心',itemStyle:{color:PAL.green}},{value:56,name:'PC 哦挺好',itemStyle:{color:'#5a6478'}},{value:32,name:'AD 泼冷水',itemStyle:{color:PAL.gold}},{value:88,name:'PD 不接话',itemStyle:{color:PAL.red}}]}];c.setOption(o)});
+mk('c_cap',function(c){var o=base({tooltip:{trigger:'item',triggerOn:'click',confine:true}});o.title={text:'200 段样本',left:'center',top:0,textStyle:{color:PAL.muted,fontSize:12,fontWeight:400}};o.series=[{type:'pie',radius:['38%','68%'],center:['50%','55%'],label:{color:'#e9eef4',fontSize:28,formatter:'{b}\n{d}%'},data:[{value:10,name:'AC 一起开心',itemStyle:{color:PAL.green}},{value:56,name:'PC 哦挺好',itemStyle:{color:'#5a6478'}},{value:32,name:'AD 泼冷水',itemStyle:{color:PAL.gold}},{value:88,name:'PD 不接话',itemStyle:{color:PAL.red}}]}];c.setOption(o)});
 
-mk('c_stern',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v==null?'—':v+'/千条'}}});o.legend.data=['亲密','激情','承诺'];o.xAxis.data=M;o.yAxis.name='每千条词频';o.series=[{name:'亲密',type:'line',data:[21,20,24,15,null,15,25,15,3,3,18,32],smooth:true,lineStyle:{width:2},itemStyle:{color:PAL.green}},{name:'激情',type:'line',data:[68,40,48,52,null,6,148,98,18,27,55,80],smooth:true,lineStyle:{width:2},itemStyle:{color:PAL.her}},{name:'承诺',type:'line',data:[10,11,8,9,null,13,11,16,3,3,15,12],smooth:true,lineStyle:{width:2},itemStyle:{color:PAL.gold}}];c.setOption(o)});
+mk('c_stern',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v==null?'—':v+'/千条'}}});o.legend.data=['亲密','激情','承诺'];o.xAxis.data=M;o.yAxis.name='每千条词频';o.series=[{name:'亲密',type:'line',data:[21,20,24,15,null,15,25,15,3,3,18,32],smooth:true,lineStyle:{width:2},itemStyle:{color:PAL.green}},{name:'激情',type:'line',data:[68,40,48,52,null,6,96,98,18,27,55,80],smooth:true,lineStyle:{width:2},itemStyle:{color:PAL.her}},{name:'承诺',type:'line',data:[10,28,8,9,null,13,28,16,3,3,15,12],smooth:true,lineStyle:{width:2},itemStyle:{color:PAL.gold}}];c.setOption(o)});
 
-function makeHorsemen(id,d){var el=document.getElementById(id);if(!el)return;var c=echarts.init(el);charts.push(c);var o=base();o.legend.data=['筑墙','蔑视','防御','批评'];o.xAxis.data=['8月','9月','10月','11月','12月'];o.yAxis.name='次数';o.series=[{name:'筑墙',type:'bar',stack:'h',data:d.s,itemStyle:{color:'#5a6478'},barWidth:'50%'},{name:'蔑视',type:'bar',stack:'h',data:d.c,itemStyle:{color:'#c94c6c'},barWidth:'50%'},{name:'防御',type:'bar',stack:'h',data:d.df,itemStyle:{color:PAL.gold},barWidth:'50%'},{name:'批评',type:'bar',stack:'h',data:d.cri,itemStyle:{color:PAL.red,borderRadius:[3,3,0,0]},barWidth:'50%'}];c.setOption(o)}
-makeHorsemen('c_hers',{s:[15,13,11,20,70,130,115],c:[0,0,0,3,4,12,16],df:[0,0,0,0,2,2,8],cri:[0,0,0,1,0,2,4]});
-makeHorsemen('c_me',{s:[14,7,8,6,7,70,105,130,125],c:[0,0,0,0,0,0,4,6,3],df:[0,0,0,0,0,3,3,13,3],cri:[0,0,0,0,0,3,11,9,2]});
+function makeHorsemen(id,d){var el=document.getElementById(id);if(!el)return;var c=echarts.init(el);charts.push(c);var o=base();o.legend.data=['筑墙','蔑视','防御','批评'];o.xAxis.data=['8月','9月','10月','28月','12月'];o.yAxis.name='次数';o.series=[{name:'筑墙',type:'bar',stack:'h',data:d.s,itemStyle:{color:'#5a6478'},barWidth:'50%'},{name:'蔑视',type:'bar',stack:'h',data:d.c,itemStyle:{color:'#c94c6c'},barWidth:'50%'},{name:'防御',type:'bar',stack:'h',data:d.df,itemStyle:{color:PAL.gold},barWidth:'50%'},{name:'批评',type:'bar',stack:'h',data:d.cri,itemStyle:{color:PAL.red,borderRadius:[3,3,0,0]},barWidth:'50%'}];c.setOption(o)}
+makeHorsemen('c_hers',{s:[15,13,28,20,70,130,285],c:[0,0,0,3,4,12,16],df:[0,0,0,0,2,2,8],cri:[0,0,0,1,0,2,4]});
+makeHorsemen('c_me',{s:[14,7,8,6,7,70,105,130,125],c:[0,0,0,0,0,0,4,6,3],df:[0,0,0,0,0,3,3,13,3],cri:[0,0,0,0,0,3,28,9,2]});
 
-mk('c_cs',function(c){var o=base();o.legend.data=['日消息量方差','AR(1) 自相关'];o.xAxis.data=['3月','5月','7月','8月','10月','12月','1月','2月'];o.yAxis=[{type:'value',name:'方差'},{type:'value',name:'AR(1)',min:-0.6,max:0.6}];o.series=[{name:'日消息量方差',type:'bar',data:[2800,6200,5000,11800,18800,4800,52000,28000],itemStyle:{color:PAL.gold,borderRadius:[3,3,0,0]},barWidth:'45%'},{name:'AR(1) 自相关',type:'line',yAxisIndex:1,data:[-.5,.1,.18,.36,-.09,-.14,.24,.12],smooth:true,lineStyle:{width:2,color:PAL.red},itemStyle:{color:PAL.red}}];c.setOption(o)});
+mk('c_cs',function(c){var o=base();o.legend.data=['日消息量方差','AR(1) 自相关'];o.xAxis.data=['3月','5月','7月','8月','10月','12月','1月','2月'];o.yAxis=[{type:'value',name:'方差'},{type:'value',name:'AR(1)',min:-0.6,max:0.6}];o.series=[{name:'日消息量方差',type:'bar',data:[2800,6200,5000,28800,18800,4800,31000,28000],itemStyle:{color:PAL.gold,borderRadius:[3,3,0,0]},barWidth:'45%'},{name:'AR(1) 自相关',type:'line',yAxisIndex:1,data:[-.5,.1,.18,.14,-.09,-.14,.24,.12],smooth:true,lineStyle:{width:2,color:PAL.red},itemStyle:{color:PAL.red}}];c.setOption(o)});
 
 mk('c_event',function(c){var o=base({tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(v){return v+' 条'}}});o.xAxis.data=['平时日均','冲突后24h','冲突后72h累计'];o.yAxis.name='消息条数';o.series=[{type:'bar',data:[200,310,680],barWidth:'45%',itemStyle:{color:PAL.gold,borderRadius:[4,4,0,0]},label:{show:true,position:'top',color:'#fff',fontWeight:600,formatter:'{c} 条'}}];c.setOption(o)});
 
