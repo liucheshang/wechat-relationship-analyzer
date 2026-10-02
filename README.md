@@ -41,14 +41,14 @@
 
 ### 第一步：提取聊天记录（不是本项目做的事）
 
-> ⚠️ **本项目只做分析，不做提取。** 你需要先自己把微信聊天记录导出成 JSON。
+> ⚠️ **本项目只做分析，不做提取。** 你需要先自己把微信聊天记录导出。
 
 推荐几个提取工具（GitHub 上搜名字就能找到）：
 
 | 工具 | 支持版本 | 特点 |
 |---|---|---|
 | WeChatMsg（留痕） | 微信 3.x | 老牌，社区活跃，导出 CSV/HTML |
-| chatlog-keeper | 微信 4.x | 支持最新版，本地解密 |
+| chatlog-keeper | 微信 4.x | 支持最新版，本地解密，导出 JSON |
 | WeLive | 微信 4.x | 命令行，速度快 |
 
 **提取注意事项：**
@@ -62,7 +62,17 @@
   - 跨年夜、吵架、纪念日这些关键时段不要缺失
   - 手机上的记录记得先同步到电脑再提取
 
-### 第二步：装环境
+### 第二步：格式转换（自动）
+
+各提取工具出来的格式不一样，跑一行命令自动转成标准格式：
+
+```bash
+python convert_input.py --input 你导出的文件.csv --output messages.json
+```
+
+自动识别 WeChatMsg 的 CSV/JSON、WeLive 的 JSONL、chatlog-keeper 的标准 JSON，不用手动改。
+
+### 第三步：装环境
 
 ```bash
 # 需要 Python 3.10+
@@ -72,7 +82,7 @@ pip install -r requirements.txt
 > 详细版还需：`pip install sentence-transformers scikit-learn`
 > 终极版还需：安装 [Ollama](https://ollama.com) 并 `ollama pull qwen2.5:3b`
 
-### 第三步：跑分析
+### 第四步：跑分析
 
 ```bash
 # 基础版（几秒钟出结果）
@@ -85,7 +95,7 @@ python run.py --input messages.json --output ./output/ --with-cluster
 python run.py --input messages.json --output ./output/ --with-cluster --with-llm
 ```
 
-### 第四步：让 AI 写报告
+### 第五步：让 AI 写报告
 
 把 `output/` 里生成的 JSON 文件，连同下面这个提示词，一起丢给任意 AI（豆包、WorkBuddy、ChatGPT、Claude 都行）：
 
