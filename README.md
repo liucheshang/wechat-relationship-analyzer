@@ -176,7 +176,7 @@ python run.py --input messages.json --output ./output/ --with-cluster --with-llm
 ## 它用了哪些心理学指标？
 
 | 指标 | 来源 | 大白话 |
-|---|---|---|---|
+|---|---|---|
 | Gottman 比率 | John Gottman | 积极词÷消极词，健康关系约 5:1 |
 | 四骑士 | Gottman | 批评/防御/蔑视/筑墙，头号离婚预测指标 |
 | 爱情三角 | Sternberg | 亲密/激情/承诺三条线 |
