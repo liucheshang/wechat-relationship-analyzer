@@ -8,7 +8,7 @@
 
 ## 效果预览
 
-![示例报告](docs/preview.jpg)
+![示例报告](preview.jpg)
 
 ---
 
