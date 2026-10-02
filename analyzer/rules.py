@@ -121,6 +121,39 @@ COQUETTE_WORDS = ["嘛", "啦", "呀", "哇", "哼", "诶", "唉",
                   "好不好嘛", "行不行嘛", "求求你", "拜托了",
                   "人家", "呜呜", "嘤嘤", "哭哭"]
 
+# 身体健康相关
+HEALTH_WORDS = ["生病", "不舒服", "感冒", "发烧", "头疼", "胃痛", "肚子疼",
+                "难受", "呕吐", "拉肚子", "咳嗽", "嗓子疼", "嗓子哑",
+                "过敏", "发炎", "挂号", "医院", "打针", "输液",
+                "吃药", "药", "体检", "复查", "手术", "伤口", "扭伤",
+                "姨妈", "月经", "例假", "生理期", "大姨妈", "痛经",
+                "怀孕", "孕吐", "产检", "预产期",
+                "疲惫", "没力气", "头晕", "心慌", "失眠", "睡不好",
+                "腰间盘", "颈椎", "牙疼", "痘痘", "皮肤"]
+
+# 旅游出行相关
+TRAVEL_WORDS = ["旅游", "旅行", "出去玩", "度假", "机票", "酒店", "民宿",
+                "景点", "出发", "到达", "返程", "高铁", "火车", "飞机",
+                "自驾游", "攻略", "订房", "订票", "签证", "护照",
+                "海边", "爬山", "露营", "农家乐",
+                "出差", "开会", "培训", "外派", "异地", "回来", "到家了"]
+
+# 特殊事件/纪念日
+EVENT_WORDS = ["生日", "纪念日", "情人节", "圣诞节", "跨年", "春节",
+               "新年", "中秋", "端午", "国庆", "五一", "七夕",
+               "第一次", "一周年", "两周年", "百天",
+               "毕业", "入职", "辞职", "换工作", "搬家",
+               "见家长", "见爸妈", "见朋友", "订婚", "求婚",
+               "吵架", "和好", "道歉", "原谅", "分手", "复合"]
+
+# 细分情绪
+MOOD_EXCITED = ["好激动", "好期待", "太期待了", "兴奋", "超级期待",
+                "终于等到", "盼了好久"]
+MOOD_DEPRESSED = ["好压抑", "好崩溃", "好绝望", "撑不住了", "扛不住了",
+                  "心里好难受", "心里堵", "喘不过气"]
+MOOD_MISSING = ["好想你", "特别想你", "超想你", "想念",
+                "什么时候见", "想见你", "多久没见", "好想见你"]
+
 for w in ['宝儿', '宝宝', '老婆', '老公', '想你', '爱你', '亲亲', '抱抱', '么么', '乖乖',
           '宝贝儿', '亲爱的', '媳妇儿', '小宝贝', '小乖乖', '小笨蛋', '小傻瓜',
           '么么哒', '啾咪', '贴贴', '比心', '笔芯']:
@@ -221,6 +254,17 @@ def run_rules(msgs):
     }
     result["conflict"] = {"self": count(by_self, CONFLICT_WORDS),
                           "her": count(by_her, CONFLICT_WORDS)}
+    result["health"] = {"self": count(by_self, HEALTH_WORDS),
+                        "her": count(by_her, HEALTH_WORDS)}
+    result["travel"] = {"self": count(by_self, TRAVEL_WORDS),
+                        "her": count(by_her, TRAVEL_WORDS)}
+    result["events"] = {"self": count(by_self, EVENT_WORDS),
+                        "her": count(by_her, EVENT_WORDS)}
+    result["mood"] = {
+        "excited": {"self": count(by_self, MOOD_EXCITED), "her": count(by_her, MOOD_EXCITED)},
+        "depressed": {"self": count(by_self, MOOD_DEPRESSED), "her": count(by_her, MOOD_DEPRESSED)},
+        "missing": {"self": count(by_self, MOOD_MISSING), "her": count(by_her, MOOD_MISSING)},
+    }
 
     day_first = {}
     for m in msgs:
