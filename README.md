@@ -12,7 +12,14 @@
 
 > ⚠️ 下面链接展示的是**模拟数据生成的示例报告**，写死在页面里，不是真实用户数据。点进去只是让你看看报告长什么样。
 
-👉 **[查看完整示例报告（模拟数据）](https://liucheshang.github.io/wechat-relationship-analyzer/ultimate.html)**
+两个最经典的关系模式，你可以对比看：
+
+| 案例 | 关系类型 | 一句话描述 | 链接 |
+|---|---|---|---|
+| **案例一** | 单向投入型（你追TA跑） | 你发得多、TA回得少，你越主动TA越冷淡 | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/ultimate.html) |
+| **案例二** | 分分合合型（拉扯反复） | 三次断联三次复燃，好的时候特别好，断的时候特别绝 | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/broken.html) |
+
+> 你自己跑完之后，你的数据会落在这两个极端之间的某个位置。
 
 ---
 
