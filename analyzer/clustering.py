@@ -3,6 +3,10 @@
 from collections import Counter
 
 def cluster_topics(text_msgs, k=20, min_len=6):
+    """
+    输入文本消息列表，输出 k 个话题簇。
+    需要：pip install sentence-transformers scikit-learn jieba
+    """
     try:
         from sentence_transformers import SentenceTransformer
         from sklearn.cluster import KMeans
@@ -18,6 +22,12 @@ def cluster_topics(text_msgs, k=20, min_len=6):
     km = KMeans(n_clusters=min(k, len(texts)//50), random_state=42, n_init=5)
     labels = km.fit_predict(emb)
 
+    try:
+        import jieba
+        use_jieba = True
+    except ImportError:
+        use_jieba = False
+
     clusters = []
     texts_by_label = {}
     for t, l in zip(texts, labels):
@@ -25,8 +35,16 @@ def cluster_topics(text_msgs, k=20, min_len=6):
     for l, ts in sorted(texts_by_label.items(), key=lambda x: -len(x[1])):
         words = Counter()
         for t in ts:
-            for w in t:
-                if len(w) >= 2: words[w] += 1
+            if use_jieba:
+                for w in jieba.cut(t):
+                    w = w.strip()
+                    if len(w) >= 2 and not w.isdigit():
+                        words[w] += 1
+            else:
+                for i in range(len(t)-1):
+                    w = t[i:i+2]
+                    if not w.isdigit():
+                        words[w] += 1
         clusters.append({
             "size": len(ts),
             "top_words": [w for w, _ in words.most_common(10)],
