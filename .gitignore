@@ -9,3 +9,8 @@ venv/
 .DS_Store
 debug.log
 *.log
+
+# PyInstaller 打包产物（由 scripts/build_exe.bat 生成，不入库）
+dist/
+_build/
+*.spec

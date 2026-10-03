@@ -1700,15 +1700,56 @@ def render(D, meta):
 # 7. main
 # =====================================================================
 
+def _base_dir():
+    """模板所在目录。打包成 exe 后资源被解到 _MEIPASS，需区别对待。"""
+    if getattr(sys, 'frozen', False):
+        return getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(sys.executable)))
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+def _pause():
+    """双击 exe 时不让窗口一闪而过。"""
+    try:
+        input('\n按回车键退出...')
+    except Exception:
+        pass
+
+
 def main():
-    if len(sys.argv) < 2:
-        print('用法: python analyze.py 聊天记录.txt [输出报告.html]')
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+    frozen = getattr(sys, 'frozen', False)
+    interactive = len(sys.argv) < 2
+
+    if interactive:
+        print('=' * 56)
+        print('  微信聊天记录 · 深度关系分析（纯本地统计，不联网）')
+        print('=' * 56)
         print('聊天记录格式: 2025-06-01 05:39 | 我 | 出发没')
-        sys.exit(1)
-    path = sys.argv[1]
+        print('（每行：时间 | 发送者 | 内容，发送者写「我」或「TA」）\n')
+        try:
+            path = input('把聊天记录 txt 文件拖到这个窗口，或粘贴路径，然后回车：\n> ').strip().strip('"').strip("'")
+        except Exception:
+            print('\n用法: analyze.py 聊天记录.txt [输出报告.html]')
+            sys.exit(1)
+        if not path:
+            print('错误: 没输入路径')
+            if frozen:
+                _pause()
+            sys.exit(1)
+    else:
+        path = sys.argv[1]
+
     out = sys.argv[2] if len(sys.argv) > 2 else '深度分析报告.html'
+    if not os.path.isabs(out):
+        out = os.path.join(os.path.dirname(os.path.abspath(path)), out)
     if not os.path.isfile(path):
         print('错误: 找不到文件 %s' % path)
+        if frozen:
+            _pause()
         sys.exit(1)
 
     print('读取: %s' % path)
@@ -1730,9 +1771,11 @@ def main():
             'raw': format(raw, ','), 'dropped': format(dropped, ','), 'path': path}
     T = render(D, meta)
 
-    tpl_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'report_template.html')
+    tpl_path = os.path.join(_base_dir(), 'report_template.html')
     if not os.path.isfile(tpl_path):
         print('错误: 缺少 report_template.html（必须和 analyze.py 放在同一个文件夹）')
+        if frozen:
+            _pause()
         sys.exit(1)
     with open(tpl_path, 'r', encoding='utf-8') as f:
         html = f.read()
@@ -1752,7 +1795,7 @@ def main():
     print('报告已生成: %s' % out)
 
     # 附带 ECharts，让报告离线也能出图（放到报告同级目录）
-    lib = os.path.join(os.path.dirname(tpl_path), 'echarts.min.js')
+    lib = os.path.join(_base_dir(), 'echarts.min.js')
     dst = os.path.join(os.path.dirname(os.path.abspath(out)) or '.', 'echarts.min.js')
     if os.path.isfile(lib) and os.path.abspath(lib) != os.path.abspath(dst):
         try:
@@ -1763,6 +1806,11 @@ def main():
             print('提示: 未能复制 echarts.min.js（%s），打开报告时若联网会自动走 CDN' % e)
     elif not os.path.isfile(lib):
         print('提示: 未找到 echarts.min.js，打开报告时若联网会自动走 CDN')
+
+    if frozen:
+        print('\n全部完成。报告就在：%s' % out)
+        print('（双击报告文件即可用浏览器打开，断网也能看图）')
+        _pause()
 
 
 if __name__ == '__main__':
