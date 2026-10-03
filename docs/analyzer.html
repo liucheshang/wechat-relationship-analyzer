@@ -417,12 +417,12 @@ function analyze(messages){
     if(!byMonth[mk])return null;
     return (byMonth[mk].mePos+byMonth[mk].herPos)/Math.max(1,byMonth[mk].meNeg+byMonth[mk].herNeg);
   });
-  var rationalMeByMonth=months.map(function(mk){return byMonth[mk].rationalMe/Math.max(1,byMonth[mk].me)});
-  var rationalHerByMonth=months.map(function(mk){return byMonth[mk].rationalHer/Math.max(1,byMonth[mk].her)});
-  var critMeByMonth=months.map(function(mk){return byMonth[mk].critMe/Math.max(1,byMonth[mk].me)*1000});
-  var critHerByMonth=months.map(function(mk){return byMonth[mk].critHer/Math.max(1,byMonth[mk].her)*1000});
-  var moodMeByMonth=months.map(function(mk){return(byMonth[mk].mePos-byMonth[mk].meNeg)/Math.max(1,byMonth[mk].me)*100});
-  var moodHerByMonth=months.map(function(mk){return(byMonth[mk].herPos-byMonth[mk].herNeg)/Math.max(1,byMonth[mk].her)*100});
+  var rationalMeByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].rationalMe/Math.max(1,byMonth[mk].me)});
+  var rationalHerByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].rationalHer/Math.max(1,byMonth[mk].her)});
+  var critMeByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].critMe/Math.max(1,byMonth[mk].me)*1000});
+  var critHerByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].critHer/Math.max(1,byMonth[mk].her)*1000});
+  var moodMeByMonth=months.map(function(mk){if(!byMonth[mk])return null;return(byMonth[mk].mePos-byMonth[mk].meNeg)/Math.max(1,byMonth[mk].me)*100});
+  var moodHerByMonth=months.map(function(mk){if(!byMonth[mk])return null;return(byMonth[mk].herPos-byMonth[mk].herNeg)/Math.max(1,byMonth[mk].her)*100});
   var conflictCount=0,repairMe=0,repairHer=0,totalSilenceMe=0,totalSilenceHer=0;
   var curConflictLen=0,curConflictLastIdx=-1;
   for(var ci=0;ci<messages.length;ci++){var cm=messages[ci];var isNeg=false;for(var nw=0;nw<NEGATIVE.length;nw++){if(cm.content.indexOf(NEGATIVE[nw])>=0){isNeg=true;break}}if(isNeg){if(curConflictLen===0)curConflictLastIdx=ci;curConflictLen++}else{if(curConflictLen>=2){conflictCount++;var silence=messages[ci].time-messages[curConflictLastIdx].time;if(messages[ci].sender==='me'){repairMe++;totalSilenceMe+=silence/3600000}else{repairHer++;totalSilenceHer+=silence/3600000}}curConflictLen=0}}
