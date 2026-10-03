@@ -575,6 +575,14 @@ function renderCharts(d){
   }
   mk('c_horsemen',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['批评','防御','蔑视','筑墙']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.critMe,d.defMe,d.contMe,d.stoneMe],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.critHer,d.defHer,d.contHer,d.stoneHer],itemStyle:{color:'#f06292'}}]});
   mk('c_love',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['关心','爱称','积极词']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.careMe,d.nickMe,d.mePos],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.careHer,d.nickHer,d.herPos],itemStyle:{color:'#f06292'}}]});
+  // 隐藏没有数据的图表卡片
+  ['c_sentiment','c_gottman','c_rational','c_critic','c_mood','c_names'].forEach(function(cid){
+    var el=document.getElementById(cid);
+    if(el && (!el.__echarts_instance__)){
+      var card=el.closest('.card');
+      if(card)card.style.display='none';
+    }
+  });
 }
 
 var dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput');
@@ -593,8 +601,11 @@ function handleFile(file){
       var sampled=messages;
       var sampleNote='';
       if(messages.length>10000){
-        sampled=messages.slice(0,10000);
-        sampleNote='（采样前10000条，共'+messages.length+'条）';
+        // 均匀采样：从全部消息中按位置等间隔抽取，覆盖整个时间范围
+        sampled=[];
+        var step=messages.length/10000;
+        for(var si=0;si<10000;si++){sampled.push(messages[Math.floor(si*step)])}
+        sampleNote='（均匀采样10000条，共'+messages.length+'条）';
       }
       var loading=document.getElementById('loading');
       var result=document.getElementById('result');
