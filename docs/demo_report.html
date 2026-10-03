@@ -344,7 +344,9 @@ chart('c_reply', {
   xAxis: { type: 'category', data: ['中位数', 'P90'], axisLabel: { color: '#8a93a6' } },
   yAxis: { type: 'value', name: '分钟', axisLabel: { color: '#8a93a6' } },
   series: [
-    { name: '你', type: 'bar', data: [8, 30], itemStyle: { color: '#60a5fa' } },
+    { name: '你', type: 'bar', data: [8, 30], itemStyle: { color: '#60a5fa' },
+      markLine: { data: [{ yAxis: 30, label: { formatter: '正常线 30分钟', color: '#4ade80' }, lineStyle: { color: '#4ade80', type: 'dashed' } }] }
+    },
     { name: 'TA', type: 'bar', data: [72, 420], itemStyle: { color: '#f778ba' } }
   ]
 });
@@ -357,7 +359,10 @@ chart('c_gottman', {
   series: [{
     type: 'line', data: [3.2, 2.8, 2.1, 1.8, 1.5, 1.2, 1.8, 2.0, 2.3, 1.9, 2.1, 2.0],
     smooth: true, lineStyle: { width: 3, color: '#f87171' },
-    markLine: { data: [{ yAxis: 5, name: '健康线' }], lineStyle: { color: '#4ade80', type: 'dashed' } }
+    markLine: { data: [
+      { yAxis: 5, label: { formatter: '健康线 5:1', color: '#4ade80' }, lineStyle: { color: '#4ade80', type: 'dashed' } },
+      { yAxis: 1, label: { formatter: '危险线 1:1', color: '#f87171' }, lineStyle: { color: '#f87171', type: 'dotted' } }
+    ] }
   }]
 });
 
@@ -398,7 +403,9 @@ chart('c_sentiment', {
   yAxis: { type: 'value', name: '情绪净分(每百条)', axisLabel: { color: '#8a93a6' } },
   series: [
     { name: '你', type: 'line', data: [12, 8, 5, 3, 2, 1, 4, 6, 8, 5, 6, 5], smooth: true, lineStyle: { color: '#60a5fa' } },
-    { name: 'TA', type: 'line', data: [3, 2, 1, 0, -1, -2, 0, 1, 2, 1, 1, 1], smooth: true, lineStyle: { color: '#f778ba' } }
+    { name: 'TA', type: 'line', data: [3, 2, 1, 0, -1, -2, 0, 1, 2, 1, 1, 1], smooth: true, lineStyle: { color: '#f778ba' },
+      markLine: { data: [{ yAxis: 0, label: { formatter: '中性线', color: '#8a93a6' }, lineStyle: { color: '#8a93a6', type: 'dashed' } }] }
+    }
   ]
 });
 </script>
