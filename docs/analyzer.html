@@ -264,6 +264,13 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:11px;text-align:center}
 <div class="card" style="border-top:3px solid var(--me)"><h3 style="color:var(--me)">你 需要改的</h3><p id="adviceMe" style="font-size:13px;line-height:1.9"></p></div>
 </div>
 <div class="card" style="border-top:3px solid var(--gold)"><h3 style="color:var(--gold)">互相需要谅解的</h3><p id="adviceBoth" style="font-size:13px;line-height:1.9"></p></div>
+<div class="card" style="border-top:3px solid var(--purple);margin-top:20px"><h3 style="color:var(--purple)">想要更深度的分析？</h3><p style="font-size:13px;line-height:1.9;color:var(--muted)">
+本在线版采样前10000条消息做快速分析。完整深度版（<b>全量消息、逐月情感趋势、理性指数、批评频率、称谓变化、冲突时间线</b>等）需要下载本地Python脚本运行：<br><br>
+1. 去 <b>github.com/liucheshang/wechat-relationship-analyzer</b> 下载 <b>scripts/analyze.py</b> 和 <b>scripts/report_template.html</b><br>
+2. 命令行运行：<code style="background:rgba(255,255,255,.08);padding:2px 8px;border-radius:4px">python analyze.py 聊天记录.txt 报告.html</code><br>
+3. 用浏览器打开生成的报告HTML即可<br><br>
+<b style="color:var(--green)">所有数据都在你本地处理，隐私零泄露。</b>
+</p></div>
 </section>
 
 <p style="font-size:11px;color:var(--dim);text-align:center;margin-top:30px">本报告为统计推断，非心理诊断。所有数据均在你的浏览器本地处理，未上传任何服务器。</p>
@@ -548,28 +555,26 @@ function renderCharts(d){
   mk('c_attachment',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['焦虑追问','回避疏离','情绪要挟','安全表达']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.anxMe,d.avoidMe,d.threatMe,d.secureMe],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.anxHer,d.avoidHer,d.threatHer,d.secureHer],itemStyle:{color:'#f06292'}}]});
   // 02 语气词
   mk('c_tone',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['哈','嗯','吧','哦','呀','呢','啊','嘛']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:d.toneMe,itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:d.toneHer,itemStyle:{color:'#f06292'}}]});
-  // 03 消息量（带断联期标红）
-  var zeroMonths=d.months.map(function(mk,i){return(d.dailyMe[i]===0&&d.dailyHer[i]===0)?mk:null}).filter(Boolean);
-  var volumeSeries=[{name:'你',type:'line',data:d.dailyMe.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#5b8def'},areaStyle:{opacity:0.1}},{name:'TA',type:'line',data:d.dailyHer.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#f06292'},areaStyle:{opacity:0.1}}];
-  if(zeroMonths.length>0){
-    volumeSeries.push({name:'断联期',type:'line',data:d.months.map(function(){return 0}),lineStyle:{width:0},symbol:'none',silent:true,tooltip:{show:false},markArea:{silent:true,itemStyle:{color:'rgba(255,92,92,.1)'},label:{show:false},data:zeroMonths.map(function(mk){return[{xAxis:mk},{xAxis:mk}]})}});
+  // 03 消息量（按月统计）
+  var meByMonth=[],herByMonth=[];
+  for(var mi=0;mi<d.months.length;mi++){meByMonth.push(0);herByMonth.push(0)}
+  for(var di=0;di<d.daysArr.length;di++){
+    var mk2=d.daysArr[di].slice(0,7);
+    var idx=d.months.indexOf(mk2);
+    if(idx>=0){meByMonth[idx]+=d.dailyMe[di];herByMonth[idx]+=d.dailyHer[di]}
   }
-  mk('c_volume',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:volumeSeries});
-  // 04 情感
-  mk('c_sentiment',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value',name:'情感分'},AX),series:[{type:'line',data:d.moodMeByMonth.map(function(x){return parseFloat(x)/100}),smooth:true,lineStyle:{color:'#07c160',width:2.5},areaStyle:{opacity:0.1}}]});
+  mk('c_volume',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:meByMonth,smooth:true,showSymbol:false,lineStyle:{color:'#5b8def'},areaStyle:{opacity:0.1}},{name:'TA',type:'line',data:herByMonth,smooth:true,showSymbol:false,lineStyle:{color:'#f06292'},areaStyle:{opacity:0.1}}]});
   // 05 修复率
   mk('c_repair',{tooltip:base.tooltip,legend:{data:['你修复','TA修复'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['修复次数']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你修复',type:'bar',data:[d.repairMe],itemStyle:{color:'#5b8def'}},{name:'TA修复',type:'bar',data:[d.repairHer],itemStyle:{color:'#f06292'}}]});
-  mk('c_silence',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['平均静默时长']},AX),yAxis:Object.assign({type:'value',name:'小时'},AX),series:[{name:'你',type:'bar',data:[parseFloat(d.avgSilenceMe)],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[parseFloat(d.avgSilenceHer)],itemStyle:{color:'#f06292'}}]});
+  mk('c_silence',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['平均静默时长']},AX),yAxis:Object.assign({type:'value',name:'小时'},AX),series:[{name:'你',type:'bar',data:[parseFloat(d.avgSilenceMe)||0],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[parseFloat(d.avgSilenceHer)||0],itemStyle:{color:'#f06292'}}]});
   // 06 生物钟
   mk('c_clock',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:['0','2','4','6','8','10','12','14','16','18','20','22']},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.byHour.filter(function(_,i){return i%2===0}),smooth:true,areaStyle:{opacity:0.15},lineStyle:{color:'#f06292',width:3}}]});
-  mk('c_rational',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.rationalMeByMonth,smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:d.rationalHerByMonth,smooth:true,lineStyle:{color:'#f06292'}}]});
-  mk('c_critic',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.critMeByMonth,smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:d.critHerByMonth,smooth:true,lineStyle:{color:'#f06292'}}]});
-  mk('c_mood',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.moodMeByMonth,smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:d.moodHerByMonth,smooth:true,lineStyle:{color:'#f06292'}}]});
-  // 07 Gottman
-  mk('c_gottman',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.gottmanByMonth,smooth:true,lineStyle:{width:3,color:'#a78bfa'},markLine:{data:[{yAxis:5,lineStyle:{color:'#07c160',type:'dashed'}},{yAxis:1,lineStyle:{color:'#ff5c5c',type:'dotted'}}]}}]});
+  // 07 Gottman（只有多月才显示）
+  if(d.gottmanByMonth.length>=2){
+    mk('c_gottman',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.gottmanByMonth,smooth:true,lineStyle:{width:3,color:'#a78bfa'},markLine:{data:[{yAxis:5,lineStyle:{color:'#07c160',type:'dashed'}},{yAxis:1,lineStyle:{color:'#ff5c5c',type:'dotted'}}]}}]});
+  }
   mk('c_horsemen',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['批评','防御','蔑视','筑墙']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.critMe,d.defMe,d.contMe,d.stoneMe],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.critHer,d.defHer,d.contHer,d.stoneHer],itemStyle:{color:'#f06292'}}]});
   mk('c_love',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['关心','爱称','积极词']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.careMe,d.nickMe,d.mePos],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.careHer,d.nickHer,d.herPos],itemStyle:{color:'#f06292'}}]});
-  mk('c_names',{tooltip:base.tooltip,legend:{data:['老公','老婆','宝宝'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'老公',type:'line',data:d.nameByMonth.map(function(x){return x.husband}),smooth:true,lineStyle:{color:'#f06292'}},{name:'老婆',type:'line',data:d.nameByMonth.map(function(x){return x.wife}),smooth:true,lineStyle:{color:'#5b8def'}},{name:'宝宝',type:'line',data:d.nameByMonth.map(function(x){return x.baby}),smooth:true,lineStyle:{color:'#ffb648'}}]});
 }
 
 var dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput');
