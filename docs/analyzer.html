@@ -401,28 +401,14 @@ function analyze(messages){
   var daySent=daysArr.map(function(d){return(byDay[d].mePos+byDay[d].herPos-byDay[d].meNeg-byDay[d].herNeg)/Math.max(1,byDay[d].me+byDay[d].her)});
   var daySentPairs=daysArr.map(function(d,i){return{d:d,v:daySent[i]}}).sort(function(a,b){return a.v-b.v});
   var low5=daySentPairs.slice(0,5),high5=daySentPairs.slice(-5).reverse();
-  // 生成连续月份轴：从首月到末月，断联月份也保留
-  var allMonths=Object.keys(byMonth).sort();
-  var months=[];
-  if(allMonths.length>0){
-    var startY=parseInt(allMonths[0].slice(0,4)),startM=parseInt(allMonths[0].slice(5,7));
-    var endY=parseInt(allMonths[allMonths.length-1].slice(0,4)),endM=parseInt(allMonths[allMonths.length-1].slice(5,7));
-    var cy=startY,cm=startM;
-    while(cy<endY||(cy===endY&&cm<=endM)){
-      months.push(cy+'-'+String(cm).padStart(2,'0'));
-      cm++;if(cm>12){cm=1;cy++}
-    }
-  }
-  var gottmanByMonth=months.map(function(mk){
-    if(!byMonth[mk])return null;
-    return (byMonth[mk].mePos+byMonth[mk].herPos)/Math.max(1,byMonth[mk].meNeg+byMonth[mk].herNeg);
-  });
-  var rationalMeByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].rationalMe/Math.max(1,byMonth[mk].me)});
-  var rationalHerByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].rationalHer/Math.max(1,byMonth[mk].her)});
-  var critMeByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].critMe/Math.max(1,byMonth[mk].me)*1000});
-  var critHerByMonth=months.map(function(mk){if(!byMonth[mk])return null;return byMonth[mk].critHer/Math.max(1,byMonth[mk].her)*1000});
-  var moodMeByMonth=months.map(function(mk){if(!byMonth[mk])return null;return(byMonth[mk].mePos-byMonth[mk].meNeg)/Math.max(1,byMonth[mk].me)*100});
-  var moodHerByMonth=months.map(function(mk){if(!byMonth[mk])return null;return(byMonth[mk].herPos-byMonth[mk].herNeg)/Math.max(1,byMonth[mk].her)*100});
+  var months=Object.keys(byMonth).sort();
+  var gottmanByMonth=months.map(function(mk){return(byMonth[mk].mePos+byMonth[mk].herPos)/Math.max(1,byMonth[mk].meNeg+byMonth[mk].herNeg)});
+  var rationalMeByMonth=months.map(function(mk){return byMonth[mk].rationalMe/Math.max(1,byMonth[mk].me)});
+  var rationalHerByMonth=months.map(function(mk){return byMonth[mk].rationalHer/Math.max(1,byMonth[mk].her)});
+  var critMeByMonth=months.map(function(mk){return byMonth[mk].critMe/Math.max(1,byMonth[mk].me)*1000});
+  var critHerByMonth=months.map(function(mk){return byMonth[mk].critHer/Math.max(1,byMonth[mk].her)*1000});
+  var moodMeByMonth=months.map(function(mk){return(byMonth[mk].mePos-byMonth[mk].meNeg)/Math.max(1,byMonth[mk].me)*100});
+  var moodHerByMonth=months.map(function(mk){return(byMonth[mk].herPos-byMonth[mk].herNeg)/Math.max(1,byMonth[mk].her)*100});
   var conflictCount=0,repairMe=0,repairHer=0,totalSilenceMe=0,totalSilenceHer=0;
   var curConflictLen=0,curConflictLastIdx=-1;
   for(var ci=0;ci<messages.length;ci++){var cm=messages[ci];var isNeg=false;for(var nw=0;nw<NEGATIVE.length;nw++){if(cm.content.indexOf(NEGATIVE[nw])>=0){isNeg=true;break}}if(isNeg){if(curConflictLen===0)curConflictLastIdx=ci;curConflictLen++}else{if(curConflictLen>=2){conflictCount++;var silence=messages[ci].time-messages[curConflictLastIdx].time;if(messages[ci].sender==='me'){repairMe++;totalSilenceMe+=silence/3600000}else{repairHer++;totalSilenceHer+=silence/3600000}}curConflictLen=0}}
@@ -443,10 +429,10 @@ function analyze(messages){
     openMe:openMe,openHer:openHer,closeMe:closeMe,closeHer:closeHer,
     maxBurstMe:maxBurstMe,maxBurstHer:maxBurstHer,burst3Me:burst3Me,burst3Her:burst3Her,burst5Me:burst5Me,burst5Her:burst5Her,
     low5:low5,high5:high5,nightSent:nightSent.toFixed(4),daySentAvg:daySentAvg.toFixed(4),
-    byHour:byHour,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x==null?null:x.toFixed(1)}),
-    rationalMeByMonth:rationalMeByMonth.map(function(x){return x==null?null:x.toFixed(2)}),rationalHerByMonth:rationalHerByMonth.map(function(x){return x==null?null:x.toFixed(2)}),
-    critMeByMonth:critMeByMonth.map(function(x){return x==null?null:x.toFixed(1)}),critHerByMonth:critHerByMonth.map(function(x){return x==null?null:x.toFixed(1)}),
-    moodMeByMonth:moodMeByMonth.map(function(x){return x==null?null:x.toFixed(1)}),moodHerByMonth:moodHerByMonth.map(function(x){return x==null?null:x.toFixed(1)}),
+    byHour:byHour,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x.toFixed(1)}),
+    rationalMeByMonth:rationalMeByMonth.map(function(x){return x.toFixed(2)}),rationalHerByMonth:rationalHerByMonth.map(function(x){return x.toFixed(2)}),
+    critMeByMonth:critMeByMonth.map(function(x){return x.toFixed(1)}),critHerByMonth:critHerByMonth.map(function(x){return x.toFixed(1)}),
+    moodMeByMonth:moodMeByMonth.map(function(x){return x.toFixed(1)}),moodHerByMonth:moodHerByMonth.map(function(x){return x.toFixed(1)}),
     conflictCount:conflictCount,repairMe:repairMe,repairHer:repairHer,
     avgSilenceMe:(totalSilenceMe/Math.max(1,repairMe)).toFixed(1),avgSilenceHer:(totalSilenceHer/Math.max(1,repairHer)).toFixed(1),
     fsMe:fsMe,fsHer:fsHer,
@@ -504,7 +490,7 @@ function renderReport(d){
     '</div>';
   // 01 画像
   document.getElementById('herProfile').innerHTML='· 焦虑追问 <span class="hl-her">'+d.anxHer+'</span> 次（你 '+d.anxMe+'）<br>· 情绪要挟 <span class="hl-her">'+d.threatHer+'</span> 次（你 '+d.threatMe+'）<br>· 安全表达 <span class="hl-her">'+d.secureHer+'</span> 次（你 '+d.secureMe+'）<br>· 关心你 <span class="hl-her">'+d.careHer+'</span> 次（你 '+d.careMe+'）';
-  document.getElementById('meProfile').innerHTML='· 回避疏离 <span class="hl-me">'+d.avoidMe+'</span> 次（TA '+d.avoidHer+'）<br>· 问句 <span class="hl-me">'+d.qMe+'</span>（TA '+d.qHer+'）——你更常了解她<br>· 修复率 '+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%<br>· 理性指数 '+(d.rationalMeByMonth.filter(function(x){return x!=null}).reduce(function(a,b){return parseFloat(a)+parseFloat(b)},0)/Math.max(1,d.rationalMeByMonth.filter(function(x){return x!=null}).length)).toFixed(2);
+  document.getElementById('meProfile').innerHTML='· 回避疏离 <span class="hl-me">'+d.avoidMe+'</span> 次（TA '+d.avoidHer+'）<br>· 问句 <span class="hl-me">'+d.qMe+'</span>（TA '+d.qHer+'）——你更常了解她<br>· 修复率 '+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%<br>· 理性指数 '+(d.rationalMeByMonth.reduce(function(a,b){return parseFloat(a)+parseFloat(b)},0)/d.months.length).toFixed(2);
   // 02 语言
   document.getElementById('pnMe').textContent=d.pnMe.toLocaleString();
   document.getElementById('pnHer').textContent=d.pnHer.toLocaleString();
@@ -602,7 +588,7 @@ function renderCharts(d){
   mk('c_clock',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:['0','2','4','6','8','10','12','14','16','18','20','22']},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.byHour.filter(function(_,i){return i%2===0}),smooth:true,areaStyle:{opacity:0.15},lineStyle:{color:'#f06292',width:3}}]});
   // 07 Gottman（只有多月才显示）
   if(d.gottmanByMonth.length>=2){
-    mk('c_gottman',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.gottmanByMonth,connectNulls:false,smooth:false,lineStyle:{width:3,color:'#a78bfa'},markLine:{data:[{yAxis:5,lineStyle:{color:'#07c160',type:'dashed'}},{yAxis:1,lineStyle:{color:'#ff5c5c',type:'dotted'}}]}}]});
+    mk('c_gottman',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.gottmanByMonth,smooth:true,lineStyle:{width:3,color:'#a78bfa'},markLine:{data:[{yAxis:5,lineStyle:{color:'#07c160',type:'dashed'}},{yAxis:1,lineStyle:{color:'#ff5c5c',type:'dotted'}}]}}]});
   }
   mk('c_horsemen',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['批评','防御','蔑视','筑墙']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.critMe,d.defMe,d.contMe,d.stoneMe],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.critHer,d.defHer,d.contHer,d.stoneHer],itemStyle:{color:'#f06292'}}]});
   mk('c_love',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['关心','爱称','积极词']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.careMe,d.nickMe,d.mePos],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.careHer,d.nickHer,d.herPos],itemStyle:{color:'#f06292'}}]});
