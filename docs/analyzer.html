@@ -103,16 +103,18 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:11px;text-align:center}
 <pre>时间 | 发送者 | 内容
 2024-01-01 10:00 | 我 | 你吃饭了吗</pre>
 <p>发送者写"我"和"TA"。也支持WeChatMsg导出的CSV和chatlog导出的JSON。</p>
-<h4 style="margin-top:16px">📊 消息量说明</h4>
-<p>最少需要 <b>10条</b> 消息。少于500条结果仅供参考。<br>
-超过1万条会自动<b>均匀采样1万条</b>做快速分析（覆盖全时间范围）。<br>
-5万条以上建议用本地Python脚本跑全量，结果更精确。</p>
+<div style="margin-top:16px;padding:12px 14px;background:#1a2332;border-radius:8px;font-size:14px;line-height:2">
+<b style="color:#5b8def">📊 消息量说明</b><br>
+最少 <b>10条</b> 消息 · 少于500条仅供参考<br>
+超过1万条自动<b style="color:#ffb648">均匀采样1万条</b>快速分析<br>
+5万条以上建议用Python跑全量
+</div>
 </div>
 </div>
 <div id="reportPage" class="report">
 <div class="back-bar">
 <button onclick="location.reload()">← 分析新文件</button>
-<a href="index.html">案例主页</a>
+
 </div>
 
 <!-- HERO -->
@@ -626,7 +628,11 @@ function handleFile(file){
   reader.onload=function(e){
     try{
       var messages=parseFile(e.target.result);
-      if(messages.length<10){alert('至少需要10条消息才能分析');return}
+      if(messages.length<10){
+        alert('未能从文件中解析出有效消息。\n\n请检查：\n1. 文件格式是否为：时间 | 发送者 | 内容\n2. 发送者是否写"我"和"TA"\n3. 也支持WeChatMsg导出的CSV和chatlog导出的JSON');
+        return
+      }
+      console.log('解析成功：'+messages.length+'条消息，时间范围'+new Date(messages[0].time).toLocaleDateString()+' ~ '+new Date(messages[messages.length-1].time).toLocaleDateString());
       var sampled=messages;
       var sampleNote='';
       var totalCount=messages.length;
