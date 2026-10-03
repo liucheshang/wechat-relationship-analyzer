@@ -440,6 +440,13 @@ function analyze(messages){
 
 // ===== 渲染 =====
 function renderReport(d){
+  // 大数据量提示
+  if(d.totalCount>20000){
+    var banner=document.createElement('div');
+    banner.style.cssText='background:#1a2332;border:1px solid #ffb648;border-radius:8px;padding:12px 16px;margin:16px 0;color:#ffb648;font-size:14px';
+    banner.innerHTML='⚠ 你的聊天记录共'+d.totalCount+'条，本在线版采样了'+d.messages+'条做快速分析。完整深度报告（全量统计、逐月趋势、话题聚类）请用本地Python脚本，见页面底部说明。';
+    document.getElementById('result').appendChild(banner);
+  }
   document.getElementById('uploadPage').style.display='none';
   document.getElementById('reportPage').style.display='block';
   // KPI
@@ -601,12 +608,13 @@ function handleFile(file){
       if(messages.length<10){alert('至少需要10条消息才能分析');return}
       var sampled=messages;
       var sampleNote='';
+      var totalCount=messages.length;
       if(messages.length>10000){
-        // 均匀采样：从全部消息中按位置等间隔抽取，覆盖整个时间范围
+        // 分级：超过1万条均匀采样到1万条，覆盖全时间范围
         sampled=[];
         var step=messages.length/10000;
         for(var si=0;si<10000;si++){sampled.push(messages[Math.floor(si*step)])}
-        sampleNote='（均匀采样10000条，共'+messages.length+'条）';
+        sampleNote='（采样10000条，共'+totalCount+'条）';
       }
       var loading=document.getElementById('loading');
       var result=document.getElementById('result');
@@ -617,7 +625,7 @@ function handleFile(file){
       setTimeout(function(){
         try{
           var data=analyze(sampled);
-          data.sampleNote=sampleNote;
+          data.sampleNote=sampleNote;data.totalCount=totalCount;
           renderReport(data);
         }catch(err){
           alert('分析出错：'+err.message);
