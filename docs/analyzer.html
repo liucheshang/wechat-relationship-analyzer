@@ -655,7 +655,7 @@ function handleFile(file){
           data.sampleNote=sampleNote;data.totalCount=totalCount;
           renderReport(data);
         }catch(err){
-          alert('分析出错：'+err.message);
+          alert('分析出错：'+err.message+'\n\n行号：'+(err.stack?err.stack.split('\n')[1]:'未知'));
           if(loading){loading.style.display='none'}
           if(upload){upload.style.display='block'}
         }
