@@ -293,8 +293,7 @@ function parseFile(text){
   text=text.trim();var messages=[];
   // JSON格式
   if(text[0]==='['){try{var data=JSON.parse(text);data.forEach(function(msg){var ts=msg.ts||msg.time||msg.timestamp||msg.CreateTime||0;if(typeof ts==='string')ts=new Date(ts).getTime();if(ts<1000000000)ts=ts*1000;var sender;if(msg.is_self!==undefined)sender=msg.is_self?'me':'her';else if(msg.sender){sender=/^(我|me|自己)/i.test(msg.sender)?'me':'her'}else sender='her';var content=msg.content||msg.message||msg.text||'';if(!content||!ts)return;messages.push({time:ts,sender:sender,content:String(content)})});if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time})}catch(e){}}
-  var allLines=text.split(/
-/).filter(function(l){return l.trim()});
+  var allLines=text.split('\n').filter(function(l){return l.trim()});
   // 检测分隔符：统计前20行里竖线vs逗号
   var pipeCount=0,commaCount=0;
   for(var pi=0;pi<Math.min(20,allLines.length);pi++){pipeCount+=(allLines[pi].match(/\|/g)||[]).length;commaCount+=(allLines[pi].match(/,/g)||[]).length}
@@ -346,7 +345,7 @@ function analyze(messages){
     byMonth[mk][s]++;
     var isNight=(h>=23||h<6);
     if(isNight)nightTotal++;else dayTotal++;
-    var wds=c.split(/[ \s\uff0c\u3002\uff01\uff1f\u3001,.!?~\u301c]+/);
+    var wds=c.split(/[\s，。！？、,.!?~～]+/);
     for(var wi=0;wi<wds.length;wi++){var w=wds[wi];if(w.length>=2&&w.length<=6)topWords[w]=(topWords[w]||0)+1}
     for(var p=0;p<POSITIVE.length;p++){if(c.indexOf(POSITIVE[p])>=0){if(s==='me'){mePos++;byDay[dk].mePos++;byMonth[mk].mePos++}else{herPos++;byDay[dk].herPos++;byMonth[mk].herPos++};if(isNight)nightPos++;else dayPos++;break}}
     for(var n=0;n<NEGATIVE.length;n++){if(c.indexOf(NEGATIVE[n])>=0){if(s==='me'){meNeg++;byDay[dk].meNeg++;byMonth[mk].meNeg++}else{herNeg++;byDay[dk].herNeg++;byMonth[mk].herNeg++};if(isNight)nightNeg++;else dayNeg++;break}}
