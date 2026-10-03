@@ -168,8 +168,8 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:11px;text-align:center}
 <table><colgroup><col style="width:34%"><col style="width:33%"><col style="width:33%"></colgroup>
 <tr><th></th><th class="num">你→TA</th><th class="num">TA→你</th></tr>
 <tr><td>中位回复</td><td class="num hl-me" id="medMe"></td><td class="num hl-her" id="medHer"></td></tr>
-<tr><td>1分钟内回复率</td><td class="num" id="fastMe"></td><td class="num" id="fastHer"></td></tr>
-</table></div>
+<tr><td>1分钟内回复率*</td><td class="num" id="fastMe"></td><td class="num" id="fastHer"></td></tr>
+</table><p class="note">*采样数据下回复间隔被拉长，仅供参考。</p></div>
 </div>
 <div class="card"><h3>倾泻 vs 凝练：连发模式</h3>
 <table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
@@ -411,7 +411,8 @@ function analyze(messages){
   var nameByMonth=months.map(function(){return{husband:0,wife:0,baby:0}});
   var monthIdx={};months.forEach(function(mk,i){monthIdx[mk]=i});
   for(var i=0;i<messages.length;i++){var dt2=new Date(messages[i].time);var mk=dt2.getFullYear()+'-'+String(dt2.getMonth()+1).padStart(2,'0');var idx=monthIdx[mk];if(idx===undefined)continue;if(messages[i].content.indexOf('老公')>=0)nameByMonth[idx].husband++;if(messages[i].content.indexOf('老婆')>=0)nameByMonth[idx].wife++;if(messages[i].content.indexOf('宝宝')>=0)nameByMonth[idx].baby++}
-  var topW=Object.keys(topWords).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,8);
+  var stopWords=['[图片]','[表情]','[其他]','[语音]','[视频]','[文件]','[链接]','[红包]','[转账]','[位置]','[名片]','[动画表情]','[撤回]'];
+  var topW=Object.keys(topWords).filter(function(w){return stopWords.indexOf(w)<0&&w.length>1}).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,8);
   var nightSent=(nightPos-nightNeg)/Math.max(1,nightTotal);
   var daySentAvg=(dayPos-dayNeg)/Math.max(1,dayTotal);
   return{total:total,mePct:(meCount/total*100).toFixed(1),herPct:(herCount/total*100).toFixed(1),
@@ -453,7 +454,7 @@ function renderReport(d){
   document.getElementById('kpiRow').innerHTML=
     '<div class="kpi"><div class="v" style="color:var(--purple)">'+d.total.toLocaleString()+'</div><div class="l">总消息数</div></div>'+
     '<div class="kpi"><div class="v" style="color:var(--purple)">'+d.days+'天</div><div class="l">持续天数</div></div>'+
-    '<div class="kpi"><div class="v hl-her">'+d.herStartPct+'%</div><div class="l">TA主动开场</div></div>'+
+    '<div class="kpi"><div class="v hl-her">'+(d.openHer/d.sessionCount*100).toFixed(1)+'%</div><div class="l">TA主动开场</div></div>'+
     '<div class="kpi"><div class="v '+(d.gottman>=5?'hl-green':d.gottman>=2?'hl-gold':'hl-red')+'">'+d.gottman+':1</div><div class="l">Gottman比率</div></div>'+
     '<div class="kpi"><div class="v '+(d.maxGapDays<=3?'hl-green':d.maxGapDays<=7?'hl-gold':'hl-red')+'">'+d.maxGapDays+'天</div><div class="l">最长断联</div></div>'+
     '<div class="kpi"><div class="v hl-me">'+d.meMed+'分</div><div class="l">你回复中位</div></div>'+
@@ -466,7 +467,7 @@ function renderReport(d){
   var herType=d.anxHer>d.anxMe?'情绪明牌者·高反应性':'温和内敛者';
   var meType=d.avoidMe>d.avoidHer?'情绪缓冲者·高理性':'热情主动者';
   document.getElementById('trioBox').innerHTML=
-    '<div><div class="head" style="color:var(--gold)">关 系 总 断</div><div class="big" style="color:var(--gold)">'+relType+'</div><div class="body" style="border-color:var(--gold)">她追，你接；她用力，你保温。</div><div class="detail">TA主动开场'+d.herStartPct+'%，你修复率'+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%</div></div>'+
+    '<div><div class="head" style="color:var(--gold)">关 系 总 断</div><div class="big" style="color:var(--gold)">'+relType+'</div><div class="body" style="border-color:var(--gold)">她追，你接；她用力，你保温。</div><div class="detail">TA主动开场'+(d.openHer/d.sessionCount*100).toFixed(1)+'%，你修复率'+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%</div></div>'+
     '<div><div class="head" style="color:var(--her)">TA · 画像</div><div class="big" style="color:var(--her)">'+herType+'</div><div class="body" style="border-color:var(--her)">燃时全盘托出，冷时一字不留。</div><div class="detail">连发'+d.maxBurstHer+'条 · 焦虑追问'+d.anxHer+'次 · 情绪要挟'+d.threatHer+'次</div></div>'+
     '<div><div class="head" style="color:var(--me)">你 · 画像</div><div class="big" style="color:var(--me)">'+meType+'</div><div class="body" style="border-color:var(--me)">话藏在表情里，态度藏在动作里。</div><div class="detail">连发'+d.maxBurstMe+'条 · 回避疏离'+d.avoidMe+'次 · 问句'+d.qMe+'次</div></div>';
   // 目录
