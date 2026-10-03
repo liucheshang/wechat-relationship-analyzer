@@ -443,10 +443,10 @@ function analyze(messages){
     openMe:openMe,openHer:openHer,closeMe:closeMe,closeHer:closeHer,
     maxBurstMe:maxBurstMe,maxBurstHer:maxBurstHer,burst3Me:burst3Me,burst3Her:burst3Her,burst5Me:burst5Me,burst5Her:burst5Her,
     low5:low5,high5:high5,nightSent:nightSent.toFixed(4),daySentAvg:daySentAvg.toFixed(4),
-    byHour:byHour,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x.toFixed(1)}),
-    rationalMeByMonth:rationalMeByMonth.map(function(x){return x.toFixed(2)}),rationalHerByMonth:rationalHerByMonth.map(function(x){return x.toFixed(2)}),
-    critMeByMonth:critMeByMonth.map(function(x){return x.toFixed(1)}),critHerByMonth:critHerByMonth.map(function(x){return x.toFixed(1)}),
-    moodMeByMonth:moodMeByMonth.map(function(x){return x.toFixed(1)}),moodHerByMonth:moodHerByMonth.map(function(x){return x.toFixed(1)}),
+    byHour:byHour,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x==null?null:x.toFixed(1)}),
+    rationalMeByMonth:rationalMeByMonth.map(function(x){return x==null?null:x.toFixed(2)}),rationalHerByMonth:rationalHerByMonth.map(function(x){return x==null?null:x.toFixed(2)}),
+    critMeByMonth:critMeByMonth.map(function(x){return x==null?null:x.toFixed(1)}),critHerByMonth:critHerByMonth.map(function(x){return x==null?null:x.toFixed(1)}),
+    moodMeByMonth:moodMeByMonth.map(function(x){return x==null?null:x.toFixed(1)}),moodHerByMonth:moodHerByMonth.map(function(x){return x==null?null:x.toFixed(1)}),
     conflictCount:conflictCount,repairMe:repairMe,repairHer:repairHer,
     avgSilenceMe:(totalSilenceMe/Math.max(1,repairMe)).toFixed(1),avgSilenceHer:(totalSilenceHer/Math.max(1,repairHer)).toFixed(1),
     fsMe:fsMe,fsHer:fsHer,
@@ -504,7 +504,7 @@ function renderReport(d){
     '</div>';
   // 01 画像
   document.getElementById('herProfile').innerHTML='· 焦虑追问 <span class="hl-her">'+d.anxHer+'</span> 次（你 '+d.anxMe+'）<br>· 情绪要挟 <span class="hl-her">'+d.threatHer+'</span> 次（你 '+d.threatMe+'）<br>· 安全表达 <span class="hl-her">'+d.secureHer+'</span> 次（你 '+d.secureMe+'）<br>· 关心你 <span class="hl-her">'+d.careHer+'</span> 次（你 '+d.careMe+'）';
-  document.getElementById('meProfile').innerHTML='· 回避疏离 <span class="hl-me">'+d.avoidMe+'</span> 次（TA '+d.avoidHer+'）<br>· 问句 <span class="hl-me">'+d.qMe+'</span>（TA '+d.qHer+'）——你更常了解她<br>· 修复率 '+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%<br>· 理性指数 '+(d.rationalMeByMonth.reduce(function(a,b){return parseFloat(a)+parseFloat(b)},0)/d.months.length).toFixed(2);
+  document.getElementById('meProfile').innerHTML='· 回避疏离 <span class="hl-me">'+d.avoidMe+'</span> 次（TA '+d.avoidHer+'）<br>· 问句 <span class="hl-me">'+d.qMe+'</span>（TA '+d.qHer+'）——你更常了解她<br>· 修复率 '+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%<br>· 理性指数 '+(d.rationalMeByMonth.filter(function(x){return x!=null}).reduce(function(a,b){return parseFloat(a)+parseFloat(b)},0)/Math.max(1,d.rationalMeByMonth.filter(function(x){return x!=null}).length)).toFixed(2);
   // 02 语言
   document.getElementById('pnMe').textContent=d.pnMe.toLocaleString();
   document.getElementById('pnHer').textContent=d.pnHer.toLocaleString();
