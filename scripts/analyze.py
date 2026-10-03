@@ -639,26 +639,44 @@ def compute(msgs, sessions):
     D['slowVar'] = [var7[i] for i in range(0, n, step)]
     D['slowAR'] = [ar30[i] for i in range(0, n, step)]
     pre = [i for i in range(n) if daysArr[i] < D['gapBefore'].strftime('%Y-%m-%d')]
-    D['slowPreVar'] = round(sum(var7[i] for i in pre[-60:]) / max(1, len(pre[-60:])), 1) if pre else 0
-    D['slowBaseVar'] = round(sum(var7) / max(1, n), 1)
-    arv = [v for v in ar30 if v is not None]
-    D['slowPreAR'] = round(sum(ar30[i] for i in pre[-60:] if ar30[i] is not None) / max(1, len([i for i in pre[-60:] if ar30[i] is not None])), 2) if pre else 0
-    D['slowBaseAR'] = round(sum(arv) / max(1, len(arv)), 2)
+    pre60 = pre[-60:]
+    # 基线用「紧邻且等长」的前一段（断联前 61~120 天），做匹配窗口对比。
+    # 旧口径用全期均值当基线：断联的 132 天方差为 0，会把基线拉低，方向失真。
+    pre120 = pre[:-60][-60:] if len(pre) > 60 else []
+    D['slowPreVar'] = round(sum(var7[i] for i in pre60) / max(1, len(pre60)), 1) if pre60 else 0
+    arpre = [ar30[i] for i in pre60 if ar30[i] is not None]
+    D['slowPreAR'] = round(sum(arpre) / max(1, len(arpre)), 2) if arpre else 0
+    if pre120:
+        D['slowBaseVar'] = round(sum(var7[i] for i in pre120) / len(pre120), 1)
+        arbase = [ar30[i] for i in pre120 if ar30[i] is not None]
+        D['slowBaseAR'] = round(sum(arbase) / max(1, len(arbase)), 2) if arbase else 0
+        D['slowBaseLabel'] = '断联前 61~120 天'
+    else:
+        D['slowBaseVar'] = round(sum(var7) / max(1, n), 1)
+        arv = [v for v in ar30 if v is not None]
+        D['slowBaseAR'] = round(sum(arv) / max(1, len(arv)), 2)
+        D['slowBaseLabel'] = '全期均值'
 
     # ---------- 事件研究 ----------
-    base = total / max(1, D['days'])
-    buckets = [('冲突前 72~24h', -3, -1), ('冲突前 24h', -1, 0), ('冲突后 24h', 0, 1), ('冲突后 24~72h', 1, 3)]
+    # 基线用「有聊天的日子」的日均。全期日历日均值会被 132 天断联和 2025-07 熄火拉低，
+    # 把冲突后的涨幅夸大好几倍（旧口径曾得出 +309%，换基线后约为 +数成）。
+    # 锚点 = 冲突段结束时刻。「冲突后」窗口不再把吵架本身算进去（旧口径从冲突开始算，虚高）。
+    actCnt = [(D['daily'][k][0] + D['daily'][k][1]) for k in daysArr
+              if (D['daily'][k][0] + D['daily'][k][1]) > 0]
+    base = sum(actCnt) / max(1, len(actCnt))
+    buckets = [('吵架当天（含吵架本身）', -1, 0), ('吵完第 1 天', 0, 1), ('吵完第 2~3 天', 1, 3)]
     ev = []
     for name, a, b in buckets:
         cnt = 0
         for cs in conflictSessions:
-            t0 = cs['start']
+            t0 = cs['end']
             lo, hi = t0 + timedelta(days=a), t0 + timedelta(days=b)
-            cnt += sum(1 for m in msgs if lo <= m['dt'] < hi)
+            cnt += sum(1 for m in msgs if lo < m['dt'] <= hi)
         per_day = cnt / max(1, len(conflictSessions)) / abs(b - a)
         ev.append({'name': name, 'perDay': round(per_day, 1), 'pct': round((per_day - base) / max(0.01, base) * 100, 1)})
     D['event'] = ev
     D['eventBase'] = round(base, 1)
+    D['eventBaseLabel'] = '有聊天日日均（%d 天）' % len(actCnt)
 
     # =====================================================================
     # 扩展维度（最完整版）：断联全清单 / 星期节律 / 长度分布 / 延迟分布 /
@@ -1355,9 +1373,9 @@ def render(D, meta):
                        '<b class="hl-green">本数据不支持临界慢化预警</b>：'
                        '那段沉默不是「渐渐失稳」攒出来的，更像一次突发的决定。')
     T['SLOW_NOTE'] = ('临界慢化理论：系统接近崩溃前，滚动方差与一阶自相关 AR(1) 会同时升高——恢复变慢，'
-                      '通常比断联本身早几个月出现。本数据：方差 全期 %s → 断联前 %s；'
-                      'AR(1) 全期 %s → 断联前 %s。%s'
-                      % (D['slowBaseVar'], D['slowPreVar'],
+                      '通常比断联本身早几个月出现。本数据（匹配窗口对比）：方差 %s（%s）→ %s（断联前 60 天）；'
+                      'AR(1) %s → %s。%s'
+                      % (D['slowBaseVar'], D['slowBaseLabel'], D['slowPreVar'],
                          D['slowBaseAR'], D['slowPreAR'], slowVerdict))
     T['EVENT_TABLE'] = ('<tr><th>时间窗</th><th class="num">日均消息</th><th class="num">相对基线</th>'
                         '<th class="read">读法</th></tr>'
@@ -1365,12 +1383,14 @@ def render(D, meta):
                                   '<td class="read">%s</td></tr>'
                                   % (e['name'], e['perDay'], 'hl-red' if e['pct'] < 0 else 'hl-green',
                                      e['pct'],
-                                     '明显低于日常——那几天在冷着' if e['pct'] < -20 else
-                                     ('低于日常' if e['pct'] < 0 else
-                                      ('显著高于日常：吵完靠刷屏把关系刷回来' if e['pct'] >= 150 else '略高于日常')))
+                                     '吵架当天的量，主要就是吵架本身' if '当天' in e['name'] else
+                                     ('明显低于日常——那几天在冷着' if e['pct'] < -20 else
+                                      ('低于日常' if e['pct'] < 0 else
+                                       ('显著高于日常：吵完靠刷屏把关系刷回来' if e['pct'] >= 150 else '略高于日常，属正常修复热度'))))
                                   for e in D['event'])
                         + '<tr><td>日常基线</td><td class="num">%s</td><td class="num">—</td>'
-                          '<td class="read">全期日均</td></tr>' % D['eventBase'])
+                          '<td class="read">%s（不含断联期与熄火期，避免拉低基线）</td></tr>'
+                          % (D['eventBase'], D['eventBaseLabel']))
     T['TOPIC_TABLE'] = ('<tr><th>话题</th><th class="num">你</th><th class="num">TA</th>'
                         '<th class="read">谁在说</th></tr>'
                         + ''.join('<tr><td>%s</td><td class="num %s">%s%%</td><td class="num %s">%s%%</td>'

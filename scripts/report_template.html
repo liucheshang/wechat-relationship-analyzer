@@ -210,7 +210,7 @@ footer b{color:var(--muted)}
 <div class="card"><h3>Sternberg 三角</h3><div class="chart-sm" id="c_stern"></div><p class="note">亲密 / 激情 / 承诺三维，均为每千条词典口径，用于双方相对比较，不用于绝对打分。</p></div>
 </div>
 <div class="card"><h3>临界慢化 · 关系是不是在「发抖」</h3><div class="chart" id="c_slow"></div><table>{{SLOW_TABLE}}</table><p class="note">{{SLOW_NOTE}}</p></div>
-<div class="card"><h3>事件研究 · 每次吵架前后发生了什么</h3><div class="chart" id="c_event"></div><table>{{EVENT_TABLE}}</table><p class="note">以每段冲突为 t=0，统计前后 24h / 72h 的日均消息量，与全期日常基线对比。注意方向：<b>消息量上升不代表吵得更凶，也可能是「刷屏式修复」。</b></p></div>
+<div class="card"><h3>事件研究 · 每次吵架前后发生了什么</h3><div class="chart" id="c_event"></div><table>{{EVENT_TABLE}}</table><p class="note">以每段冲突<b>结束时刻</b>为锚点：「吵架当天」含吵架本身，「吵完第 1 天 / 第 2~3 天」只算吵完之后。基线用<b>有聊天日的日均</b>（全期日历日均会被断联和熄火月拉低，把涨幅夸大好几倍）。同理，任何「72 小时累计 ÷ 单日基线」都是单位错位——72h 累计要和 3 天的基线比。</p></div>
 <div class="card"><h3>话题聚类</h3><div class="chart" id="c_topic"></div><table>{{TOPIC_TABLE}}</table><p class="note"><b>词典近似口径</b>：按关键词把消息归入预设话题簇，非向量化聚类。看的是双方在哪些话题上各说各话。</p></div>
 </section>
 
