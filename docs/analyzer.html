@@ -314,6 +314,7 @@ function parseFile(text){
   var startLine=headerIdx>=0?headerIdx+1:0;var colMap={time:0,sender:1,content:2};
   if(headerIdx>=0){var headers=allLines[headerIdx].split(',').map(function(s){return s.trim().toLowerCase()});headers.forEach(function(h,idx){if(/时间|time|日期|create/i.test(h))colMap.time=idx;if(/发送者|sender|from|who/i.test(h))colMap.sender=idx;if(/内容|content|message|text/i.test(h))colMap.content=idx})}
   for(var i=startLine;i<allLines.length;i++){var parts=allLines[i].split(',').map(function(s){return s.trim()});if(parts.length<3)continue;var timeStr=parts[colMap.time],senderStr=parts[colMap.sender],content=parts.slice(colMap.content).join(',').trim();var time=parseTime(timeStr);if(isNaN(time)||!content)continue;var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';messages.push({time:time,sender:sender,content:content})}
+  messages=messages.filter(function(m){return m.time>946684800000 && m.time<4102444800000});
   return messages.sort(function(a,b){return a.time-b.time});
 }
 function parseTime(str){if(!str)return NaN;str=String(str).trim();if(/^\d{10}$/.test(str))return parseInt(str)*1000;if(/^\d{13}$/.test(str))return parseInt(str);var t=new Date(str).getTime();if(!isNaN(t))return t;var m=str.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})\s+(\d{1,2}):(\d{1,2})/);if(m)return new Date(m[1],m[2]-1,m[3],m[4],m[5]).getTime();return NaN}
@@ -344,8 +345,8 @@ function analyze(messages){
     times.push(m.time);
     if(s==='me')meCount++;else herCount++;
     var h=new Date(m.time).getHours();byHour[h]++;
-    var mk=new Date(m.time).toISOString().slice(0,7);
-    var dk=new Date(m.time).toISOString().slice(0,10);
+    var dt=new Date(m.time);var mk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+    var dk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
     if(!byDay[dk])byDay[dk]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0};
     byDay[dk][s]++;
     if(!byMonth[mk])byMonth[mk]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0,rationalMe:0,rationalHer:0,critMe:0,critHer:0};
@@ -409,7 +410,7 @@ function analyze(messages){
   var maxGap=0;for(var i=1;i<times.length;i++){var g=times[i]-times[i-1];if(g>maxGap)maxGap=g}var maxGapDays=Math.round(maxGap/86400000);
   var nameByMonth=months.map(function(){return{husband:0,wife:0,baby:0}});
   var monthIdx={};months.forEach(function(mk,i){monthIdx[mk]=i});
-  for(var i=0;i<messages.length;i++){var mk=new Date(messages[i].time).toISOString().slice(0,7);var idx=monthIdx[mk];if(idx===undefined)continue;if(messages[i].content.indexOf('老公')>=0)nameByMonth[idx].husband++;if(messages[i].content.indexOf('老婆')>=0)nameByMonth[idx].wife++;if(messages[i].content.indexOf('宝宝')>=0)nameByMonth[idx].baby++}
+  for(var i=0;i<messages.length;i++){var dt2=new Date(messages[i].time);var mk=dt2.getFullYear()+'-'+String(dt2.getMonth()+1).padStart(2,'0');var idx=monthIdx[mk];if(idx===undefined)continue;if(messages[i].content.indexOf('老公')>=0)nameByMonth[idx].husband++;if(messages[i].content.indexOf('老婆')>=0)nameByMonth[idx].wife++;if(messages[i].content.indexOf('宝宝')>=0)nameByMonth[idx].baby++}
   var topW=Object.keys(topWords).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,8);
   var nightSent=(nightPos-nightNeg)/Math.max(1,nightTotal);
   var daySentAvg=(dayPos-dayNeg)/Math.max(1,dayTotal);
