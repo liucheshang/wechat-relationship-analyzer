@@ -461,15 +461,15 @@ function analyze(messages){
 
 // ===== 渲染 =====
 function renderReport(d){
+  document.getElementById('uploadPage').style.display='none';
+  document.getElementById('reportPage').style.display='block';
   // 大数据量提示
   if(d.totalCount>20000){
     var banner=document.createElement('div');
     banner.style.cssText='background:#1a2332;border:1px solid #ffb648;border-radius:8px;padding:12px 16px;margin:16px 0;color:#ffb648;font-size:14px';
-    banner.innerHTML='⚠ 你的聊天记录共'+d.totalCount+'条，本在线版采样了'+d.messages+'条做快速分析。完整深度报告（全量统计、逐月趋势、话题聚类）请用本地Python脚本，见页面底部说明。';
-    document.getElementById('result').appendChild(banner);
+    banner.innerHTML='⚠ 你的聊天记录共'+d.totalCount+'条，本在线版采样了'+d.total+'条做快速分析。完整深度报告请用本地Python脚本，见页面底部说明。';
+    document.getElementById('reportPage').insertBefore(banner, document.getElementById('kpiRow'));
   }
-  document.getElementById('uploadPage').style.display='none';
-  document.getElementById('reportPage').style.display='block';
   // KPI
   document.getElementById('kpiRow').innerHTML=
     '<div class="kpi"><div class="v" style="color:var(--purple)">'+d.total.toLocaleString()+'</div><div class="l">总消息数</div></div>'+
