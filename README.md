@@ -8,18 +8,36 @@
 
 ---
 
-## 效果预览
+## 🚀 在线分析（最简单，零安装）
 
-> ⚠️ 下面链接展示的是**模拟数据生成的示例报告**，写死在页面里，不是真实用户数据。点进去只是让你看看报告长什么样。
+**👉 [点这里直接用 →](https://liucheshang.github.io/wechat-relationship-analyzer/analyzer.html)**
 
-两个最经典的关系模式，你可以对比看：
+打开网页，上传聊天记录文件，几秒钟出报告。
 
-| 案例 | 关系类型 | 一句话描述 | 链接 |
-|---|---|---|---|
-| **案例一** | 单向投入型（你追TA跑） | 你发得多、TA回得少，你越主动TA越冷淡 | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/ultimate.html) |
-| **案例二** | 分分合合型（拉扯反复） | 三次断联三次复燃，好的时候特别好，断的时候特别绝 | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/broken.html) |
+- ✅ 不用装 Python、不用装任何东西
+- ✅ 纯浏览器本地运行，数据不上传
+- ✅ 关闭页面数据自动消失
+- ✅ 支持 .txt / .csv 格式
 
-> 你自己跑完之后，你的数据会落在这两个极端之间的某个位置。
+> 格式：每行 `时间 | 发送者 | 内容`，发送者写"我"和"TA"。
+
+---
+
+## 四种典型关系模式（模拟数据演示）
+
+> ⚠️ 以下全部是**模拟数据**，不是真实用户隐私。点进去只是看报告长什么样。
+
+|  | 💚 甜蜜双向型 | 💙 单向投入型 | 💛 分分合合型 | 💔 冷战型 |
+|---|---|---|---|---|
+| **一句话** | 双向奔赴，谁也不欠谁 | 你追TA跑，你连发TA短回 | 好的时候特别好，断的时候特别绝 | 双方都不说话，聊不起来 |
+| **Gottman比率** | 6.2 : 1 | 2.1 : 1 | 2.8 : 1（波动大） | 1.2 : 1 |
+| **最长断联** | 1天 | 3天 | 45天 | 12天 |
+| **TA主动开场** | 52% | 28.6% | 38% | 22% |
+| **你的类型** | 安全依恋 | 深情焦虑者 | 反复拉扯者 | 沉默忍受者 |
+| **TA的类型** | 安全依恋 | 冷淡被动者 | 忽冷忽热者 | 极度回避者 |
+| **点进去看** | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/case_sweet.html) | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/demo_report.html) | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/case_broken.html) | [查看报告](https://liucheshang.github.io/wechat-relationship-analyzer/case_cold.html) |
+
+> 你自己跑完之后，你的数据会落在这四种模式之间的某个位置。
 
 ---
 
