@@ -1,5 +1,0 @@
-[
-  {"ts": 1700000000.0, "sender": "示例昵称", "sender_wxid": "wxid_xxx", "content": "今天吃到一家特别好吃的火锅！", "msg_type": 1, "is_self": false, "is_group_chat": false},
-  {"ts": 1700000060.0, "sender": "我", "sender_wxid": "wxid_yyy", "content": "哦挺好", "msg_type": 1, "is_self": true, "is_group_chat": false},
-  {"ts": 1700000120.0, "sender": "示例昵称", "sender_wxid": "wxid_xxx", "content": "你都不问我在哪吃的", "msg_type": 1, "is_self": false, "is_group_chat": false}
-]
