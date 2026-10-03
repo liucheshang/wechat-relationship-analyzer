@@ -7,3 +7,5 @@ venv/
 *.json
 !examples/*.json
 .DS_Store
+debug.log
+*.log

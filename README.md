@@ -111,7 +111,7 @@ python convert.py 导出文件.json 聊天记录.txt
 python convert.py 导出文件.csv 聊天记录.txt
 
 # 只保留和某个联系人的聊天
-python convert.py 导出文件.csv 聊天记录.txt --contact 宝儿
+python convert.py 导出文件.csv 聊天记录.txt --contact 小美
 
 # 如果你导出的"自己"字段不是"我"，指定一下
 python convert.py 导出文件.json 聊天记录.txt --self-names 我,本人,me

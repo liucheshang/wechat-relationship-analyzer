@@ -13,7 +13,7 @@ analyze.py 只认这种一行一条的纯文本：
 用法：
     python convert.py 导出文件.json 聊天记录.txt
     python convert.py 导出文件.csv  聊天记录.txt
-    python convert.py 导出文件.csv  聊天记录.txt --contact 宝儿
+    python convert.py 导出文件.csv  聊天记录.txt --contact 小美
     python convert.py 导出文件.json 聊天记录.txt --self-names 我,自己,me
 
 只有标准库，不用 pip install 任何东西。Python 3.8+。
