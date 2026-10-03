@@ -538,16 +538,18 @@ function renderReport(d){
   document.getElementById('loveVerdict').innerHTML='<b>综合判断：</b>在主动投入维度上——开口、关心、说爱你——TA是更用力的一方。你更拿手的是爱称粘性和情绪缓冲。这不是「谁更爱谁」，而是「TA更敢表达，你更擅长保温」。';
   // 09 药方
   var aH=[];
-  if(d.threatHer>10)aH.push('1. 把「分手」从情绪砝码里拿掉——说多了，真分手那一次就没人当真了。');
-  if(d.maxBurstHer>20)aH.push('2. 情绪上来时，先缓24小时再发——连发'+d.maxBurstHer+'条是宣泄，但不是沟通。');
-  if(d.contHer>10)aH.push('3. 别用蔑视/阴阳怪气——讽刺比吵架更伤人。');
+  if(d.threatHer>10)aH.push('把「分手」从情绪砝码里拿掉——说多了，真分手那一次就没人当真了。');
+  if(d.maxBurstHer>20)aH.push('情绪上来时，先缓24小时再发——连发'+d.maxBurstHer+'条是宣泄，但不是沟通。');
+  if(d.contHer>10)aH.push('别用蔑视/阴阳怪气——讽刺比吵架更伤人。');
   if(!aH.length)aH.push('保持现状，继续表达。');
+  aH=aH.map(function(t,i){return (i+1)+'. '+t});
   var aM=[];
-  if(d.mePct>55)aM.push('1. 别太主动——你发了'+d.mePct+'%的消息，留点空间给TA。');
-  if(d.avoidMe>50)aM.push('2. 把「算了」换成具体诉求——回避疏离'+d.avoidMe+'次，冲突后别用沉默收尾。');
-  if(d.openMe<d.openHer*0.5)aM.push('3. 主动开口——TA承担了'+(d.openHer/d.sessionCount*100).toFixed(0)+'%的开场，每天多一次你先开口。');
-  if(d.critMe>10)aM.push('4. 减少批评——多用肯定代替指责。');
+  if(d.mePct>55)aM.push('别太主动——你发了'+d.mePct+'%的消息，留点空间给TA。');
+  if(d.avoidMe>50)aM.push('把「算了」换成具体诉求——回避疏离'+d.avoidMe+'次，冲突后别用沉默收尾。');
+  if(d.openMe<d.openHer*0.5)aM.push('主动开口——TA承担了'+(d.openHer/d.sessionCount*100).toFixed(0)+'%的开场，每天多一次你先开口。');
+  if(d.critMe>10)aM.push('减少批评——多用肯定代替指责。');
   if(!aM.length)aM.push('保持现状，继续表达。');
+  aM=aM.map(function(t,i){return (i+1)+'. '+t});
   document.getElementById('adviceHer').innerHTML=aH.join('<br><br>');
   document.getElementById('adviceMe').innerHTML=aM.join('<br><br>');
   document.getElementById('adviceBoth').innerHTML='你们从不吵三观——'+d.conflictCount+'次冲突里，吵的从来都是「有没有被放在第一位」。这是可以被解决的问题，不是不合适。TA的情绪化不是无理取闹，是焦虑型依恋的标准动作；你的冷静不是不在乎，是回避型处理情绪的方式——只是TA读不出来。';
