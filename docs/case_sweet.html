@@ -35,7 +35,9 @@ body { background: #0f1115; color: #e9eef4; font-family: -apple-system, "PingFan
 ul { padding-left: 20px; margin: 12px 0; }
 li { margin-bottom: 8px; font-size: 14px; }
 .note { font-size: 12px; color: #8a93a6; margin-top: 8px; }
-.back { display: inline-block; padding: 8px 16px; background: #2a2d35; color: #e9eef4; text-decoration: none; border-radius: 6px; margin-bottom: 24px; font-size: 13px; }
+.back-bar { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+.back-bar a { display: inline-block; padding: 8px 16px; background: #2a2d35; color: #e9eef4; text-decoration: none; border-radius: 6px; font-size: 13px; }
+.back-bar a.home { background: #7c3aed; font-weight: 600; }
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .main { margin-left: 0; padding: 20px; }
@@ -59,7 +61,10 @@ li { margin-bottom: 8px; font-size: 14px; }
 <a href="#sec10">十、改进建议</a>
 </nav>
 <main class="main">
-<a href="index.html" class="back">← 返回主页</a>
+<div class="back-bar">
+<a href="javascript:history.back()">← 返回上一页</a>
+<a href="index.html" class="home">案例主页</a>
+</div>
 <section class="section" id="sec1">
 <h2>一、总览</h2>
 <p style="color:#8a93a6;margin-bottom:24px">2024.01.01 — 2024.12.31 · 365 天 · 45,600 条消息</p>
