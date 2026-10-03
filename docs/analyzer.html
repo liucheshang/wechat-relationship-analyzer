@@ -3,46 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>关系分析器 · 在线版</title>
+<title>关系分析器 · 深度版</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <style>
+:root{
+--bg:#0e1318;--panel:#151d26;--panel2:#1a242f;--line:rgba(255,255,255,.08);
+--text:#e9eef4;--muted:#8fa1b4;--dim:#5f7285;
+--me:#5b8def;--her:#f06292;--green:#07c160;--gold:#ffb648;--red:#ff5c5c;--purple:#a78bfa;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}
-.container{max-width:1000px;margin:0 auto;padding:20px}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;font-size:14px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+.container{max-width:1060px;margin:0 auto;padding:20px}
 .hero{text-align:center;padding:50px 20px 30px}
-.hero h1{font-size:28px;margin-bottom:12px;background:linear-gradient(135deg,#60a5fa,#a78bfa,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:#8a93a6;font-size:14px;max-width:600px;margin:0 auto 24px}
-.privacy-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;padding:6px 14px;border-radius:16px;font-size:12px;margin-bottom:24px}
-.upload-zone{border:2px dashed #2a2d35;border-radius:16px;padding:50px 20px;text-align:center;cursor:pointer;transition:all .3s;background:#1a1d24}
-.upload-zone:hover,.upload-zone.dragover{border-color:#7c3aed;background:rgba(124,58,237,0.05)}
+.hero h1{font-size:28px;margin-bottom:12px;background:linear-gradient(135deg,var(--me),var(--purple),var(--her));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:14px;max-width:600px;margin:0 auto 20px}
+.privacy-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(7,193,96,.1);border:1px solid rgba(7,193,96,.3);color:var(--green);padding:6px 14px;border-radius:16px;font-size:12px;margin-bottom:20px}
+.upload-zone{border:2px dashed #2a2d35;border-radius:16px;padding:50px 20px;text-align:center;cursor:pointer;transition:all .3s;background:var(--panel)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--purple);background:rgba(124,58,237,.05)}
 .upload-zone .icon{font-size:42px;margin-bottom:12px}
 .upload-zone h3{font-size:16px;margin-bottom:6px}
-.upload-zone p{color:#8a93a6;font-size:12px}
-.format-help{background:#1a1d24;border-radius:12px;padding:20px;margin-top:20px;font-size:12px;text-align:left}
-.format-help h4{color:#a78bfa;margin-bottom:8px;font-size:13px}
-.format-help pre{background:#0f1115;padding:10px;border-radius:6px;overflow-x:auto;font-size:11px;color:#8a93a6;margin:6px 0}
+.upload-zone p{color:var(--muted);font-size:12px}
+.format-help{background:var(--panel);border-radius:12px;padding:20px;margin-top:20px;font-size:12px;text-align:left}
+.format-help h4{color:var(--purple);margin-bottom:8px;font-size:13px}
+.format-help pre{background:var(--bg);padding:10px;border-radius:6px;overflow-x:auto;font-size:11px;color:var(--muted);margin:6px 0}
 .report{display:none}
-.verdict{background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(247,120,186,0.1));border:1px solid rgba(124,58,237,0.3);border-radius:16px;padding:20px;margin:20px 0}
-.verdict h3{font-size:16px;margin-bottom:8px;color:#a78bfa}
-.verdict p{font-size:13px;line-height:1.8}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
-.kpi{background:#1a1d24;padding:16px;border-radius:10px;text-align:center}
-.kpi .v{font-size:24px;font-weight:700;margin-bottom:2px}
-.kpi .l{font-size:10px;color:#8a93a6}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-.card{background:#1a1d24;padding:14px;border-radius:10px}
-.card h4{font-size:12px;color:#8a93a6;margin-bottom:6px}
-.card .big{font-size:16px;font-weight:600;margin-bottom:4px}
-.chart{width:100%;height:280px;background:#1a1d24;border-radius:10px;padding:10px;margin:12px 0}
-.section{margin:24px 0}
-.section h2{font-size:16px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #2a2d35}
-.note{font-size:11px;color:#8a93a6;margin-top:4px}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hl-me{color:#60a5fa}.hl-her{color:#f778ba}.hl-green{color:#4ade80}.hl-red{color:#f87171}.hl-gold{color:#fbbf24}.hl-purple{color:#a78bfa}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+@media(max-width:760px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 16px;text-align:center}
+.kpi .v{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi .l{font-size:11px;color:var(--muted);margin-top:4px}
+.verdict{background:linear-gradient(135deg,rgba(7,193,96,.12),rgba(91,141,239,.08));border:1px solid rgba(7,193,96,.3);border-radius:14px;padding:20px 24px;margin:16px 0;font-size:14px;line-height:1.8}
+.verdict b{color:var(--green)}
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0}
+@media(max-width:760px){.trio{grid-template-columns:1fr}}
+.trio>div{padding:20px;border-right:1px solid var(--line)}
+.trio>div:last-child{border-right:none}
+.trio .head{font-size:11px;letter-spacing:3px;margin-bottom:6px}
+.trio .big{font-size:17px;font-weight:900;line-height:1.4;margin-bottom:8px}
+.trio .body{font-size:12.5px;line-height:1.8;color:var(--muted);border-left:2px solid;padding-left:8px;margin-bottom:8px}
+.trio .detail{font-size:12px;line-height:1.8;color:var(--dim)}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin:16px 0}
+.toc h4{font-size:12px;letter-spacing:4px;color:var(--green);margin-bottom:12px}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 20px}
+@media(max-width:760px){.toc-grid{grid-template-columns:1fr}}
+.toc-item{padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.toc-item b{color:var(--green);margin-right:6px}
+section{padding:32px 0 8px}
+h2{font-size:20px;font-weight:900;margin-bottom:6px}
+.sec-no{color:var(--green);font-size:12px;font-weight:700;letter-spacing:3px;display:block;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:720px}
+h3{font-size:15px;font-weight:700;margin:20px 0 10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.chart{width:100%;height:300px}
+.chart-sm{width:100%;height:260px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;margin:10px 0}
+th,td{padding:8px 10px;text-align:left;font-size:13px;border-bottom:1px solid var(--line);word-break:break-all}
+th{color:var(--muted);font-weight:500;font-size:12px;background:rgba(255,255,255,.03)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:11px;color:var(--dim);margin-top:6px}
+.quote{border-left:3px solid var(--green);background:var(--panel2);padding:10px 14px;border-radius:0 10px 10px 0;margin:10px 0;font-size:13px}
+.quote.her{border-left-color:var(--her)}
+.hl-me{color:var(--me);font-weight:700}.hl-her{color:var(--her);font-weight:700}.hl-green{color:var(--green);font-weight:700}.hl-gold{color:var(--gold);font-weight:700}.hl-red{color:var(--red);font-weight:700}
 .back-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.back-bar button{padding:6px 14px;background:#2a2d35;color:#e9eef4;border:none;border-radius:6px;font-size:12px;cursor:pointer}
-.back-bar a{padding:6px 14px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:6px;font-size:12px;font-weight:600}
-@media(max-width:768px){.kpi-grid,.cards,.two-col{grid-template-columns:1fr}}
+.back-bar button{padding:6px 14px;background:#2a2d35;color:var(--text);border:none;border-radius:6px;font-size:12px;cursor:pointer}
+.back-bar a{padding:6px 14px;background:var(--purple);color:#fff;text-decoration:none;border-radius:6px;font-size:12px;font-weight:600}
+.timeline{display:grid;grid-template-columns:90px 40px 1fr;gap:0;margin:16px 0}
+.tl-time{text-align:right;padding:10px 10px 10px 0;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tl-dot{position:relative;display:flex;justify-content:center;padding:10px 0}
+.tl-dot::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--line)}
+.tl-dot span{width:10px;height:10px;border-radius:50%;background:var(--green);position:relative;z-index:1;margin-top:4px}
+.tl-dot.red span{background:var(--red)}
+.tl-dot.gold span{background:var(--gold)}
+.tl-body{padding:8px 0 8px 14px;border-bottom:1px solid var(--line);font-size:13px}
+.tl-body .t{font-weight:700;font-size:13.5px}
+.tl-body .d{font-size:12px;color:var(--muted);margin-top:2px}
+footer{padding:40px 0 60px;color:var(--dim);font-size:11px;text-align:center}
 </style>
 </head>
 <body>
@@ -51,20 +90,19 @@ body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"PingFang SC","M
 <div class="hero">
 <h1>💬 关系分析器</h1>
 <div class="privacy-badge">🔒 纯本地运行 · 数据不上传 · 关闭即消失</div>
-<p>上传聊天记录，自动分析互动模式、情感趋势、冲突规律和关系健康度。所有计算在浏览器里完成，不发送到任何服务器。</p>
+<p>上传聊天记录，自动分析互动模式、情感趋势、冲突规律和关系健康度。所有计算在浏览器里完成。</p>
 </div>
 <div class="upload-zone" id="dropZone">
 <div class="icon">📂</div>
 <h3>点击或拖拽聊天记录文件到这里</h3>
-<p>支持 .txt / .csv 格式</p>
+<p>支持 .txt / .csv / .json 格式</p>
 </div>
-<input type="file" id="fileInput" accept=".txt,.csv" style="display:none">
+<input type="file" id="fileInput" accept=".txt,.csv,.json" style="display:none">
 <div class="format-help">
-<h4>📋 文件格式</h4>
+<h4>📋 支持的格式</h4>
 <pre>时间 | 发送者 | 内容
-2024-01-01 10:00 | 我 | 你吃饭了吗
-2024-01-01 10:05 | TA | 吃了，你呢</pre>
-<p>发送者写"我"和"TA"即可。时间格式 2024-01-01 10:00。</p>
+2024-01-01 10:00 | 我 | 你吃饭了吗</pre>
+<p>发送者写"我"和"TA"。也支持WeChatMsg导出的CSV和chatlog导出的JSON。</p>
 </div>
 </div>
 <div id="reportPage" class="report">
@@ -72,114 +110,198 @@ body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"PingFang SC","M
 <button onclick="location.reload()">← 分析新文件</button>
 <a href="index.html">案例主页</a>
 </div>
-<div class="verdict"><h3 id="verdictTitle"></h3><p id="verdictText"></p></div>
-<div class="kpi-grid" id="kpiGrid"></div>
-<div class="cards" id="roleCards"></div>
-<div class="section"><h2>📊 每日消息量趋势</h2><div class="chart" id="c_daily"></div><p class="note">谁发得多谁发得少，一目了然。</p></div>
-<div class="section"><h2>📈 Gottman 比率趋势</h2><div class="chart" id="c_gottman"></div><p class="note">积极词÷消极词。健康约5:1以上，低于1:1危险。绿色虚线=健康线，红色虚线=危险线。</p></div>
-<div class="section"><h2>💝 情感趋势对比</h2><div class="chart" id="c_sentiment"></div><p class="note">你们的情绪曲线是正相关还是负相关？你开心时TA也开心吗？</p></div>
-<div class="section"><h2>⏱️ 回复延迟对比</h2><div class="chart" id="c_reply"></div><p class="note">谁回得快谁回得慢。中位数差越大，说明投入不对等。</p></div>
-<div class="section"><h2>📏 消息长度对比</h2><div class="chart" id="c_len"></div><p class="note">谁写得更长、谁更敷衍。短消息多=应付，长消息多=投入。</p></div>
-<div class="section"><h2>🔥 高频词对比</h2><div class="chart" id="c_words"></div><p class="note">你们最常说什么？从用词看性格。</p></div>
-<div class="section"><h2>🕐 24小时分布</h2><div class="chart" id="c_hour"></div><p class="note">你们爱几点聊天？深夜聊天多=亲密。</p></div>
-<div class="section"><h2>📅 一周分布</h2><div class="chart" id="c_week"></div></div>
-<div class="section"><h2>⚔️ 四骑士统计</h2><div class="chart" id="c_horsemen"></div><p class="note">批评/防御/蔑视/筑墙——Gottman发现的离婚四大预测指标。谁更多？</p></div>
-<div class="section"><h2>💞 亲密行为对比</h2><div class="chart" id="c_love"></div><p class="note">关心次数 / 爱称次数 / 积极词次数——谁更会表达爱？</p></div>
-<div class="section"><h2>💡 改进建议</h2>
-<div class="two-col">
-<div class="card"><h4>💬 TA 该改什么</h4><p id="adviceHer" style="font-size:12px;line-height:1.8"></p></div>
-<div class="card"><h4>🙋 你 该改什么</h4><p id="adviceMe" style="font-size:12px;line-height:1.8"></p></div>
-</div></div>
-<p style="font-size:10px;color:#8a93a6;text-align:center;margin-top:30px">本报告为统计推断，非心理诊断。所有数据均在你的浏览器本地处理，未上传任何服务器。</p>
+
+<!-- HERO -->
+<div class="wrap" style="padding:0">
+<h1 id="reportTitle" style="font-size:28px;font-weight:900;margin-bottom:8px">聊天记录深度分析报告</h1>
+<p class="sub" id="reportSub"></p>
+<div class="kpi-row" id="kpiRow"></div>
+<div class="verdict" id="verdictBox"></div>
+<div class="trio" id="trioBox"></div>
+<div class="toc" id="tocBox"></div>
+</div>
+
+<!-- 01 两个人的画像 -->
+<section>
+<span class="sec-no">01 · 两个人的画像</span>
+<h2>两个依恋系统</h2>
+<p class="sub">从语言行为反推依恋风格（统计推断，非心理诊断）。</p>
+<div class="card"><div class="chart" id="c_attachment"></div><p class="note">焦虑追问=反复求证/怕失去；回避疏离=转移话题/敷衍收尾；情绪要挟=以分手/拉黑施压；安全表达=主动认错/安抚。</p></div>
+<div class="grid2">
+<div class="card"><h3>TA 的特征</h3><p id="herProfile" style="font-size:13px;line-height:1.9"></p></div>
+<div class="card"><h3>你的特征</h3><p id="meProfile" style="font-size:13px;line-height:1.9"></p></div>
+</div>
+</section>
+
+<!-- 02 同一句话两种语言 -->
+<section>
+<span class="sec-no">02 · 同一句话，两种语言</span>
+<h2>同一句话，两种语言</h2>
+<p class="sub">高频词、语气词、人称代词——语言习惯差异拼出两个人格。</p>
+<div class="grid2">
+<div class="card"><h3>语气词对比</h3><div class="chart-sm" id="c_tone"></div></div>
+<div class="card"><h3>人称与句式</h3>
+<table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
+<tr><th></th><th class="num">你</th><th class="num">TA</th><th>解读</th></tr>
+<tr><td>「我」字</td><td class="num" id="pnMe"></td><td class="num hl-her" id="pnHer"></td><td id="pnRead"></td></tr>
+<tr><td>「你」字</td><td class="num hl-me" id="pyMe"></td><td class="num" id="pyHer"></td><td id="pyRead"></td></tr>
+<tr><td>问句数</td><td class="num hl-me" id="qMe"></td><td class="num" id="qHer"></td><td>你更爱提问</td></tr>
+</table></div>
+</div>
+<div class="card"><h3>高频词 Top</h3><p id="topWordsDesc" style="font-size:13px;line-height:1.8"></p></div>
+</section>
+
+<!-- 03 谁在推谁在接 -->
+<section>
+<span class="sec-no">03 · 谁在推，谁在接</span>
+<h2>谁在推，谁在接</h2>
+<p class="sub">谁先开口、谁先收尾、谁回得快。</p>
+<div class="card"><div class="chart" id="c_volume"></div><p class="note">逐月消息量。断联期为0。</p></div>
+<div class="grid2">
+<div class="card"><h3>对话开启与收尾</h3>
+<table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
+<tr><th>会话段</th><th class="num">你</th><th class="num">TA</th><th>占比</th></tr>
+<tr><td>由谁开启</td><td class="num" id="openMe"></td><td class="num hl-her" id="openHer"></td><td id="openPct"></td></tr>
+<tr><td>由谁收尾</td><td class="num" id="closeMe"></td><td class="num" id="closeHer"></td><td></td></tr>
+</table></div>
+<div class="card"><h3>回复速度</h3>
+<table><colgroup><col style="width:34%"><col style="width:33%"><col style="width:33%"></colgroup>
+<tr><th></th><th class="num">你→TA</th><th class="num">TA→你</th></tr>
+<tr><td>中位回复</td><td class="num hl-me" id="medMe"></td><td class="num hl-her" id="medHer"></td></tr>
+<tr><td>1分钟内回复率</td><td class="num" id="fastMe"></td><td class="num" id="fastHer"></td></tr>
+</table></div>
+</div>
+<div class="card"><h3>倾泻 vs 凝练：连发模式</h3>
+<table><colgroup><col style="width:34%"><col style="width:22%"><col style="width:22%"><col style="width:22%"></colgroup>
+<tr><th>连发行为</th><th class="num">你</th><th class="num">TA</th><th>解读</th></tr>
+<tr><td>最长一次连发</td><td class="num" id="maxBurstMe"></td><td class="num hl-her" id="maxBurstHer"></td><td id="burstRead"></td></tr>
+<tr><td>连发≥3条次数</td><td class="num" id="burst3Me"></td><td class="num" id="burst3Her"></td><td></td></tr>
+<tr><td>连发≥5条次数</td><td class="num" id="burst5Me"></td><td class="num" id="burst5Her"></td><td></td></tr>
+</table></div>
+</section>
+
+<!-- 04 感情波动 -->
+<section>
+<span class="sec-no">04 · 感情波动</span>
+<h2>感情波动</h2>
+<p class="sub">月度情感倾向分（积极词-消极词标准化）。</p>
+<div class="card"><div class="chart" id="c_sentiment"></div><p class="note">情感分 = 段内积极词-消极词。负值越冷。</p></div>
+<div class="grid2">
+<div class="card"><h3>情绪低点 Top5</h3><table id="lowTable"></table></div>
+<div class="card"><h3>情绪高点 Top5</h3><table id="highTable"></table></div>
+</div>
+<div class="card"><h3>深夜温差</h3><p id="nightDiff" style="font-size:13px;line-height:1.8"></p></div>
+</section>
+
+<!-- 05 吵架怎么结束的 -->
+<section>
+<span class="sec-no">05 · 吵架是怎么结束的</span>
+<h2>吵架是怎么结束的</h2>
+<p class="sub">冲突段检测（段内冲突词≥2），统计修复率和静默时长。</p>
+<div class="grid2">
+<div class="card"><h3>冲突后修复率</h3><div class="chart-sm" id="c_repair"></div></div>
+<div class="card"><h3>冲突后静默时长</h3><div class="chart-sm" id="c_silence"></div></div>
+</div>
+<div class="card"><h3>冲突统计</h3>
+<table><colgroup><col style="width:50%"><col style="width:25%"><col style="width:25%"></colgroup>
+<tr><th>指标</th><th class="num">你</th><th class="num">TA</th></tr>
+<tr><td>冲突段总数</td><td class="num" colspan="2" id="conflictTotal"></td></tr>
+<tr><td>主动修复次数</td><td class="num hl-me" id="repairMe"></td><td class="num hl-her" id="repairHer"></td></tr>
+<tr><td>平均静默(小时)</td><td class="num" id="silenceMe"></td><td class="num" id="silenceHer"></td></tr>
+<tr><td>「分手」出现次数</td><td class="num" id="fsMe"></td><td class="num hl-red" id="fsHer"></td></tr>
+</table></div>
+</section>
+
+<!-- 06 节奏与逐月变化 -->
+<section>
+<span class="sec-no">06 · 节奏与逐月变化</span>
+<h2>节奏、理性与情绪的逐月变化</h2>
+<div class="card"><h3>24小时聊天生物钟</h3><div class="chart" id="c_clock"></div></div>
+<div class="grid2">
+<div class="card"><h3>理性指数逐月</h3><div class="chart-sm" id="c_rational"></div><p class="note">理性词占比，越高越理性。</p></div>
+<div class="card"><h3>批评频率（每千条）</h3><div class="chart-sm" id="c_critic"></div><p class="note">谁更爱挑对方毛病。</p></div>
+</div>
+<div class="card"><h3>情绪净分逐月</h3><div class="chart" id="c_mood"></div><p class="note">积极词-消极词（每百条），正数越开心。</p></div>
+</section>
+
+<!-- 07 心理学框架 -->
+<section>
+<span class="sec-no">07 · 心理学框架</span>
+<h2>把聊天记录放到关系科学的尺子上</h2>
+<div class="card"><h3>Gottman 比率趋势</h3><div class="chart" id="c_gottman"></div><p class="note">积极互动÷消极互动。5:1健康，1:1警戒。</p></div>
+<div class="grid2">
+<div class="card"><h3>四骑士月度频率</h3><div class="chart-sm" id="c_horsemen"></div><p class="note">批评/防御/蔑视/筑墙。</p></div>
+<div class="card"><h3>亲密行为对比</h3><div class="chart-sm" id="c_love"></div><p class="note">关心/爱称/积极词。</p></div>
+</div>
+<div class="card"><h3>称谓温度计</h3><div class="chart" id="c_names"></div><p class="note">老公/老婆/宝宝的逐月变化。称谓先于行为退潮。</p></div>
+</section>
+
+<!-- 08 谁更爱谁 -->
+<section>
+<span class="sec-no">08 · 谁更爱谁</span>
+<h2>谁更爱谁</h2>
+<p class="sub">「爱」无法被证明，但「投入」可以被统计。</p>
+<div class="card">
+<table><colgroup><col style="width:26%"><col style="width:24%"><col style="width:24%"><col style="width:26%"></colgroup>
+<tr><th>投入维度</th><th class="num">你</th><th class="num">TA</th><th>谁更投入</th></tr>
+<tr id="row_count"></tr>
+<tr id="row_start"></tr>
+<tr id="row_care"></tr>
+<tr id="row_nick"></tr>
+<tr id="row_love"></tr>
+<tr id="row_miss"></tr>
+</table>
+<div class="verdict" id="loveVerdict" style="margin-top:14px"></div>
+</div>
+</section>
+
+<!-- 09 最终药方 -->
+<section>
+<span class="sec-no">09 · 最终药方</span>
+<h2>她要改什么，你要改什么</h2>
+<div class="grid2">
+<div class="card" style="border-top:3px solid var(--her)"><h3 style="color:var(--her)">TA 需要改的</h3><p id="adviceHer" style="font-size:13px;line-height:1.9"></p></div>
+<div class="card" style="border-top:3px solid var(--me)"><h3 style="color:var(--me)">你 需要改的</h3><p id="adviceMe" style="font-size:13px;line-height:1.9"></p></div>
+</div>
+<div class="card" style="border-top:3px solid var(--gold)"><h3 style="color:var(--gold)">互相需要谅解的</h3><p id="adviceBoth" style="font-size:13px;line-height:1.9"></p></div>
+</section>
+
+<p style="font-size:11px;color:var(--dim);text-align:center;margin-top:30px">本报告为统计推断，非心理诊断。所有数据均在你的浏览器本地处理，未上传任何服务器。</p>
 </div>
 </div>
 <script>
+// ===== 词典体系 =====
 var POSITIVE=['喜欢','爱','想你','开心','哈哈','谢谢','好的','嗯呢','宝贝','宝宝','亲爱的','么么哒','晚安','早安','辛苦','好吃','好看','漂亮','可爱','加油','棒棒','爱你','亲亲','抱抱','嘿嘿','嘻嘻','太好啦','真好','幸福','温暖','感动','心疼','乖','乖乖','么么','爱死','超爱','最爱','爱你哦','想你了'];
 var NEGATIVE=['分手','算了','随便','烦','累','生气','讨厌','滚','再见','不想','难过','哭','失望','伤心','委屈','不理','为什么','怎么办','无所谓','哦','嗯','呵呵','心累','绝望','崩溃','窒息','压抑','痛苦','煎熬','折磨','冷战','沉默','无语','扯淡','离谱','过分','气死','讨厌你','不爱了','没感觉','不合适'];
-var STONEWALL=['嗯','哦','不说了','随便','忙','呵呵','哦嗯','无所谓','算了','嗯呢'];
+var ANXIOUS=['为什么不回','你在哪','你是不是不爱我','你不在乎我','我不重要','你到底','你根本不','我害怕','我担心','我好怕','你别离开','我怕失去','你是不是有别人'];
+var AVOID=['算了','不说了','随便','我没事','还好','还行','忙','嗯','哦','哦嗯','无所谓','不想说','你忙吧'];
+var THREAT=['分手','拉黑','不理你了','再也不','我走了','我消失','删了','永远不要'];
+var SECURE=['对不起','我错了','别生气','我理解','我知道','抱歉','我改','原谅我','我在乎','我担心你'];
 var CRITICISM=['你总是','你从来','你怎么又','为什么你不能','你每次','你就知道','你从来不','你总是这样'];
 var DEFENSIVE=['我没有','不是我','是你先','凭什么','我怎么了','又不是我','我以为','我只是'];
-var CONTEMPT=['呵呵','切','可笑','你真行','有病','幼稚','无聊','神经病'];
+var CONTEMPT=['呵呵','切','可笑','你真行','有病','幼稚','无聊','神经病','服了你'];
+var STONEWALL=['嗯','哦','不说了','随便','忙','呵呵','哦嗯','无所谓','算了','嗯呢'];
 var CARE=['吃饭','睡了吗','早点','身体','累不累','冷不冷','吃药','多喝热水','注意安全','到家了','吃了吗','喝水','休息','别熬夜','照顾好','心疼','难受','好点了吗','记得吃','多穿点'];
-var NICKNAMES=['宝宝','宝贝','老婆','老公','亲爱的','猪猪','乖乖','媳妇','哈尼','宝','老婆大人','小宝贝','乖乖女','猪猪宝贝'];
+var NICKNAMES=['宝宝','宝贝','老婆','老公','亲爱的','猪猪','乖乖','媳妇','哈尼','宝','老婆大人','小宝贝','乖乖女'];
+var RATIONAL=['所以','因为','但是','逻辑','道理','其实','应该','合理','分析','总结','计划','考虑','客观'];
+var TONE_WORDS=['哈','嗯','吧','哦','呀','呢','啊','嘛'];
+var LOVE_WORDS=['爱你','喜欢你','我爱你','好想你'];
+var MISS_WORDS=['想你','好想你','想念','惦记'];
 
+// ===== 解析 =====
 function parseFile(text){
-  text=text.trim();
-  var messages=[];
-  if(text[0]==='['){
-    try{
-      var data=JSON.parse(text);
-      data.forEach(function(msg){
-        var ts=msg.ts||msg.time||msg.timestamp||msg.CreateTime||0;
-        if(typeof ts==='string')ts=new Date(ts).getTime();
-        if(ts<1000000000)ts=ts*1000;
-        var sender;
-        if(msg.is_self!==undefined)sender=msg.is_self?'me':'her';
-        else if(msg.sender){sender=/^(我|me|自己)/i.test(msg.sender)?'me':'her'}
-        else sender='her';
-        var content=msg.content||msg.message||msg.text||'';
-        if(!content||!ts)return;
-        messages.push({time:ts,sender:sender,content:String(content)});
-      });
-      if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time});
-    }catch(e){}
-  }
-  if(text.indexOf(',')>=0&&text.indexOf('\n')>=0){
-    var lines=text.split(/\n/).filter(function(l){return l.trim()});
-    var headerIdx=-1;
-    for(var i=0;i<Math.min(5,lines.length);i++){
-      if(/时间|time|日期|发送者|sender|内容|content/i.test(lines[i])){headerIdx=i;break}
-    }
-    var startLine=headerIdx>=0?headerIdx+1:0;
-    var colMap={time:0,sender:1,content:2};
-    if(headerIdx>=0){
-      var headers=lines[headerIdx].split(',').map(function(s){return s.trim().toLowerCase()});
-      headers.forEach(function(h,idx){
-        if(/时间|time|日期|create/i.test(h))colMap.time=idx;
-        if(/发送者|sender|from|who/i.test(h))colMap.sender=idx;
-        if(/内容|content|message|text/i.test(h))colMap.content=idx;
-      });
-    }
-    for(var i=startLine;i<lines.length;i++){
-      var parts=lines[i].split(',').map(function(s){return s.trim()});
-      if(parts.length<3)continue;
-      var timeStr=parts[colMap.time],senderStr=parts[colMap.sender],content=parts.slice(colMap.content).join(',').trim();
-      var time=parseTime(timeStr);
-      if(isNaN(time)||!content)continue;
-      var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';
-      messages.push({time:time,sender:sender,content:content});
-    }
-    if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time});
-  }
-  lines=text.split(/\n/).filter(function(l){return l.trim()});
-  lines.forEach(function(line){
-    var parts;
-    if(line.indexOf('|')>=0){parts=line.split('|').map(function(s){return s.trim()})}
-    else{return}
-    if(parts.length<3)return;
-    var timeStr=parts[0],senderStr=parts[1],content=parts.slice(2).join('|').trim();
-    var time=parseTime(timeStr);
-    if(isNaN(time)||!content)return;
-    var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';
-    messages.push({time:time,sender:sender,content:content});
-  });
+  text=text.trim();var messages=[];
+  if(text[0]==='['){try{var data=JSON.parse(text);data.forEach(function(msg){var ts=msg.ts||msg.time||msg.timestamp||msg.CreateTime||0;if(typeof ts==='string')ts=new Date(ts).getTime();if(ts<1000000000)ts=ts*1000;var sender;if(msg.is_self!==undefined)sender=msg.is_self?'me':'her';else if(msg.sender){sender=/^(我|me|自己)/i.test(msg.sender)?'me':'her'}else sender='her';var content=msg.content||msg.message||msg.text||'';if(!content||!ts)return;messages.push({time:ts,sender:sender,content:String(content)})});if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time})}catch(e){}}
+  if(text.indexOf(',')>=0&&text.indexOf('\n')>=0){var lines=text.split(/\n/).filter(function(l){return l.trim()});var headerIdx=-1;for(var i=0;i<Math.min(5,lines.length);i++){if(/时间|time|日期|发送者|sender|内容|content/i.test(lines[i])){headerIdx=i;break}}var startLine=headerIdx>=0?headerIdx+1:0;var colMap={time:0,sender:1,content:2};if(headerIdx>=0){var headers=lines[headerIdx].split(',').map(function(s){return s.trim().toLowerCase()});headers.forEach(function(h,idx){if(/时间|time|日期|create/i.test(h))colMap.time=idx;if(/发送者|sender|from|who/i.test(h))colMap.sender=idx;if(/内容|content|message|text/i.test(h))colMap.content=idx})}for(var i=startLine;i<lines.length;i++){var parts=lines[i].split(',').map(function(s){return s.trim()});if(parts.length<3)continue;var timeStr=parts[colMap.time],senderStr=parts[colMap.sender],content=parts.slice(colMap.content).join(',').trim();var time=parseTime(timeStr);if(isNaN(time)||!content)continue;var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';messages.push({time:time,sender:sender,content:content})}if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time})}
+  lines=text.split(/\n/).filter(function(l){return l.trim()});lines.forEach(function(line){var parts;if(line.indexOf('|')>=0){parts=line.split('|').map(function(s){return s.trim()})}else{return}if(parts.length<3)return;var timeStr=parts[0],senderStr=parts[1],content=parts.slice(2).join('|').trim();var time=parseTime(timeStr);if(isNaN(time)||!content)return;var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';messages.push({time:time,sender:sender,content:content})});
   return messages.sort(function(a,b){return a.time-b.time});
 }
-function parseTime(str){
-  if(!str)return NaN;
-  str=String(str).trim();
-  if(/^\d{10}$/.test(str))return parseInt(str)*1000;
-  if(/^\d{13}$/.test(str))return parseInt(str);
-  var t=new Date(str).getTime();
-  if(!isNaN(t))return t;
-  var m=str.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})\s+(\d{1,2}):(\d{1,2})/);
-  if(m)return new Date(m[1],m[2]-1,m[3],m[4],m[5]).getTime();
-  return NaN;
-}
-
+function parseTime(str){if(!str)return NaN;str=String(str).trim();if(/^\d{10}$/.test(str))return parseInt(str)*1000;if(/^\d{13}$/.test(str))return parseInt(str);var t=new Date(str).getTime();if(!isNaN(t))return t;var m=str.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})\s+(\d{1,2}):(\d{1,2})/);if(m)return new Date(m[1],m[2]-1,m[3],m[4],m[5]).getTime();return NaN}
 function countWords(arr,words){var c=0;arr.forEach(function(m){words.forEach(function(w){if(m.content.indexOf(w)>=0)c++})});return c}
+function countWord(arr,w){var c=0;arr.forEach(function(m){if(m.content.indexOf(w)>=0)c++});return c}
 function median(arr){if(!arr.length)return 0;var s=arr.slice().sort(function(a,b){return a-b});var mid=Math.floor(s.length/2);return s.length%2?s[mid]:(s[mid-1]+s[mid])/2}
 
+// ===== 主分析 =====
 function analyze(messages){
   var total=messages.length;
   var me=messages.filter(function(m){return m.sender==='me'});
@@ -187,131 +309,271 @@ function analyze(messages){
   var meCount=me.length,herCount=her.length;
   var times=messages.map(function(m){return m.time}).sort();
   var days=Math.max(1,Math.round((times[times.length-1]-times[0])/86400000));
+  
+  // 基础词频
   var mePos=countWords(me,POSITIVE),herPos=countWords(her,POSITIVE);
   var meNeg=countWords(me,NEGATIVE),herNeg=countWords(her,NEGATIVE);
   var gottman=(mePos+herPos)/Math.max(1,meNeg+herNeg);
+  
+  // 会话切分（间隔>6h）
+  var sessions=[],cur=[];
+  messages.forEach(function(m,i){if(i===0){cur.push(m)}else{var gap=m.time-messages[i-1].time;if(gap>21600000){sessions.push(cur);cur=[m]}else{cur.push(m)}}});
+  if(cur.length)sessions.push(cur);
+  var sessionCount=sessions.length;
+  var openMe=0,openHer=0,closeMe=0,closeHer=0;
+  sessions.forEach(function(s){if(s[0].sender==='me')openMe++;else openHer++;if(s[s.length-1].sender==='me')closeMe++;else closeHer++});
+  
+  // 回复延迟
+  var meDelays=[],herDelays=[],meFast=0,herFast=0;
+  for(var i=1;i<messages.length;i++){var diff=messages[i].time-messages[i-1].time;if(diff>60000&&diff<3600000&&messages[i].sender!==messages[i-1].sender){if(messages[i].sender==='me'){meDelays.push(diff/60000);if(diff<60000)meFast++}else{herDelays.push(diff/60000);if(diff<60000)herFast++}}}
+  
+  // 连发模式
+  var maxBurstMe=0,maxBurstHer=0,burst3Me=0,burst3Her=0,burst5Me=0,burst5Her=0;
+  var curSender=null,curBurst=0;
+  messages.forEach(function(m){if(m.sender===curSender){curBurst++;if(curBurst===3){if(m.sender==='me')burst3Me++;else burst3Her++}if(curBurst===5){if(m.sender==='me')burst5Me++;else burst5Her++}if(curBurst>maxBurstMe&&m.sender==='me')maxBurstMe=curBurst;if(curBurst>maxBurstHer&&m.sender==='her')maxBurstHer=curBurst}else{curSender=m.sender;curBurst=1}});
+  
+  // 按天
   var byDay={};
-  messages.forEach(function(m){var d=new Date(m.time).toISOString().slice(0,10);if(!byDay[d])byDay[d]={me:0,her:0};byDay[d][m.sender]++});
+  messages.forEach(function(m){var d=new Date(m.time).toISOString().slice(0,10);if(!byDay[d])byDay[d]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0};byDay[d][m.sender]++;if(POSITIVE.some(function(w){return m.content.indexOf(w)>=0}))byDay[d][m.sender+'Pos']++;if(NEGATIVE.some(function(w){return m.content.indexOf(w)>=0}))byDay[d][m.sender+'Neg']++});
   var daysArr=Object.keys(byDay).sort();
-  var meStart=daysArr.filter(function(d){return byDay[d].me>0}).length;
-  var herStart=daysArr.filter(function(d){return byDay[d].her>0}).length;
-  var meDelays=[],herDelays=[];
-  for(var i=1;i<messages.length;i++){
-    var diff=messages[i].time-messages[i-1].time;
-    if(diff>60000&&diff<3600000&&messages[i].sender!==messages[i-1].sender){
-      if(messages[i].sender==='me')meDelays.push(diff/60000);else herDelays.push(diff/60000);
-    }
-  }
-  var byHour=new Array(24).fill(0);
-  messages.forEach(function(m){byHour[new Date(m.time).getHours()]++});
-  var byWeek=[0,0,0,0,0,0,0];
-  messages.forEach(function(m){byWeek[new Date(m.time).getDay()]++});
+  var herStartDays=daysArr.filter(function(d){return byDay[d].her>0}).length;
+  
+  // 情感高低点
+  var daySent=daysArr.map(function(d){return(byDay[d].mePos+byDay[d].herPos-byDay[d].meNeg-byDay[d].herNeg)/Math.max(1,byDay[d].me+byDay[d].her)});
+  var daySentPairs=daysArr.map(function(d,i){return{d:d,v:daySent[i]}}).sort(function(a,b){return a.v-b.v});
+  var low5=daySentPairs.slice(0,5),high5=daySentPairs.slice(-5).reverse();
+  
+  // 深夜情感
+  var nightMsgs=messages.filter(function(m){var h=new Date(m.time).getHours();return h>=23||h<6});
+  var nightPos=countWords(nightMsgs,POSITIVE),nightNeg=countWords(nightMsgs,NEGATIVE);
+  var nightSent=(nightPos-nightNeg)/Math.max(1,nightMsgs.length);
+  var dayMsgs=messages.filter(function(m){var h=new Date(m.time).getHours();return h<23&&h>=6});
+  var dayPos=countWords(dayMsgs,POSITIVE),dayNeg=countWords(dayMsgs,NEGATIVE);
+  var daySentAvg=(dayPos-dayNeg)/Math.max(1,dayMsgs.length);
+  
+  // 按月
   var byMonth={};
-  messages.forEach(function(m){
-    var mk=new Date(m.time).toISOString().slice(0,7);
-    if(!byMonth[mk])byMonth[mk]={mePos:0,meNeg:0,herPos:0,herNeg:0,me:0,her:0};
-    var s=m.sender;
-    var isPos=POSITIVE.some(function(w){return m.content.indexOf(w)>=0});
-    var isNeg=NEGATIVE.some(function(w){return m.content.indexOf(w)>=0});
-    if(s==='me'){byMonth[mk].me++;if(isPos)byMonth[mk].mePos++;if(isNeg)byMonth[mk].meNeg++}
-    else{byMonth[mk].her++;if(isPos)byMonth[mk].herPos++;if(isNeg)byMonth[mk].herNeg++}
-  });
+  messages.forEach(function(m){var mk=new Date(m.time).toISOString().slice(0,7);if(!byMonth[mk])byMonth[mk]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0,rationalMe:0,rationalHer:0,critMe:0,critHer:0};var s=m.sender;byMonth[mk][s]++;if(POSITIVE.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk][s+'Pos']++;if(NEGATIVE.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk][s+'Neg']++;if(RATIONAL.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk]['rational'+(s==='me'?'Me':'Her')]++;if(CRITICISM.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk]['crit'+(s==='me'?'Me':'Her')]++});
   var months=Object.keys(byMonth).sort();
-  var gottmanByMonth=months.map(function(mk){return (byMonth[mk].mePos+byMonth[mk].herPos)/Math.max(1,byMonth[mk].meNeg+byMonth[mk].herNeg)});
-  var sentMe=months.map(function(mk){return byMonth[mk].mePos-byMonth[mk].meNeg});
-  var sentHer=months.map(function(mk){return byMonth[mk].herPos-byMonth[mk].herNeg});
-  var maxGap=0;
-  for(var i=1;i<times.length;i++){var g=times[i]-times[i-1];if(g>maxGap)maxGap=g}
-  var maxGapDays=Math.round(maxGap/86400000);
-  var meLen=me.reduce(function(s,m){return s+m.content.length},0)/Math.max(1,meCount);
-  var herLen=her.reduce(function(s,m){return s+m.content.length},0)/Math.max(1,herCount);
-  var meLenByMonth=months.map(function(mk){var ms=messages.filter(function(m){return m.sender==='me'&&new Date(m.time).toISOString().slice(0,7)===mk});return ms.reduce(function(s,m){return s+m.content.length},0)/Math.max(1,ms.length)});
-  var herLenByMonth=months.map(function(mk){var hs=messages.filter(function(m){return m.sender==='her'&&new Date(m.time).toISOString().slice(0,7)===mk});return hs.reduce(function(s,m){return s+m.content.length},0)/Math.max(1,hs.length)});
-  var topWords={};
-  messages.forEach(function(m){
-    m.content.split(/[\s，。！？、,.!?~～]+/).forEach(function(w){
-      if(w.length>=2&&w.length<=6)topWords[w]=(topWords[w]||0)+1;
-    });
-  });
-  var topW=Object.keys(topWords).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,8);
+  var gottmanByMonth=months.map(function(mk){return(byMonth[mk].mePos+byMonth[mk].herPos)/Math.max(1,byMonth[mk].meNeg+byMonth[mk].herNeg)});
+  var rationalMeByMonth=months.map(function(mk){return byMonth[mk].rationalMe/Math.max(1,byMonth[mk].me)});
+  var rationalHerByMonth=months.map(function(mk){return byMonth[mk].rationalHer/Math.max(1,byMonth[mk].her)});
+  var critMeByMonth=months.map(function(mk){return byMonth[mk].critMe/Math.max(1,byMonth[mk].me)*1000});
+  var critHerByMonth=months.map(function(mk){return byMonth[mk].critHer/Math.max(1,byMonth[mk].her)*1000});
+  var moodMeByMonth=months.map(function(mk){return(byMonth[mk].mePos-byMonth[mk].meNeg)/Math.max(1,byMonth[mk].me)*100});
+  var moodHerByMonth=months.map(function(mk){return(byMonth[mk].herPos-byMonth[mk].herNeg)/Math.max(1,byMonth[mk].her)*100});
+  
+  // 冲突段检测
+  var conflictSegments=[],curConflict=[];
+  messages.forEach(function(m){var isNeg=NEGATIVE.some(function(w){return m.content.indexOf(w)>=0});if(isNeg){curConflict.push(m)}else{if(curConflict.length>=2)conflictSegments.push(curConflict);curConflict=[]}});
+  if(curConflict.length>=2)conflictSegments.push(curConflict);
+  var conflictCount=conflictSegments.length;
+  var repairMe=0,repairHer=0,totalSilenceMe=0,totalSilenceHer=0;
+  conflictSegments.forEach(function(seg){var lastNegTime=seg[seg.length-1].time;var nextMsgIdx=messages.indexOf(seg[seg.length-1])+1;if(nextMsgIdx<messages.length){var nextMsg=messages[nextMsgIdx];var silence=nextMsg.time-lastNegTime;if(nextMsg.sender==='me'){repairMe++;totalSilenceMe+=silence/3600000}else{repairHer++;totalSilenceHer+=silence/3600000}}});
+  
+  // 断联
+  var maxGap=0;for(var i=1;i<times.length;i++){var g=times[i]-times[i-1];if(g>maxGap)maxGap=g}var maxGapDays=Math.round(maxGap/86400000);
+  
+  // 人称
+  var pnMe=countWord(me,'我'),pnHer=countWord(her,'我');
+  var pyMe=countWord(me,'你'),pyHer=countWord(her,'你');
+  var qMe=me.filter(function(m){return m.content.indexOf('？')>=0||m.content.indexOf('?')>=0}).length;
+  var qHer=her.filter(function(m){return m.content.indexOf('？')>=0||m.content.indexOf('?')>=0}).length;
+  
+  // 语气词
+  var toneMe=TONE_WORDS.map(function(w){return countWord(me,w)});
+  var toneHer=TONE_WORDS.map(function(w){return countWord(her,w)});
+  
+  // 依恋
+  var anxMe=countWords(me,ANXIOUS),anxHer=countWords(her,ANXIOUS);
+  var avoidMe=countWords(me,AVOID),avoidHer=countWords(her,AVOID);
+  var threatMe=countWords(me,THREAT),threatHer=countWords(her,THREAT);
+  var secureMe=countWords(me,SECURE),secureHer=countWords(her,SECURE);
+  
+  // 四骑士
   var critMe=countWords(me,CRITICISM),critHer=countWords(her,CRITICISM);
   var defMe=countWords(me,DEFENSIVE),defHer=countWords(her,DEFENSIVE);
   var contMe=countWords(me,CONTEMPT),contHer=countWords(her,CONTEMPT);
   var stoneMe=countWords(me,STONEWALL),stoneHer=countWords(her,STONEWALL);
+  
+  // 关心/爱称
   var careMe=countWords(me,CARE),careHer=countWords(her,CARE);
   var nickMe=countWords(me,NICKNAMES),nickHer=countWords(her,NICKNAMES);
-  var dailyMe=daysArr.map(function(d){return byDay[d].me});
-  var dailyHer=daysArr.map(function(d){return byDay[d].her});
+  var loveMe=countWords(me,LOVE_WORDS),loveHer=countWords(her,LOVE_WORDS);
+  var missMe=countWords(me,MISS_WORDS),missHer=countWords(her,MISS_WORDS);
+  var fsMe=countWord(me,'分手'),fsHer=countWord(her,'分手');
+  
+  // 高频词
+  var topWords={};
+  messages.forEach(function(m){m.content.split(/[\s，。！？、,.!?~～]+/).forEach(function(w){if(w.length>=2&&w.length<=6)topWords[w]=(topWords[w]||0)+1})});
+  var topW=Object.keys(topWords).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,8);
+  
+  // 小时/周
+  var byHour=new Array(24).fill(0);messages.forEach(function(m){byHour[new Date(m.time).getHours()]++});
+  var byWeek=[0,0,0,0,0,0,0];messages.forEach(function(m){byWeek[new Date(m.time).getDay()]++});
+  
+  // 称谓逐月
+  var nameByMonth=months.map(function(mk){var ms=messages.filter(function(m){return new Date(m.time).toISOString().slice(0,7)===mk});return{husband:countWord(ms,'老公'),wife:countWord(ms,'老婆'),baby:countWord(ms,'宝宝')}});
+  
   return{total:total,mePct:(meCount/total*100).toFixed(1),herPct:(herCount/total*100).toFixed(1),
-    days:days,herStartPct:(herStart/days*100).toFixed(1),gottman:gottman.toFixed(1),
+    days:days,herStartPct:(herStartDays/days*100).toFixed(1),gottman:gottman.toFixed(1),
     meMed:median(meDelays).toFixed(0),herMed:median(herDelays).toFixed(0),
-    meLen:meLen.toFixed(1),herLen:herLen.toFixed(1),maxGapDays:maxGapDays,
+    meFastPct:(meFast/Math.max(1,meDelays.length)*100).toFixed(1),herFastPct:(herFast/Math.max(1,herDelays.length)*100).toFixed(1),
+    maxGapDays:maxGapDays,sessionCount:sessionCount,
+    openMe:openMe,openHer:openHer,closeMe:closeMe,closeHer:closeHer,
+    maxBurstMe:maxBurstMe,maxBurstHer:maxBurstHer,burst3Me:burst3Me,burst3Her:burst3Her,burst5Me:burst5Me,burst5Her:burst5Her,
+    low5:low5,high5:high5,nightSent:nightSent.toFixed(4),daySentAvg:daySentAvg.toFixed(4),
     byHour:byHour,byWeek:byWeek,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x.toFixed(1)}),
-    sentMe:sentMe,sentHer:sentHer,topW:topW,topWords:topWords,
-    stoneMe:stoneMe,stoneHer:stoneHer,critMe:critMe,critHer:critHer,
-    defMe:defMe,defHer:defHer,contMe:contMe,contHer:contHer,
-    mePos:mePos,herPos:herPos,meNeg:meNeg,herNeg:herNeg,
-    careMe:careMe,careHer:careHer,nickMe:nickMe,nickHer:nickHer,
-    daysArr:daysArr,dailyMe:dailyMe,dailyHer:dailyHer,
-    meLenByMonth:meLenByMonth.map(function(x){return x.toFixed(1)}),
-    herLenByMonth:herLenByMonth.map(function(x){return x.toFixed(1)})};
+    rationalMeByMonth:rationalMeByMonth.map(function(x){return x.toFixed(2)}),rationalHerByMonth:rationalHerByMonth.map(function(x){return x.toFixed(2)}),
+    critMeByMonth:critMeByMonth.map(function(x){return x.toFixed(1)}),critHerByMonth:critHerByMonth.map(function(x){return x.toFixed(1)}),
+    moodMeByMonth:moodMeByMonth.map(function(x){return x.toFixed(1)}),moodHerByMonth:moodHerByMonth.map(function(x){return x.toFixed(1)}),
+    conflictCount:conflictCount,repairMe:repairMe,repairHer:repairHer,
+    avgSilenceMe:(totalSilenceMe/Math.max(1,repairMe)).toFixed(1),avgSilenceHer:(totalSilenceHer/Math.max(1,repairHer)).toFixed(1),
+    fsMe:fsMe,fsHer:fsHer,
+    pnMe:pnMe,pnHer:pnHer,pyMe:pyMe,pyHer:pyHer,qMe:qMe,qHer:qHer,
+    toneMe:toneMe,toneHer:toneHer,
+    anxMe:anxMe,anxHer:anxHer,avoidMe:avoidMe,avoidHer:avoidHer,threatMe:threatMe,threatHer:threatHer,secureMe:secureMe,secureHer:secureHer,
+    critMe:critMe,critHer:critHer,defMe:defMe,defHer:defHer,contMe:contMe,contHer:contHer,stoneMe:stoneMe,stoneHer:stoneHer,
+    careMe:careMe,careHer:careHer,nickMe:nickMe,nickHer:nickHer,loveMe:loveMe,loveHer:loveHer,missMe:missMe,missHer:missHer,
+    topW:topW,topWords:topWords,nameByMonth:nameByMonth,
+    daysArr:daysArr,dailyMe:daysArr.map(function(d){return byDay[d].me}),dailyHer:daysArr.map(function(d){return byDay[d].her})};
 }
 
+// ===== 渲染 =====
 function renderReport(d){
   document.getElementById('uploadPage').style.display='none';
   document.getElementById('reportPage').style.display='block';
-  var verdict;
-  if(d.gottman>=5&&d.maxGapDays<=3)verdict={t:'💚 健康甜蜜型',x:'你们的Gottman比率是'+d.gottman+':1，远高于健康线5:1。双方互动均衡，最长断联只有'+d.maxGapDays+'天。这是一段健康、稳定、双向奔赴的关系。'};
-  else if(d.mePct>60)verdict={t:'💙 单向投入型',x:'你发了'+d.mePct+'%的消息，TA只发了'+d.herPct+'%。你在关系里投入更多。Gottman比率'+d.gottman+':1。最长断联'+d.maxGapDays+'天。你一直在追，TA一直在退。'};
-  else if(d.gottman<1.5)verdict={t:'💔 高风险型',x:'Gottman比率只有'+d.gottman+':1，低于危险线。消极词多于积极词。最长断联'+d.maxGapDays+'天。这段关系需要认真对待了。'};
-  else if(d.maxGapDays>30)verdict={t:'💛 分分合合型',x:'Gottman比率'+d.gottman+':1，但最长断联'+d.maxGapDays+'天。好的时候特别好，断的时候特别绝。关系波动很大。'};
-  else verdict={t:'💜 总体稳定型',x:'Gottman比率'+d.gottman+':1，基本健康但有提升空间。最长断联'+d.maxGapDays+'天。有小摩擦但不影响大局。'};
-  document.getElementById('verdictTitle').textContent=verdict.t;
-  document.getElementById('verdictText').textContent=verdict.x;
-  document.getElementById('kpiGrid').innerHTML=
-    '<div class="kpi"><div class="v hl-purple">'+d.total.toLocaleString()+'</div><div class="l">总消息数</div></div>'+
-    '<div class="kpi"><div class="v" style="color:#a78bfa">'+d.days+'天</div><div class="l">持续天数</div></div>'+
+  // KPI
+  document.getElementById('kpiRow').innerHTML=
+    '<div class="kpi"><div class="v" style="color:var(--purple)">'+d.total.toLocaleString()+'</div><div class="l">总消息数</div></div>'+
+    '<div class="kpi"><div class="v" style="color:var(--purple)">'+d.days+'天</div><div class="l">持续天数</div></div>'+
     '<div class="kpi"><div class="v hl-her">'+d.herStartPct+'%</div><div class="l">TA主动开场</div></div>'+
     '<div class="kpi"><div class="v '+(d.gottman>=5?'hl-green':d.gottman>=2?'hl-gold':'hl-red')+'">'+d.gottman+':1</div><div class="l">Gottman比率</div></div>'+
     '<div class="kpi"><div class="v '+(d.maxGapDays<=3?'hl-green':d.maxGapDays<=7?'hl-gold':'hl-red')+'">'+d.maxGapDays+'天</div><div class="l">最长断联</div></div>'+
-    '<div class="kpi"><div class="v hl-me">'+d.meMed+'分</div><div class="l">你回复中位数</div></div>'+
-    '<div class="kpi"><div class="v hl-her">'+d.herMed+'分</div><div class="l">TA回复中位数</div></div>'+
+    '<div class="kpi"><div class="v hl-me">'+d.meMed+'分</div><div class="l">你回复中位</div></div>'+
+    '<div class="kpi"><div class="v hl-her">'+d.herMed+'分</div><div class="l">TA回复中位</div></div>'+
     '<div class="kpi"><div class="v hl-gold">'+d.careHer+'次</div><div class="l">TA关心你</div></div>';
-  var meType=d.meLen>12&&d.meMed<30?'深情焦虑者':d.meLen<6&&d.meMed>60?'冷淡被动者':'均衡沟通者';
-  var herType=d.herLen>12&&d.herMed<30?'温暖主动者':d.herLen<6&&d.herMed>60?'冷淡被动者':'均衡沟通者';
-  document.getElementById('roleCards').innerHTML=
-    '<div class="card"><h4>关系总断</h4><div class="big hl-purple">'+verdict.t.replace(/^\S+\s/,'')+'</div><p style="font-size:11px;color:#8a93a6">'+d.days+'天 · Gottman '+d.gottman+':1</p></div>'+
-    '<div class="card"><h4>TA 画像</h4><div class="big hl-her">'+herType+'</div><p style="font-size:11px;color:#8a93a6">'+d.herLen+'字/条 · 回复'+d.herMed+'分 · 关心'+d.careHer+'次</p></div>'+
-    '<div class="card"><h4>你 画像</h4><div class="big hl-me">'+meType+'</div><p style="font-size:11px;color:#8a93a6">'+d.meLen+'字/条 · 回复'+d.meMed+'分 · 关心'+d.careMe+'次</p></div>';
-  var aH=[],aM=[];
-  if(d.herMed>60)aH.push('回复速度：从'+d.herMed+'分钟降到30分钟内');
-  if(d.herStartPct<35)aH.push('多主动开场：从'+d.herStartPct+'%提到40%');
-  if(d.stoneHer>20)aH.push('别筑墙：有情绪直接说出来');
-  if(d.contHer>5)aH.push('减少蔑视：别阴阳怪气');
-  if(!aH.length)aH.push('保持现状，继续表达');
-  if(d.mePct>60)aM.push('别太主动：你发了'+d.mePct+'%的消息，留点空间给TA');
-  if(d.meMed<15&&d.meLen>15)aM.push('别连发小作文，简洁一点');
-  if(d.critMe>20)aM.push('减少批评：多用肯定代替指责');
-  if(d.meLen<4)aM.push('多说几句，别总用嗯哦应付');
-  if(!aM.length)aM.push('保持现状，继续表达');
-  document.getElementById('adviceHer').innerHTML='• '+aH.join('<br>• ');
-  document.getElementById('adviceMe').innerHTML='• '+aM.join('<br>• ');
+  // 判词
+  var relType=d.mePct>55?'单向投入型':d.maxGapDays>30?'分分合合型':d.gottman>=5?'健康甜蜜型':d.gottman<1.5?'高风险型':'波动型';
+  document.getElementById('verdictBox').innerHTML='<b>一句话结论：</b>这是一段<span class="hl-gold">'+relType+'</span>的关系。你发了'+d.mePct+'%的消息，TA发了'+d.herPct+'%；Gottman比率'+d.gottman+':1，最长断联'+d.maxGapDays+'天。';
+  // 三纸判词
+  var herType=d.anxHer>d.anxMe?'情绪明牌者·高反应性':'温和内敛者';
+  var meType=d.avoidMe>d.avoidHer?'情绪缓冲者·高理性':'热情主动者';
+  document.getElementById('trioBox').innerHTML=
+    '<div><div class="head" style="color:var(--gold)">关 系 总 断</div><div class="big" style="color:var(--gold)">'+relType+'</div><div class="body" style="border-color:var(--gold)">她追，你接；她用力，你保温。</div><div class="detail">TA主动开场'+d.herStartPct+'%，你修复率'+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%</div></div>'+
+    '<div><div class="head" style="color:var(--her)">TA · 画像</div><div class="big" style="color:var(--her)">'+herType+'</div><div class="body" style="border-color:var(--her)">燃时全盘托出，冷时一字不留。</div><div class="detail">连发'+d.maxBurstHer+'条 · 焦虑追问'+d.anxHer+'次 · 情绪要挟'+d.threatHer+'次</div></div>'+
+    '<div><div class="head" style="color:var(--me)">你 · 画像</div><div class="big" style="color:var(--me)">'+meType+'</div><div class="body" style="border-color:var(--me)">话藏在表情里，态度藏在动作里。</div><div class="detail">连发'+d.maxBurstMe+'条 · 回避疏离'+d.avoidMe+'次 · 问句'+d.qMe+'次</div></div>';
+  // 目录
+  document.getElementById('tocBox').innerHTML='<h4>目 录</h4><div class="toc-grid">'+
+    '<div class="toc-item"><b>01</b>两个人的画像</div>'+
+    '<div class="toc-item"><b>02</b>同一句话两种语言</div>'+
+    '<div class="toc-item"><b>03</b>谁在推谁在接</div>'+
+    '<div class="toc-item"><b>04</b>感情波动</div>'+
+    '<div class="toc-item"><b>05</b>吵架怎么结束</div>'+
+    '<div class="toc-item"><b>06</b>节奏与逐月变化</div>'+
+    '<div class="toc-item"><b>07</b>心理学框架</div>'+
+    '<div class="toc-item"><b>08</b>谁更爱谁</div>'+
+    '<div class="toc-item"><b>09</b>最终药方</div>'+
+    '</div>';
+  // 01 画像
+  document.getElementById('herProfile').innerHTML='· 焦虑追问 <span class="hl-her">'+d.anxHer+'</span> 次（你 '+d.anxMe+'）<br>· 情绪要挟 <span class="hl-her">'+d.threatHer+'</span> 次（你 '+d.threatMe+'）<br>· 安全表达 <span class="hl-her">'+d.secureHer+'</span> 次（你 '+d.secureMe+'）<br>· 关心你 <span class="hl-her">'+d.careHer+'</span> 次（你 '+d.careMe+'）';
+  document.getElementById('meProfile').innerHTML='· 回避疏离 <span class="hl-me">'+d.avoidMe+'</span> 次（TA '+d.avoidHer+'）<br>· 问句 <span class="hl-me">'+d.qMe+'</span>（TA '+d.qHer+'）——你更常了解她<br>· 修复率 '+(d.repairMe/Math.max(1,d.conflictCount)*100).toFixed(1)+'%<br>· 理性指数 '+(d.rationalMeByMonth.reduce(function(a,b){return parseFloat(a)+parseFloat(b)},0)/d.months.length).toFixed(2);
+  // 02 语言
+  document.getElementById('pnMe').textContent=d.pnMe.toLocaleString();
+  document.getElementById('pnHer').textContent=d.pnHer.toLocaleString();
+  document.getElementById('pnRead').textContent=d.pnHer>d.pnMe?'TA自我表露多':'你自我表露多';
+  document.getElementById('pyMe').textContent=d.pyMe.toLocaleString();
+  document.getElementById('pyHer').textContent=d.pyHer.toLocaleString();
+  document.getElementById('pyRead').textContent=d.pyMe>d.pyHer?'你更指向TA':'TA更指向你';
+  document.getElementById('qMe').textContent=d.qMe;
+  document.getElementById('qHer').textContent=d.qHer;
+  document.getElementById('topWordsDesc').textContent='你的Top8: '+d.topW.slice(0,4).join('、')+'...';
+  // 03 对话
+  document.getElementById('openMe').textContent=d.openMe;
+  document.getElementById('openHer').textContent=d.openHer;
+  document.getElementById('openPct').textContent=(d.openHer/d.sessionCount*100).toFixed(1)+'% TA';
+  document.getElementById('closeMe').textContent=d.closeMe;
+  document.getElementById('closeHer').textContent=d.closeHer;
+  document.getElementById('medMe').textContent=d.meMed+'分';
+  document.getElementById('medHer').textContent=d.herMed+'分';
+  document.getElementById('fastMe').textContent=d.meFastPct+'%';
+  document.getElementById('fastHer').textContent=d.herFastPct+'%';
+  document.getElementById('maxBurstMe').textContent=d.maxBurstMe+'条';
+  document.getElementById('maxBurstHer').textContent=d.maxBurstHer+'条';
+  document.getElementById('burstRead').textContent=d.maxBurstHer>d.maxBurstMe?'TA倾泻式':'你倾泻式';
+  document.getElementById('burst3Me').textContent=d.burst3Me;
+  document.getElementById('burst3Her').textContent=d.burst3Her;
+  document.getElementById('burst5Me').textContent=d.burst5Me;
+  document.getElementById('burst5Her').textContent=d.burst5Her;
+  // 04 情绪
+  var lowHtml='<tr><th>日期</th><th class="num">情感分</th></tr>';
+  d.low5.forEach(function(p){lowHtml+='<tr><td>'+p.d+'</td><td class="num hl-red">'+(p.v*100).toFixed(1)+'</td></tr>'});
+  document.getElementById('lowTable').innerHTML=lowHtml;
+  var highHtml='<tr><th>日期</th><th class="num">情感分</th></tr>';
+  d.high5.forEach(function(p){highHtml+='<tr><td>'+p.d+'</td><td class="num hl-green">'+(p.v*100).toFixed(1)+'</td></tr>'});
+  document.getElementById('highTable').innerHTML=highHtml;
+  document.getElementById('nightDiff').innerHTML='深夜情感均分 <span class="hl-red">'+(d.nightSent*100).toFixed(2)+'</span>，白天 <span class="hl-me">'+(d.daySentAvg*100).toFixed(2)+'</span>——你们的坏话和心事都攒到深夜才说。';
+  // 05 冲突
+  document.getElementById('conflictTotal').textContent=d.conflictCount+' 个冲突段';
+  document.getElementById('repairMe').textContent=d.repairMe+' 次';
+  document.getElementById('repairHer').textContent=d.repairHer+' 次';
+  document.getElementById('silenceMe').textContent=d.avgSilenceMe+' h';
+  document.getElementById('silenceHer').textContent=d.avgSilenceHer+' h';
+  document.getElementById('fsMe').textContent=d.fsMe+' 次';
+  document.getElementById('fsHer').textContent=d.fsHer+' 次';
+  // 08 谁更爱谁
+  document.getElementById('row_count').innerHTML='<td>消息条数</td><td class="num">'+(d.total*(1-d.mePct/100)).toFixed(0)+'</td><td class="num hl-her">'+(d.total*d.mePct/100).toFixed(0)+'</td><td class="'+(d.herPct>d.mePct?'hl-her':'hl-me')+'">'+(d.herPct>d.mePct?'TA +'+(d.herPct-d.mePct).toFixed(0)+'%':'你 +'+(d.mePct-d.herPct).toFixed(0)+'%')+'</td>';
+  document.getElementById('row_start').innerHTML='<td>主动开场</td><td class="num">'+d.openMe+'</td><td class="num hl-her">'+d.openHer+'</td><td class="hl-her">TA '+(d.openHer/d.sessionCount*100).toFixed(0)+'%</td>';
+  document.getElementById('row_care').innerHTML='<td>关心/问候</td><td class="num">'+d.careMe+'</td><td class="num hl-her">'+d.careHer+'</td><td class="'+(d.careHer>d.careMe?'hl-her':'hl-me')+'">'+(d.careHer>d.careMe?'TA +'+Math.round((d.careHer-d.careMe)/Math.max(1,d.careMe)*100)+'%':'你 +'+Math.round((d.careMe-d.careHer)/Math.max(1,d.careHer)*100)+'%')+'</td>';
+  document.getElementById('row_nick').innerHTML='<td>爱称次数</td><td class="num">'+d.nickMe+'</td><td class="num">'+d.nickHer+'</td><td class="'+(d.nickHer>d.nickMe?'hl-her':'hl-me')+'">'+(d.nickHer>d.nickMe?'TA多':'你多')+'</td>';
+  document.getElementById('row_love').innerHTML='<td>「爱你」</td><td class="num">'+d.loveMe+'</td><td class="num">'+d.loveHer+'</td><td class="'+(d.loveHer>d.loveMe?'hl-her':'hl-me')+'">'+(d.loveHer>d.loveMe?'TA多':'你多')+'</td>';
+  document.getElementById('row_miss').innerHTML='<td>「想你」</td><td class="num">'+d.missMe+'</td><td class="num">'+d.missHer+'</td><td class="'+(d.missMe>d.missHer?'hl-me':'hl-her')+'">'+(d.missMe>d.missHer?'你多':'TA多')+'</td>';
+  document.getElementById('loveVerdict').innerHTML='<b>综合判断：</b>在主动投入维度上——开口、关心、说爱你——TA是更用力的一方。你更拿手的是爱称粘性和情绪缓冲。这不是「谁更爱谁」，而是「TA更敢表达，你更擅长保温」。';
+  // 09 药方
+  var aH=[];
+  if(d.threatHer>10)aH.push('1. 把「分手」从情绪砝码里拿掉——说多了，真分手那一次就没人当真了。');
+  if(d.maxBurstHer>20)aH.push('2. 情绪上来时，先缓24小时再发——连发'+d.maxBurstHer+'条是宣泄，但不是沟通。');
+  if(d.contHer>10)aH.push('3. 别用蔑视/阴阳怪气——讽刺比吵架更伤人。');
+  if(!aH.length)aH.push('保持现状，继续表达。');
+  var aM=[];
+  if(d.mePct>55)aM.push('1. 别太主动——你发了'+d.mePct+'%的消息，留点空间给TA。');
+  if(d.avoidMe>50)aM.push('2. 把「算了」换成具体诉求——回避疏离'+d.avoidMe+'次，冲突后别用沉默收尾。');
+  if(d.openMe<d.openHer*0.5)aM.push('3. 主动开口——TA承担了'+(d.openHer/d.sessionCount*100).toFixed(0)+'%的开场，每天多一次你先开口。');
+  if(d.critMe>10)aM.push('4. 减少批评——多用肯定代替指责。');
+  if(!aM.length)aM.push('保持现状，继续表达。');
+  document.getElementById('adviceHer').innerHTML=aH.join('<br><br>');
+  document.getElementById('adviceMe').innerHTML=aM.join('<br><br>');
+  document.getElementById('adviceBoth').innerHTML='你们从不吵三观——'+d.conflictCount+'次冲突里，吵的从来都是「有没有被放在第一位」。这是可以被解决的问题，不是不合适。TA的情绪化不是无理取闹，是焦虑型依恋的标准动作；你的冷静不是不在乎，是回避型处理情绪的方式——只是TA读不出来。';
+  
   renderCharts(d);
   window.scrollTo(0,0);
 }
 
 function renderCharts(d){
-  function mk(id,opt){echarts.init(document.getElementById(id)).setOption(opt)}
-  mk('c_daily',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'},top:0},grid:{top:30,bottom:30,left:40,right:20},xAxis:{type:'category',data:d.daysArr,axisLabel:{color:'#8a93a6',show:false}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'line',data:d.dailyMe,smooth:true,lineStyle:{color:'#60a5fa',width:2},showSymbol:false},{name:'TA',type:'line',data:d.dailyHer,smooth:true,lineStyle:{color:'#f778ba',width:2},showSymbol:false}]});
-  mk('c_gottman',{tooltip:{trigger:'axis',triggerOn:'click',confine:true,valueFormatter:function(x){return x+':1'}},grid:{top:20,bottom:30,left:40,right:20},xAxis:{type:'category',data:d.months,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{type:'line',data:d.gottmanByMonth,smooth:true,lineStyle:{width:3,color:'#a78bfa'},areaStyle:{opacity:0.1},markLine:{data:[{yAxis:5,label:{formatter:'健康线',color:'#4ade80'},lineStyle:{color:'#4ade80',type:'dashed'}},{yAxis:1,label:{formatter:'危险线',color:'#f87171'},lineStyle:{color:'#f87171',type:'dotted'}}]}}]});
-  mk('c_sentiment',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'},top:0},grid:{top:30,bottom:30,left:40,right:20},xAxis:{type:'category',data:d.months,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'情绪净分',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'line',data:d.sentMe,smooth:true,lineStyle:{color:'#60a5fa'}},{name:'TA',type:'line',data:d.sentHer,smooth:true,lineStyle:{color:'#f778ba'},markLine:{data:[{yAxis:0,lineStyle:{color:'#8a93a6',type:'dashed'}}]}}]});
-  mk('c_reply',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'},top:0},grid:{top:30,bottom:30,left:40,right:20},xAxis:{type:'category',data:['中位数回复延迟'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'分钟',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'bar',data:[parseInt(d.meMed)],itemStyle:{color:'#60a5fa'},markLine:{data:[{yAxis:30,label:{formatter:'正常线',color:'#4ade80'},lineStyle:{color:'#4ade80',type:'dashed'}}]}},{name:'TA',type:'bar',data:[parseInt(d.herMed)],itemStyle:{color:'#f778ba'}}]});
-  mk('c_len',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'},top:0},grid:{top:30,bottom:30,left:40,right:20},xAxis:{type:'category',data:d.months,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'字/条',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'line',data:d.meLenByMonth,smooth:true,lineStyle:{color:'#60a5fa'}},{name:'TA',type:'line',data:d.herLenByMonth,smooth:true,lineStyle:{color:'#f778ba'}}]});
-  mk('c_words',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{top:20,bottom:30,left:40,right:20},xAxis:{type:'category',data:d.topW,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{type:'bar',data:d.topW.map(function(w){return d.topWords[w]||0}),itemStyle:{color:'#a78bfa'}}]});
-  mk('c_hour',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{top:20,bottom:30,left:40,right:20},xAxis:{type:'category',data:['0','2','4','6','8','10','12','14','16','18','20','22'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{type:'line',data:d.byHour.filter(function(_,i){return i%2===0}),smooth:true,areaStyle:{opacity:0.15},lineStyle:{color:'#f778ba',width:3}}]});
-  mk('c_week',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},grid:{top:20,bottom:30,left:40,right:20},xAxis:{type:'category',data:['周日','周一','周二','周三','周四','周五','周六'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{type:'bar',data:d.byWeek,itemStyle:{color:function(p){return p.dataIndex===0||p.dataIndex===6?'#f778ba':'#60a5fa'}}}]});
-  mk('c_horsemen',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'},top:0},grid:{top:30,bottom:30,left:40,right:20},xAxis:{type:'category',data:['批评','防御','蔑视','筑墙'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'bar',data:[d.critMe,d.defMe,d.contMe,d.stoneMe],itemStyle:{color:'#60a5fa'}},{name:'TA',type:'bar',data:[d.critHer,d.defHer,d.contHer,d.stoneHer],itemStyle:{color:'#f778ba'}}]});
-  mk('c_love',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'},top:0},grid:{top:30,bottom:30,left:40,right:20},xAxis:{type:'category',data:['关心次数','爱称次数','积极词'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'bar',data:[d.careMe,d.nickMe,d.mePos],itemStyle:{color:'#60a5fa'}},{name:'TA',type:'bar',data:[d.careHer,d.nickHer,d.herPos],itemStyle:{color:'#f778ba'}}]});
+  function mk(id,opt){var el=document.getElementById(id);if(el)echarts.init(el).setOption(opt)}
+  var AX={axisLine:{lineStyle:{color:'rgba(255,255,255,.2)'}},axisLabel:{color:'#8fa1b4',fontSize:11},splitLine:{lineStyle:{color:'rgba(255,255,255,.06)'}}};
+  var base={tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{textStyle:{color:'#8fa1b4',fontSize:11},top:2},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category'},AX),yAxis:Object.assign({type:'value'},AX)};
+  // 01 依恋
+  mk('c_attachment',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['焦虑追问','回避疏离','情绪要挟','安全表达']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.anxMe,d.avoidMe,d.threatMe,d.secureMe],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.anxHer,d.avoidHer,d.threatHer,d.secureHer],itemStyle:{color:'#f06292'}}]});
+  // 02 语气词
+  mk('c_tone',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['哈','嗯','吧','哦','呀','呢','啊','嘛']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:d.toneMe,itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:d.toneHer,itemStyle:{color:'#f06292'}}]});
+  // 03 消息量
+  mk('c_volume',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.dailyMe.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#5b8def'},areaStyle:{opacity:0.1}},{name:'TA',type:'line',data:d.dailyHer.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#f06292'},areaStyle:{opacity:0.1}}]});
+  // 04 情感
+  mk('c_sentiment',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value',name:'情感分'},AX),series:[{type:'line',data:d.moodMeByMonth.map(function(x){return parseFloat(x)/100}),smooth:true,lineStyle:{color:'#07c160',width:2.5},areaStyle:{opacity:0.1}}]});
+  // 05 修复率
+  mk('c_repair',{tooltip:base.tooltip,legend:{data:['你修复','TA修复'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['修复次数']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你修复',type:'bar',data:[d.repairMe],itemStyle:{color:'#5b8def'}},{name:'TA修复',type:'bar',data:[d.repairHer],itemStyle:{color:'#f06292'}}]});
+  mk('c_silence',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['平均静默时长']},AX),yAxis:Object.assign({type:'value',name:'小时'},AX),series:[{name:'你',type:'bar',data:[parseFloat(d.avgSilenceMe)],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[parseFloat(d.avgSilenceHer)],itemStyle:{color:'#f06292'}}]});
+  // 06 生物钟
+  mk('c_clock',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:['0','2','4','6','8','10','12','14','16','18','20','22']},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.byHour.filter(function(_,i){return i%2===0}),smooth:true,areaStyle:{opacity:0.15},lineStyle:{color:'#f06292',width:3}}]});
+  mk('c_rational',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.rationalMeByMonth,smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:d.rationalHerByMonth,smooth:true,lineStyle:{color:'#f06292'}}]});
+  mk('c_critic',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.critMeByMonth,smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:d.critHerByMonth,smooth:true,lineStyle:{color:'#f06292'}}]});
+  mk('c_mood',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.moodMeByMonth,smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:d.moodHerByMonth,smooth:true,lineStyle:{color:'#f06292'}}]});
+  // 07 Gottman
+  mk('c_gottman',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:d.gottmanByMonth,smooth:true,lineStyle:{width:3,color:'#a78bfa'},markLine:{data:[{yAxis:5,lineStyle:{color:'#07c160',type:'dashed'}},{yAxis:1,lineStyle:{color:'#ff5c5c',type:'dotted'}}]}}]});
+  mk('c_horsemen',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['批评','防御','蔑视','筑墙']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.critMe,d.defMe,d.contMe,d.stoneMe],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.critHer,d.defHer,d.contHer,d.stoneHer],itemStyle:{color:'#f06292'}}]});
+  mk('c_love',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['关心','爱称','积极词']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.careMe,d.nickMe,d.mePos],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.careHer,d.nickHer,d.herPos],itemStyle:{color:'#f06292'}}]});
+  mk('c_names',{tooltip:base.tooltip,legend:{data:['老公','老婆','宝宝'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'老公',type:'line',data:d.nameByMonth.map(function(x){return x.husband}),smooth:true,lineStyle:{color:'#f06292'}},{name:'老婆',type:'line',data:d.nameByMonth.map(function(x){return x.wife}),smooth:true,lineStyle:{color:'#5b8def'}},{name:'宝宝',type:'line',data:d.nameByMonth.map(function(x){return x.baby}),smooth:true,lineStyle:{color:'#ffb648'}}]});
 }
 
 var dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput');
@@ -327,11 +589,8 @@ function handleFile(file){
     try{
       var messages=parseFile(e.target.result);
       if(messages.length<10){alert('至少需要10条消息才能分析');return}
-      alert('正在分析 '+messages.length+' 条消息，请稍候...');
-      setTimeout(function(){
-        var data=analyze(messages);
-        renderReport(data);
-      },100);
+      alert('正在深度分析 '+messages.length+' 条消息，请稍候...');
+      setTimeout(function(){var data=analyze(messages);renderReport(data)},200);
     }catch(err){alert('解析失败：'+err.message)}
   };
   reader.readAsText(file,'UTF-8');
@@ -339,4 +598,3 @@ function handleFile(file){
 </script>
 </body>
 </html>
-
