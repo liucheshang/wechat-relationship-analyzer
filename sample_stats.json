@@ -1,0 +1,72 @@
+{
+  "period": {"start": "2024-05-15", "end": "2025-02-20", "days": 280},
+  "total_messages": 32900,
+  "by_sender": {"self": 22300, "her": 10600},
+  "self_ratio": 0.678,
+  "her_ratio": 0.322,
+  "her_initiate_rate": 0.286,
+  "her_initiate_days": 80,
+  "self_initiate_days": 200,
+  "max_silence_days": 3,
+  "reply_median_minutes": {"self": 8, "her": 72},
+  "reply_p90_minutes": {"self": 30, "her": 420},
+  "avg_msg_len": {"self": 18.5, "her": 6.2},
+  "late_night_msgs": {"self": 3200, "her": 890},
+  "voice_msgs": {"self": 45, "her": 23},
+  "emoji_count": {"self": 1890, "her": 480},
+  "gottman_ratio": {
+    "overall": 2.1,
+    "monthly": [3.2, 2.8, 2.1, 1.8, 1.5, 1.2, 1.8, 2.0, 2.3, 1.9, 2.1, 2.0],
+    "months": ["5月","6月","7月","8月","9月","10月","11月","12月","1月","2月","3月","4月"]
+  },
+  "four_horsemen": {
+    "criticism": {"self": 28, "her": 12},
+    "defensiveness": {"self": 45, "her": 8},
+    "contempt": {"self": 6, "her": 19},
+    "stonewalling": {"self": 3, "her": 38}
+  },
+  "love_triangle": {
+    "intimacy": {"self": 1200, "her": 680},
+    "passion": {"self": 850, "her": 320},
+    "commitment": {"self": 420, "her": 95}
+  },
+  "love_languages": {
+    "affirmation": {"self": 89, "her": 23},
+    "service": {"self": 214, "her": 76},
+    "gifts": {"self": 12, "her": 3},
+    "time": {"self": 3200, "her": 890},
+    "touch": {"self": 45, "her": 8}
+  },
+  "power": {
+    "end_convo": {"self": 67, "her": 156},
+    "compromise": {"self": 189, "her": 45},
+    "questions": {"self": 1240, "her": 320}
+  },
+  "emotion_sync": {"correlation": -0.32},
+  "resilience": {
+    "total_conflicts": 14,
+    "repaired": 11,
+    "avg_silence_hours": 42,
+    "self_first_repair": 9,
+    "her_first_repair": 2
+  },
+  "conflict_timeline": [
+    {"start": "2024-07-12 14:30", "end": "2024-07-12 20:15", "silence_hours": 18, "first_repairer": "self"},
+    {"start": "2024-09-03 22:40", "end": "2024-09-04 10:20", "silence_hours": 36, "first_repairer": "self"},
+    {"start": "2024-11-18 16:00", "end": "2024-11-19 09:30", "silence_hours": 24, "first_repairer": "self"}
+  ],
+  "topics": {
+    "家庭": {"self": 340, "her": 180},
+    "朋友": {"self": 280, "her": 150},
+    "工作": {"self": 560, "her": 320},
+    "钱": {"self": 120, "her": 45},
+    "感情": {"self": 890, "her": 230},
+    "身体": {"self": 180, "her": 90},
+    "娱乐": {"self": 420, "her": 280},
+    "出行": {"self": 260, "her": 110}
+  },
+  "nicknames": {"self_uses": 45, "her_uses": 12},
+  "care_count": {"self_to_her": 214, "her_to_self": 76},
+  "top_words_self": ["宝宝", "哈哈哈", "嗯", "好吧", "想你", "吃饭了吗", "早点睡"],
+  "top_words_her": ["嗯", "哦", "哈哈", "好吧", "行", "忙", "嗯呢"]
+}
