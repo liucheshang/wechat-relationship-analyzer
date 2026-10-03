@@ -271,8 +271,8 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:11px;text-align:center}
 </div>
 <div class="card" style="border-top:3px solid var(--gold)"><h3 style="color:var(--gold)">互相需要谅解的</h3><p id="adviceBoth" style="font-size:13px;line-height:1.9"></p></div>
 <div class="card" style="border-top:3px solid var(--purple);margin-top:20px"><h3 style="color:var(--purple)">想要更深度的分析？</h3><p style="font-size:13px;line-height:1.9;color:var(--muted)">
-本在线版采样前10000条消息做快速分析。完整深度版（<b>全量消息、逐月情感趋势、理性指数、批评频率、称谓变化、冲突时间线</b>等）需要下载本地Python脚本运行：<br><br>
-1. 去 <b>github.com/liucheshang/wechat-relationship-analyzer</b> 下载 <b>scripts/analyze.py</b> 和 <b>scripts/report_template.html</b><br>
+本在线版超过 1 万条时，会按时间顺序<b>均匀采样 1 万条</b>做快速分析（覆盖全时间范围，不是只取开头）。完整深度版（<b>全量消息、逐月情感趋势、理性指数、批评频率、称谓变化、冲突时间线</b>等）需要下载本地Python脚本运行：<br><br>
+1. 去 <b>github.com/liucheshang/wechat-relationship-analyzer</b> 下载 <b>scripts/analyze.py</b> 和 <b>scripts/report_template.html</b>（可选再下 <b>scripts/echarts.min.js</b>，断网也能出图）<br>
 2. 命令行运行：<code style="background:rgba(255,255,255,.08);padding:2px 8px;border-radius:4px">python analyze.py 聊天记录.txt 报告.html</code><br>
 3. 用浏览器打开生成的报告HTML即可<br><br>
 <b style="color:var(--green)">所有数据都在你本地处理，隐私零泄露。</b>
@@ -462,7 +462,7 @@ function renderReport(d){
   document.getElementById('uploadPage').style.display='none';
   document.getElementById('reportPage').style.display='block';
   // 大数据量提示
-  if(d.totalCount>20000){
+  if(d.totalCount>10000){
     var banner=document.createElement('div');
     banner.style.cssText='background:#1a2332;border:1px solid #ffb648;border-radius:8px;padding:12px 16px;margin:16px 0;color:#ffb648;font-size:14px';
     banner.innerHTML='⚠ 你的聊天记录共'+d.totalCount+'条，本在线版采样了'+d.total+'条做快速分析。完整深度报告请用本地Python脚本，见页面底部说明。';
