@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分分合合型 · 关系分析报告</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0f1115; color: #e9eef4; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.7; }
+.layout { display: flex; max-width: 1200px; margin: 0 auto; }
+.sidebar { width: 240px; position: fixed; top: 0; left: 0; height: 100vh; padding: 30px 20px; background: #1a1d24; border-right: 1px solid #2a2d35; overflow-y: auto; }
+.sidebar h3 { font-size: 14px; color: #8a93a6; margin-bottom: 16px; font-weight: 600; }
+.sidebar a { display: block; padding: 8px 12px; color: #8a93a6; text-decoration: none; font-size: 13px; border-radius: 6px; margin-bottom: 2px; transition: all 0.2s; }
+.sidebar a:hover, .sidebar a.active { color: #fbbf24; background: rgba(251,191,36,0.1); }
+.main { margin-left: 240px; flex: 1; padding: 40px; max-width: 960px; }
+.section { margin-bottom: 60px; }
+.section h2 { font-size: 24px; color: #fbbf24; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid #2a2d35; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.kpi { background: #1a1d24; padding: 24px; border-radius: 12px; text-align: center; }
+.kpi .v { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+.kpi .l { font-size: 12px; color: #8a93a6; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.card { background: #1a1d24; padding: 20px; border-radius: 12px; }
+.card h3 { font-size: 14px; color: #8a93a6; margin-bottom: 12px; }
+.card .big { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.chart { width: 100%; height: 350px; background: #1a1d24; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.hl-me { color: #60a5fa; }
+.hl-her { color: #f778ba; }
+.hl-green { color: #4ade80; }
+.hl-red { color: #f87171; }
+.hl-gold { color: #fbbf24; }
+.hl-purple { color: #a78bfa; }
+ul { padding-left: 20px; margin: 12px 0; }
+li { margin-bottom: 8px; font-size: 14px; }
+.note { font-size: 12px; color: #8a93a6; margin-top: 8px; }
+.back { display: inline-block; padding: 8px 16px; background: #2a2d35; color: #e9eef4; text-decoration: none; border-radius: 6px; margin-bottom: 24px; font-size: 13px; }
+.timeline { position: relative; padding-left: 30px; margin: 20px 0; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #fbbf24; }
+.timeline-item { position: relative; margin-bottom: 20px; }
+.timeline-item::before { content: ''; position: absolute; left: -28px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #fbbf24; border: 2px solid #0f1115; }
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px; }
+  .kpi-grid, .cards, .two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar">
+<h3>目录</h3>
+<a href="#sec1">一、总览</a>
+<a href="#sec2">二、依恋与人格</a>
+<a href="#sec3">三、语言风格</a>
+<a href="#sec4">四、互动模式</a>
+<a href="#sec5">五、情感趋势</a>
+<a href="#sec6">六、冲突时间线</a>
+<a href="#sec7">七、节奏与变化</a>
+<a href="#sec8">八、关系科学</a>
+<a href="#sec9">九、证据总结</a>
+<a href="#sec10">十、改进建议</a>
+</nav>
+<main class="main">
+<a href="index.html" class="back">← 返回主页</a>
+<section class="section" id="sec1">
+<h2>一、总览</h2>
+<p style="color:#8a93a6;margin-bottom:24px">2024.01.01 — 2024.12.31 · 365 天 · 28,500 条消息</p>
+<div class="kpi-grid">
+<div class="kpi"><div class="v hl-gold">28,500</div><div class="l">总消息数</div></div>
+<div class="kpi"><div class="v hl-gold">38%</div><div class="l">TA 主动开场率</div></div>
+<div class="kpi"><div class="v hl-red">45 天</div><div class="l">最长断联</div></div>
+<div class="kpi"><div class="v hl-gold">2.8 : 1</div><div class="l">Gottman 比率（波动大）</div></div>
+</div>
+<div class="cards">
+<div class="card"><h3>关系总断</h3><div class="big hl-gold">分分合合型</div><p style="font-size:13px;color:#8a93a6">好的时候很好，差的时候断联。过山车式的关系。</p></div>
+<div class="card"><h3>TA 画像</h3><div class="big hl-her">忽冷忽热者</div><p style="font-size:13px;color:#8a93a6">开心时很暖，吵架时消失。情绪不稳定。</p></div>
+<div class="card"><h3>你 画像</h3><div class="big hl-me">反复拉扯者</div><p style="font-size:13px;color:#8a93a6">想分又舍不得，想留又很痛苦。内耗严重。</p></div>
+</div>
+</section>
+<section class="section" id="sec2">
+<h2>二、依恋风格与人格</h2>
+<div class="two-col">
+<div class="card"><h3>TA（焦虑-回避摇摆）</h3><ul><li>吵架就消失（45天断联）—— 回避型发作</li><li>和好就很甜（Gottman 5.2）—— 焦虑型发作</li><li>回复忽快忽慢（中位数95分钟）—— 看心情</li><li>爱说"分手/算了"—— 情绪上头就提</li></ul><p style="font-size:13px;color:#8a93a6;margin-top:12px"><b>判词：</b>情绪过山车 · 极不稳定。靠不住但很吸引人。</p></div>
+<div class="card"><h3>你（焦虑型加重）</h3><ul><li>连发消息多（16.8字/条）—— 怕被抛弃</li><li>回复快（中位数25分钟）—— 怕断联</li><li>主动开场多（55%）—— 拼命维系</li><li>爱说"为什么/怎么办"—— 焦虑型追问</li></ul><p style="font-size:13px;color:#8a93a6;margin-top:12px"><b>判词：</b>拉扯型人格 · 内耗严重。越痛越放不下。</p></div>
+</div>
+<p><b>结论：</b>你们是「焦虑-回避」的极端版本。TA冷你追，你追TA跑，跑完又回来找你。</p>
+</section>
+<section class="section" id="sec3">
+<h2>三、语言风格对比</h2>
+<div class="chart" id="c_words"></div>
+<p class="note">高频词对比：你爱说"为什么/算了/怎么办"，TA爱说"分手/累了/不知道"。</p>
+<div class="two-col">
+<div class="card"><h3>你的口头禅</h3><p style="font-size:14px">为什么 · 算了 · 随便 · 好吧 · 想你 · 对不起 · 怎么办</p><p style="font-size:12px;color:#8a93a6">特征：焦虑型、追问型、自责型</p></div>
+<div class="card"><h3>TA的口头禅</h3><p style="font-size:14px">嗯 · 哦 · 随便 · 累了 · 分手 · 算了 · 不知道</p><p style="font-size:12px;color:#8a93a6">特征：回避型、绝望型、撤退型</p></div>
+</div>
+<p><b>结论：</b>你在追问，TA在撤退。你越追问TA越撤退，TA越撤退你越追问。</p>
+</section>
+<section class="section" id="sec4">
+<h2>四、互动模式：过山车</h2>
+<div class="kpi-grid">
+<div class="kpi"><div class="v hl-me">180天</div><div class="l">你主动开场</div></div>
+<div class="kpi"><div class="v hl-her">110天</div><div class="l">TA主动开场</div></div>
+<div class="kpi"><div class="v hl-me">25分钟</div><div class="l">你回复中位数</div></div>
+<div class="kpi"><div class="v hl-her">95分钟</div><div class="l">TA回复中位数</div></div>
+</div>
+<div class="chart" id="c_reply"></div>
+<p class="note">回复延迟对比：你秒回，TA平均95分钟。P90差了12倍。</p>
+<p><b>结论：</b>好的时候双向奔赴，差的时候单向追逐。这就是你们的节奏。</p>
+</section>
+<section class="section" id="sec5">
+<h2>五、情感趋势：大起大落</h2>
+<div class="chart" id="c_gottman"></div>
+<p class="note">Gottman比率月度趋势：从5.2暴跌到0.2，又回升到4.2。过山车。</p>
+<div class="two-col">
+<div class="card"><h3>四骑士对比</h3><p style="font-size:14px">你：批评45次 > 防御32次 > 筑墙25次 > 蔑视18次<br>TA：筑墙42次 > 批评38次 > 蔑视22次 > 防御28次</p><p style="font-size:12px;color:#8a93a6;margin-top:8px">TA的筑墙（42次）是头号问题——吵架就消失。</p></div>
+<div class="card"><h3>爱情三角</h3><p style="font-size:14px">亲密：你1500 vs TA1100<br>激情：你980 vs TA650<br>承诺：你520 vs TA280</p><p style="font-size:12px;color:#8a93a6;margin-top:8px">TA的承诺只有你的一半——TA还没想好要不要走下去。</p></div>
+</div>
+<p><b>结论：</b>关系极不稳定。Gottman比率从5.2跌到0.2又回升，典型的分分合合。</p>
+</section>
+<section class="section" id="sec6">
+<h2>六、冲突时间线</h2>
+<div class="kpi-grid">
+<div class="kpi"><div class="v hl-gold">23次</div><div class="l">总冲突</div></div>
+<div class="kpi"><div class="v hl-gold">15次</div><div class="l">和好（65%）</div></div>
+<div class="kpi"><div class="v hl-red">72小时</div><div class="l">平均静默</div></div>
+<div class="kpi"><div class="v hl-me">12次</div><div class="l">你先和好</div></div>
+</div>
+<div class="timeline">
+<div class="timeline-item"><h4>2024.05.20 — 2024.07.05（断联45天）</h4><p style="font-size:13px;color:#8a93a6">大吵架，TA消失45天。你发了200条消息TA没回。最后双方都忍不住了，和好了。</p></div>
+<div class="timeline-item"><h4>2024.11.10 — 2024.11.25（断联15天）</h4><p style="font-size:13px;color:#8a93a6">小吵架，TA消失15天。你先低头，和好了。</p></div>
+<div class="timeline-item"><h4>2024.12.28 — 2025.01.10（断联13天）</h4><p style="font-size:13px;color:#8a93a6">跨年吵架，TA消失13天。新年又和好了。</p></div>
+</div>
+<p><b>结论：</b>你们吵架不是解决问题，是冷战-和好-再冷战。每次和好都像重新开始。</p>
+</section>
+<section class="section" id="sec7">
+<h2>七、节奏与变化</h2>
+<div class="two-col"><div class="chart" id="c_hour"></div><div class="chart" id="c_week"></div></div>
+<div class="chart" id="c_sentiment"></div>
+<p class="note">逐月情绪净分：5-6月跌到最低（断联期），之后慢慢回升。</p>
+<p><b>结论：</b>你们深夜聊得多（吵架都在半夜），周末比工作日聊得多（有空就吵）。</p>
+</section>
+<section class="section" id="sec8">
+<h2>八、关系科学验证</h2>
+<div class="cards">
+<div class="card"><h3>爱的五种语言</h3><p style="font-size:14px">你主要用：精心时刻 + 服务行动<br>TA主要用：筑墙（42次）</p><p style="font-size:12px;color:#8a93a6;margin-top:8px">TA吵架就关闭所有爱语。</p></div>
+<div class="card"><h3>权力动态</h3><p style="font-size:14px">谁更常结束对话：TA（145次）<br>谁更常妥协：你（145次）<br>谁更常发问：你（890次）</p><p style="font-size:12px;color:#8a93a6;margin-top:8px">TA掌握主动权，你在被动妥协。</p></div>
+<div class="card"><h3>情绪同步性</h3><p style="font-size:14px">相关系数：0.25</p><p style="font-size:12px;color:#8a93a6;margin-top:8px">弱正相关——你们情绪基本不同步。</p></div>
+</div>
+</section>
+<section class="section" id="sec9">
+<h2>九、证据总结</h2>
+<p style="font-size:15px;line-height:1.9">数据显示：<b>这是一段高风险的过山车关系。</b><br><br>Gottman比率从5.2暴跌到0.2，又回升到4.2。最长断联45天。吵架23次，只和好15次。<br>TA的筑墙次数42次——吵架就消失，这是最伤人的。<br><br><b>最大的风险是：</b>你们每次和好都像在重复同一个剧本。如果不改这个模式，下一次断联可能就是真的结束。</p>
+</section>
+<section class="section" id="sec10">
+<h2>十、改进建议</h2>
+<div class="two-col">
+<div class="card"><h3>TA 该改什么</h3><ul><li>吵架别消失：有情绪直接说，别冷战45天</li><li>别提分手：吵架时说"分手"是最伤人的</li><li>主动修复：每次都是你先低头，TA也该主动一次</li></ul></div>
+<div class="card"><h3>你 该改什么</h3><ul><li>别追问：TA消失就别连发100条消息</li><li>别自责：不是你的错，别每次都先低头</li><li>立规矩：约定吵架不能冷战超过24小时</li></ul></div>
+</div>
+<div class="card"><h3>互相该怎么磨合</h3><ul><li>约定"吵架不超过24小时"：超过就必须谈清楚</li><li>约定"不提分手"：再生气也不说这两个字</li></ul></div>
+<p style="font-size:12px;color:#8a93a6;margin-top:40px;text-align:center">本报告为统计推断，非心理诊断。如有情感困扰请咨询专业人士。</p>
+</section>
+</main>
+</div>
+<script>
+function chart(id, opt) { var c = echarts.init(document.getElementById(id)); c.setOption(opt); }
+chart('c_words', { tooltip: { trigger: 'axis', triggerOn: 'click', confine: true }, legend: { data: ['你', 'TA'], textStyle: { color: '#8a93a6' } }, xAxis: { type: 'category', data: ['为什么','算了','想你','对不起','怎么办','分手','累了'], axisLabel: { color: '#8a93a6' } }, yAxis: { type: 'value', axisLabel: { color: '#8a93a6' } }, series: [ { name: '你', type: 'bar', data: [380, 290, 420, 280, 350, 45, 12], itemStyle: { color: '#60a5fa' } }, { name: 'TA', type: 'bar', data: [120, 350, 180, 45, 95, 156, 189], itemStyle: { color: '#f778ba' } } ] });
+chart('c_reply', { tooltip: { trigger: 'axis', triggerOn: 'click', confine: true }, legend: { data: ['你', 'TA'], textStyle: { color: '#8a93a6' } }, xAxis: { type: 'category', data: ['中位数', 'P90'], axisLabel: { color: '#8a93a6' } }, yAxis: { type: 'value', name: '分钟', axisLabel: { color: '#8a93a6' } }, series: [ { name: '你', type: 'bar', data: [25, 120], itemStyle: { color: '#60a5fa' }, markLine: { data: [{ yAxis: 30, label: { formatter: '正常线 30分钟', color: '#4ade80' }, lineStyle: { color: '#4ade80', type: 'dashed' } }] } }, { name: 'TA', type: 'bar', data: [95, 1440], itemStyle: { color: '#f778ba' } } ] });
+chart('c_gottman', { tooltip: { trigger: 'axis', triggerOn: 'click', confine: true, valueFormatter: function(x){return x+':1'} }, xAxis: { type: 'category', data: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'], axisLabel: { color: '#8a93a6' } }, yAxis: { type: 'value', axisLabel: { color: '#8a93a6' } }, series: [{ type: 'line', data: [4.5, 5.2, 3.8, 2.1, 0.5, 0.2, 1.8, 3.5, 4.2, 3.8, 2.9, 1.5], smooth: true, lineStyle: { width: 3, color: '#fbbf24' }, markLine: { data: [ { yAxis: 5, label: { formatter: '健康线 5:1', color: '#4ade80' }, lineStyle: { color: '#4ade80', type: 'dashed' } }, { yAxis: 1, label: { formatter: '危险线 1:1', color: '#f87171' }, lineStyle: { color: '#f87171', type: 'dotted' } } ] } }] });
+chart('c_hour', { title: { text: '24小时聊天分布', textStyle: { color: '#e9eef4', fontSize: 14 } }, tooltip: { trigger: 'axis', triggerOn: 'click', confine: true }, xAxis: { type: 'category', data: ['0','2','4','6','8','10','12','14','16','18','20','22'], axisLabel: { color: '#8a93a6' } }, yAxis: { type: 'value', axisLabel: { color: '#8a93a6' } }, series: [{ type: 'line', data: [280, 180, 80, 60, 220, 320, 280, 250, 280, 320, 450, 380], smooth: true, lineStyle: { color: '#fbbf24' } }] });
+chart('c_week', { title: { text: '一周聊天分布', textStyle: { color: '#e9eef4', fontSize: 14 } }, tooltip: { trigger: 'axis', triggerOn: 'click', confine: true }, xAxis: { type: 'category', data: ['一','二','三','四','五','六','日'], axisLabel: { color: '#8a93a6' } }, yAxis: { type: 'value', axisLabel: { color: '#8a93a6' } }, series: [{ type: 'bar', data: [620, 580, 550, 560, 620, 780, 820], itemStyle: { color: '#fbbf24' } }] });
+chart('c_sentiment', { tooltip: { trigger: 'axis', triggerOn: 'click', confine: true, valueFormatter: function(x){return x+'分'} }, legend: { data: ['你', 'TA'], textStyle: { color: '#8a93a6' } }, xAxis: { type: 'category', data: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'], axisLabel: { color: '#8a93a6' } }, yAxis: { type: 'value', name: '情绪净分(每百条)', axisLabel: { color: '#8a93a6' } }, series: [ { name: '你', type: 'line', data: [15, 18, 12, 5, -8, -15, 0, 8, 12, 10, 5, -2], smooth: true, lineStyle: { color: '#60a5fa' } }, { name: 'TA', type: 'line', data: [8, 10, 5, -2, -12, -18, -5, 2, 5, 3, -2, -8], smooth: true, lineStyle: { color: '#f778ba' }, markLine: { data: [{ yAxis: 0, label: { formatter: '中性线', color: '#8a93a6' }, lineStyle: { color: '#8a93a6', type: 'dashed' } }] } } ] });
+</script>
+</body>
+</html>
