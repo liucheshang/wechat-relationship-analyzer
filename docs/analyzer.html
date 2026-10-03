@@ -291,9 +291,23 @@ var MISS_WORDS=['想你','好想你','想念','惦记'];
 // ===== 解析 =====
 function parseFile(text){
   text=text.trim();var messages=[];
+  // JSON格式
   if(text[0]==='['){try{var data=JSON.parse(text);data.forEach(function(msg){var ts=msg.ts||msg.time||msg.timestamp||msg.CreateTime||0;if(typeof ts==='string')ts=new Date(ts).getTime();if(ts<1000000000)ts=ts*1000;var sender;if(msg.is_self!==undefined)sender=msg.is_self?'me':'her';else if(msg.sender){sender=/^(我|me|自己)/i.test(msg.sender)?'me':'her'}else sender='her';var content=msg.content||msg.message||msg.text||'';if(!content||!ts)return;messages.push({time:ts,sender:sender,content:String(content)})});if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time})}catch(e){}}
-  if(text.indexOf(',')>=0&&text.indexOf('\n')>=0){var lines=text.split(/\n/).filter(function(l){return l.trim()});var headerIdx=-1;for(var i=0;i<Math.min(5,lines.length);i++){if(/时间|time|日期|发送者|sender|内容|content/i.test(lines[i])){headerIdx=i;break}}var startLine=headerIdx>=0?headerIdx+1:0;var colMap={time:0,sender:1,content:2};if(headerIdx>=0){var headers=lines[headerIdx].split(',').map(function(s){return s.trim().toLowerCase()});headers.forEach(function(h,idx){if(/时间|time|日期|create/i.test(h))colMap.time=idx;if(/发送者|sender|from|who/i.test(h))colMap.sender=idx;if(/内容|content|message|text/i.test(h))colMap.content=idx})}for(var i=startLine;i<lines.length;i++){var parts=lines[i].split(',').map(function(s){return s.trim()});if(parts.length<3)continue;var timeStr=parts[colMap.time],senderStr=parts[colMap.sender],content=parts.slice(colMap.content).join(',').trim();var time=parseTime(timeStr);if(isNaN(time)||!content)continue;var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';messages.push({time:time,sender:sender,content:content})}if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time})}
-  lines=text.split(/\n/).filter(function(l){return l.trim()});lines.forEach(function(line){var parts;if(line.indexOf('|')>=0){parts=line.split('|').map(function(s){return s.trim()})}else{return}if(parts.length<3)return;var timeStr=parts[0],senderStr=parts[1],content=parts.slice(2).join('|').trim();var time=parseTime(timeStr);if(isNaN(time)||!content)return;var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';messages.push({time:time,sender:sender,content:content})});
+  var allLines=text.split(/
+/).filter(function(l){return l.trim()});
+  // 检测分隔符：统计前20行里竖线vs逗号
+  var pipeCount=0,commaCount=0;
+  for(var pi=0;pi<Math.min(20,allLines.length);pi++){pipeCount+=(allLines[pi].match(/\|/g)||[]).length;commaCount+=(allLines[pi].match(/,/g)||[]).length}
+  // 竖线分隔优先（微信导出格式：时间 | 发送者 | 内容）
+  if(pipeCount>=commaCount){
+    allLines.forEach(function(line){var parts=line.split('|').map(function(s){return s.trim()});if(parts.length<3)return;var timeStr=parts[0],senderStr=parts[1],content=parts.slice(2).join('|').trim();var time=parseTime(timeStr);if(isNaN(time)||!content)return;var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';messages.push({time:time,sender:sender,content:content})});
+    if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time});
+  }
+  // CSV格式（逗号分隔，带header）
+  var headerIdx=-1;for(var i=0;i<Math.min(5,allLines.length);i++){if(/时间|time|日期|发送者|sender|内容|content/i.test(allLines[i])){headerIdx=i;break}}
+  var startLine=headerIdx>=0?headerIdx+1:0;var colMap={time:0,sender:1,content:2};
+  if(headerIdx>=0){var headers=allLines[headerIdx].split(',').map(function(s){return s.trim().toLowerCase()});headers.forEach(function(h,idx){if(/时间|time|日期|create/i.test(h))colMap.time=idx;if(/发送者|sender|from|who/i.test(h))colMap.sender=idx;if(/内容|content|message|text/i.test(h))colMap.content=idx})}
+  for(var i=startLine;i<allLines.length;i++){var parts=allLines[i].split(',').map(function(s){return s.trim()});if(parts.length<3)continue;var timeStr=parts[colMap.time],senderStr=parts[colMap.sender],content=parts.slice(colMap.content).join(',').trim();var time=parseTime(timeStr);if(isNaN(time)||!content)continue;var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';messages.push({time:time,sender:sender,content:content})}
   return messages.sort(function(a,b){return a.time-b.time});
 }
 function parseTime(str){if(!str)return NaN;str=String(str).trim();if(/^\d{10}$/.test(str))return parseInt(str)*1000;if(/^\d{13}$/.test(str))return parseInt(str);var t=new Date(str).getTime();if(!isNaN(t))return t;var m=str.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})\s+(\d{1,2}):(\d{1,2})/);if(m)return new Date(m[1],m[2]-1,m[3],m[4],m[5]).getTime();return NaN}
