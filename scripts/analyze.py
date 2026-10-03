@@ -1192,6 +1192,24 @@ def render(D, meta):
                           D['slowPreVar'], D['slowBaseVar'],
                           'hl-red' if D['slowPreAR'] > D['slowBaseAR'] else 'hl-green',
                           D['slowPreAR'], D['slowBaseAR']))
+    # 临界慢化的判读必须跟着真实方向走，不能写死「两项一起抬头」
+    varUp = D['slowPreVar'] > D['slowBaseVar']
+    arUp = D['slowPreAR'] > D['slowBaseAR']
+    if varUp and arUp:
+        slowVerdict = ('两项同时抬升，<b class="hl-red">符合临界慢化的预警特征</b>：'
+                       '系统在失去恢复力，扰动开始不容易被吸收。')
+    elif varUp or arUp:
+        slowVerdict = ('只有<b>%s</b>抬升，另一项没跟上——属于<b class="hl-gold">弱信号</b>，'
+                       '不足以单独当作断联预警。' % ('滚动方差' if varUp else 'AR(1) 自相关'))
+    else:
+        slowVerdict = ('两项都没有抬升，断联前方差甚至更低——'
+                       '<b class="hl-green">本数据不支持临界慢化预警</b>：'
+                       '那段沉默不是「渐渐失稳」攒出来的，更像一次突发的决定。')
+    T['SLOW_NOTE'] = ('临界慢化理论：系统接近崩溃前，滚动方差与一阶自相关 AR(1) 会同时升高——恢复变慢，'
+                      '通常比断联本身早几个月出现。本数据：方差 全期 %s → 断联前 %s；'
+                      'AR(1) 全期 %s → 断联前 %s。%s'
+                      % (D['slowBaseVar'], D['slowPreVar'],
+                         D['slowBaseAR'], D['slowPreAR'], slowVerdict))
     T['EVENT_TABLE'] = ('<tr><th>时间窗</th><th class="num">日均消息</th><th class="num">相对基线</th>'
                         '<th class="read">读法</th></tr>'
                         + ''.join('<tr><td>%s</td><td class="num">%s</td><td class="num %s">%s%%</td>'
