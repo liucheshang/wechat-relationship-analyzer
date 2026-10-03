@@ -385,6 +385,66 @@ def run_rules(msgs):
                          "to": datetime.fromtimestamp(ts[i]).strftime("%Y-%m-%d"),
                          "days": round(g, 1)})
     segs.sort(key=lambda x: -x["days"])
+    # ===== 新增：24小时聊天生物钟 =====
+    hour_dist = [0]*24
+    for m in text:
+        h = m["dt"].hour
+        hour_dist[h] += 1
+    result["hour_distribution"] = hour_dist
+
+    # ===== 新增：一周节奏（0=周一 6=周日）=====
+    weekday_dist = [0]*7
+    for m in text:
+        wd = m["dt"].weekday()
+        weekday_dist[wd] += 1
+    result["weekday_distribution"] = weekday_dist
+
+    # ===== 新增：逐月理性指数（理性词占比）=====
+    RATIONAL_WORDS = ["因为", "所以", "但是", "不过", "其实", "道理", "逻辑", "客观",
+                      "确实", "应该", "必须", "需要", "问题", "解决", "分析"]
+    monthly_rational_self = [0]*len(months)
+    monthly_rational_her = [0]*len(months)
+    for i, m in enumerate(months):
+        ms = [x for x in text if x["dt"].strftime("%Y-%m") == m]
+        ms_self = [x for x in ms if x["is_self"]]
+        ms_her = [x for x in ms if not x["is_self"]]
+        rs = sum(1 for x in ms_self if any(w in x["content"] for w in RATIONAL_WORDS))
+        rh = sum(1 for x in ms_her if any(w in x["content"] for w in RATIONAL_WORDS))
+        monthly_rational_self[i] = round(rs / max(1, len(ms_self)), 3)
+        monthly_rational_her[i] = round(rh / max(1, len(ms_her)), 3)
+    result["monthly_rational"] = {"self": monthly_rational_self, "her": monthly_rational_her}
+
+    # ===== 新增：逐月情绪净分（每百条）=====
+    monthly_sentiment_self = [0]*len(months)
+    monthly_sentiment_her = [0]*len(months)
+    for i, m in enumerate(months):
+        ms = [x for x in text if x["dt"].strftime("%Y-%m") == m]
+        ms_self = [x for x in ms if x["is_self"]]
+        ms_her = [x for x in ms if not x["is_self"]]
+        ps = sum(1 for x in ms_self if _match(x["_tok"], x["content"], set(POS_WORDS)))
+        ns = sum(1 for x in ms_self if _match(x["_tok"], x["content"], set(NEG_WORDS)))
+        ph = sum(1 for x in ms_her if _match(x["_tok"], x["content"], set(POS_WORDS)))
+        nh = sum(1 for x in ms_her if _match(x["_tok"], x["content"], set(NEG_WORDS)))
+        monthly_sentiment_self[i] = round((ps - ns) / max(1, len(ms_self)) * 100, 2)
+        monthly_sentiment_her[i] = round((ph - nh) / max(1, len(ms_her)) * 100, 2)
+    result["monthly_sentiment"] = {"self": monthly_sentiment_self, "her": monthly_sentiment_her}
+
+    # ===== 新增：深夜情感分 =====
+    late_self = [m for m in by_self if m["dt"].hour >= 23 or m["dt"].hour < 6]
+    late_her = [m for m in by_her if m["dt"].hour >= 23 or m["dt"].hour < 6]
+    day_self = [m for m in by_self if 6 <= m["dt"].hour < 23]
+    day_her = [m for m in by_her if 6 <= m["dt"].hour < 23]
+    result["day_night_sentiment"] = {
+        "late_self": round((sum(1 for m in late_self if _match(m["_tok"], m["content"], set(POS_WORDS))) -
+                           sum(1 for m in late_self if _match(m["_tok"], m["content"], set(NEG_WORDS)))) / max(1, len(late_self)), 4),
+        "day_self": round((sum(1 for m in day_self if _match(m["_tok"], m["content"], set(POS_WORDS))) -
+                          sum(1 for m in day_self if _match(m["_tok"], m["content"], set(NEG_WORDS)))) / max(1, len(day_self)), 4),
+        "late_her": round((sum(1 for m in late_her if _match(m["_tok"], m["content"], set(POS_WORDS))) -
+                          sum(1 for m in late_her if _match(m["_tok"], m["content"], set(NEG_WORDS)))) / max(1, len(late_her)), 4),
+        "day_her": round((sum(1 for m in day_her if _match(m["_tok"], m["content"], set(POS_WORDS))) -
+                         sum(1 for m in day_her if _match(m["_tok"], m["content"], set(NEG_WORDS)))) / max(1, len(day_her)), 4),
+    }
+
     result["silence"] = {
         "max_days": segs[0]["days"] if segs else 0,
         "max_from": segs[0]["from"] if segs else None,
