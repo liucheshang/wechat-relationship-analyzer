@@ -363,13 +363,27 @@ function analyze(messages){
   var moodMeByMonth=months.map(function(mk){return(byMonth[mk].mePos-byMonth[mk].meNeg)/Math.max(1,byMonth[mk].me)*100});
   var moodHerByMonth=months.map(function(mk){return(byMonth[mk].herPos-byMonth[mk].herNeg)/Math.max(1,byMonth[mk].her)*100});
   
-  // 冲突段检测
-  var conflictSegments=[],curConflict=[];
-  messages.forEach(function(m){var isNeg=NEGATIVE.some(function(w){return m.content.indexOf(w)>=0});if(isNeg){curConflict.push(m)}else{if(curConflict.length>=2)conflictSegments.push(curConflict);curConflict=[]}});
-  if(curConflict.length>=2)conflictSegments.push(curConflict);
-  var conflictCount=conflictSegments.length;
-  var repairMe=0,repairHer=0,totalSilenceMe=0,totalSilenceHer=0;
-  conflictSegments.forEach(function(seg){var lastNegTime=seg[seg.length-1].time;var nextMsgIdx=messages.indexOf(seg[seg.length-1])+1;if(nextMsgIdx<messages.length){var nextMsg=messages[nextMsgIdx];var silence=nextMsg.time-lastNegTime;if(nextMsg.sender==='me'){repairMe++;totalSilenceMe+=silence/3600000}else{repairHer++;totalSilenceHer+=silence/3600000}}});
+  // 冲突段检测（优化：直接索引，不用indexOf，避免O(n²)卡死）
+  var conflictCount=0,repairMe=0,repairHer=0,totalSilenceMe=0,totalSilenceHer=0;
+  var curConflictLen=0,curConflictLastIdx=-1;
+  for(var ci=0;ci<messages.length;ci++){
+    var cm=messages[ci];
+    var isNeg=false;
+    for(var nw=0;nw<NEGATIVE.length;nw++){if(cm.content.indexOf(NEGATIVE[nw])>=0){isNeg=true;break}}
+    if(isNeg){
+      if(curConflictLen===0)curConflictLastIdx=ci;
+      curConflictLen++;
+    }else{
+      if(curConflictLen>=2){
+        conflictCount++;
+        var silence=messages[ci].time-messages[curConflictLastIdx].time;
+        if(messages[ci].sender==='me'){repairMe++;totalSilenceMe+=silence/3600000}
+        else{repairHer++;totalSilenceHer+=silence/3600000}
+      }
+      curConflictLen=0;
+    }
+  }
+  if(curConflictLen>=2)conflictCount++;
   
   // 断联
   var maxGap=0;for(var i=1;i<times.length;i++){var g=times[i]-times[i-1];if(g>maxGap)maxGap=g}var maxGapDays=Math.round(maxGap/86400000);
@@ -412,8 +426,16 @@ function analyze(messages){
   var byHour=new Array(24).fill(0);messages.forEach(function(m){byHour[new Date(m.time).getHours()]++});
   var byWeek=[0,0,0,0,0,0,0];messages.forEach(function(m){byWeek[new Date(m.time).getDay()]++});
   
-  // 称谓逐月
-  var nameByMonth=months.map(function(mk){var ms=messages.filter(function(m){return new Date(m.time).toISOString().slice(0,7)===mk});return{husband:countWord(ms,'老公'),wife:countWord(ms,'老婆'),baby:countWord(ms,'宝宝')}});
+  // 称谓逐月（优化：在byMonth遍历时顺便统计，不在循环里filter）
+  var nameByMonth=months.map(function(){return{husband:0,wife:0,baby:0}});
+  var monthIdx={};months.forEach(function(mk,i){monthIdx[mk]=i});
+  messages.forEach(function(m){
+    var mk=new Date(m.time).toISOString().slice(0,7);
+    var idx=monthIdx[mk];if(idx===undefined)return;
+    if(m.content.indexOf('老公')>=0)nameByMonth[idx].husband++;
+    if(m.content.indexOf('老婆')>=0)nameByMonth[idx].wife++;
+    if(m.content.indexOf('宝宝')>=0)nameByMonth[idx].baby++;
+  });
   
   return{total:total,mePct:(meCount/total*100).toFixed(1),herPct:(herCount/total*100).toFixed(1),
     days:days,herStartPct:(herStartDays/days*100).toFixed(1),gottman:gottman.toFixed(1),
@@ -557,8 +579,13 @@ function renderCharts(d){
   mk('c_attachment',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['焦虑追问','回避疏离','情绪要挟','安全表达']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[d.anxMe,d.avoidMe,d.threatMe,d.secureMe],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[d.anxHer,d.avoidHer,d.threatHer,d.secureHer],itemStyle:{color:'#f06292'}}]});
   // 02 语气词
   mk('c_tone',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:['哈','嗯','吧','哦','呀','呢','啊','嘛']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:d.toneMe,itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:d.toneHer,itemStyle:{color:'#f06292'}}]});
-  // 03 消息量
-  mk('c_volume',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:d.dailyMe.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#5b8def'},areaStyle:{opacity:0.1}},{name:'TA',type:'line',data:d.dailyHer.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#f06292'},areaStyle:{opacity:0.1}}]});
+  // 03 消息量（带断联期标红）
+  var zeroMonths=d.months.map(function(mk,i){return(d.dailyMe[i]===0&&d.dailyHer[i]===0)?mk:null}).filter(Boolean);
+  var volumeSeries=[{name:'你',type:'line',data:d.dailyMe.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#5b8def'},areaStyle:{opacity:0.1}},{name:'TA',type:'line',data:d.dailyHer.slice(0,d.months.length),smooth:true,showSymbol:false,lineStyle:{color:'#f06292'},areaStyle:{opacity:0.1}}];
+  if(zeroMonths.length>0){
+    volumeSeries.push({name:'断联期',type:'line',data:d.months.map(function(){return 0}),lineStyle:{width:0},symbol:'none',silent:true,tooltip:{show:false},markArea:{silent:true,itemStyle:{color:'rgba(255,92,92,.1)'},label:{show:false},data:zeroMonths.map(function(mk){return[{xAxis:mk},{xAxis:mk}]})}});
+  }
+  mk('c_volume',{tooltip:base.tooltip,legend:{data:['你','TA'],textStyle:{color:'#8fa1b4'},top:0},grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value'},AX),series:volumeSeries});
   // 04 情感
   mk('c_sentiment',{tooltip:base.tooltip,grid:base.grid,xAxis:Object.assign({type:'category',data:d.months},AX),yAxis:Object.assign({type:'value',name:'情感分'},AX),series:[{type:'line',data:d.moodMeByMonth.map(function(x){return parseFloat(x)/100}),smooth:true,lineStyle:{color:'#07c160',width:2.5},areaStyle:{opacity:0.1}}]});
   // 05 修复率
