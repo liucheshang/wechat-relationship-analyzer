@@ -585,8 +585,29 @@ function handleFile(file){
     try{
       var messages=parseFile(e.target.result);
       if(messages.length<10){alert('至少需要10条消息才能分析');return}
-      alert('正在深度分析 '+messages.length+' 条消息，请稍候...');
-      setTimeout(function(){var data=analyze(messages);renderReport(data)},200);
+      var sampled=messages;
+      var sampleNote='';
+      if(messages.length>10000){
+        sampled=messages.slice(0,10000);
+        sampleNote='（采样前10000条，共'+messages.length+'条）';
+      }
+      var loading=document.getElementById('loading');
+      var result=document.getElementById('result');
+      var upload=document.getElementById('upload-zone');
+      if(loading){loading.style.display='block'}
+      if(result){result.innerHTML=''}
+      if(upload){upload.style.display='none'}
+      setTimeout(function(){
+        try{
+          var data=analyze(sampled);
+          data.sampleNote=sampleNote;
+          renderReport(data);
+        }catch(err){
+          alert('分析出错：'+err.message);
+          if(loading){loading.style.display='none'}
+          if(upload){upload.style.display='block'}
+        }
+      },300);
     }catch(err){alert('解析失败：'+err.message)}
   };
   reader.readAsText(file,'UTF-8');

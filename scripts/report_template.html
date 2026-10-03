@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>聊天记录深度分析报告</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root{--bg:#0e1318;--panel:#151d26;--line:rgba(255,255,255,.08);--text:#e9eef4;--muted:#8fa1b4;--me:#5b8def;--her:#f06292;--green:#07c160;--gold:#ffb648;--red:#ff5c5c;--purple:#a78bfa}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;font-size:14px}
+.wrap{max-width:1060px;margin:0 auto;padding:20px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+@media(max-width:760px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 16px;text-align:center}
+.kpi .v{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:11px;color:var(--muted);margin-top:4px}
+.verdict{background:linear-gradient(135deg,rgba(7,193,96,.12),rgba(91,141,239,.08));border:1px solid rgba(7,193,96,.3);border-radius:14px;padding:20px 24px;margin:16px 0;font-size:14px;line-height:1.8}
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0}
+@media(max-width:760px){.trio{grid-template-columns:1fr}}
+.trio>div{padding:20px;border-right:1px solid var(--line)}
+.trio>div:last-child{border-right:none}
+.trio .head{font-size:11px;letter-spacing:3px;margin-bottom:6px}
+.trio .big{font-size:17px;font-weight:900;margin-bottom:8px}
+.trio .body{font-size:12.5px;line-height:1.8;color:var(--muted);border-left:2px solid;padding-left:8px;margin-bottom:8px}
+.trio .detail{font-size:12px;color:#5f7285}
+section{padding:32px 0 8px}
+h2{font-size:20px;font-weight:900;margin-bottom:6px}
+.sec-no{color:var(--green);font-size:12px;font-weight:700;letter-spacing:3px;display:block;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px;max-width:720px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.chart{width:100%;height:300px}
+.chart-sm{width:100%;height:260px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;margin:10px 0}
+th,td{padding:8px 10px;text-align:left;font-size:13px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:500;font-size:12px;background:rgba(255,255,255,.03)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:11px;color:#5f7285;margin-top:6px}
+.hl-me{color:var(--me);font-weight:700}.hl-her{color:var(--her);font-weight:700}.hl-green{color:var(--green);font-weight:700}.hl-gold{color:var(--gold);font-weight:700}.hl-red{color:var(--red);font-weight:700}
+.back-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.back-bar a{padding:6px 14px;background:var(--purple);color:#fff;text-decoration:none;border-radius:6px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="back-bar"><a href="index.html">← 返回主页</a></div>
+<h1 style="font-size:28px;font-weight:900;margin-bottom:8px">聊天记录深度分析报告</h1>
+<p class="sub">{{START_DATE}} ~ {{END_DATE}} · {{TOTAL}}条消息 · {{DAYS}}天</p>
+
+<div class="kpi-row">
+<div class="kpi"><div class="v" style="color:var(--purple)">{{TOTAL}}</div><div class="l">总消息数</div></div>
+<div class="kpi"><div class="v" style="color:var(--purple)">{{DAYS}}天</div><div class="l">持续天数</div></div>
+<div class="kpi"><div class="v hl-her">{{HER_START_PCT}}%</div><div class="l">TA主动开场</div></div>
+<div class="kpi"><div class="v {{GOTTMAN_CLASS}}">{{GOTTMAN}}:1</div><div class="l">Gottman比率</div></div>
+<div class="kpi"><div class="v {{GAP_CLASS}}">{{MAX_GAP}}天</div><div class="l">最长断联</div></div>
+<div class="kpi"><div class="v hl-me">{{ME_MED}}分</div><div class="l">你回复中位</div></div>
+<div class="kpi"><div class="v hl-her">{{HER_MED}}分</div><div class="l">TA回复中位</div></div>
+<div class="kpi"><div class="v hl-gold">{{CARE_HER}}次</div><div class="l">TA关心你</div></div>
+</div>
+
+<div class="verdict"><b>一句话结论：</b>这是一段<span class="hl-gold">{{REL_TYPE}}</span>的关系。你发了{{ME_PCT}}%的消息，TA发了{{HER_PCT}}%；Gottman比率{{GOTTMAN}}:1，最长断联{{MAX_GAP}}天。</div>
+
+<div class="trio">
+<div><div class="head" style="color:var(--gold)">关 系 总 断</div><div class="big" style="color:var(--gold)">{{REL_TYPE}}</div><div class="body" style="border-color:var(--gold)">她追，你接；她用力，你保温。</div><div class="detail">TA主动开场{{HER_START_PCT}}%</div></div>
+<div><div class="head" style="color:var(--her)">TA · 画像</div><div class="big" style="color:var(--her)">{{HER_TYPE}}</div><div class="body" style="border-color:var(--her)">燃时全盘托出，冷时一字不留。</div><div class="detail">连发{{MAX_BURST_HER}}条 · 焦虑追问{{ANX_HER}}次 · 情绪要挟{{THREAT_HER}}次</div></div>
+<div><div class="head" style="color:var(--me)">你 · 画像</div><div class="big" style="color:var(--me)">{{ME_TYPE}}</div><div class="body" style="border-color:var(--me)">话藏在表情里，态度藏在动作里。</div><div class="detail">连发{{MAX_BURST_ME}}条 · 回避疏离{{AVOID_ME}}次 · 问句{{Q_ME}}次</div></div>
+</div>
+
+<section><span class="sec-no">01 · 两个人的画像</span><h2>两个依恋系统</h2><p class="sub">从语言行为反推依恋风格（统计推断，非心理诊断）。</p>
+<div class="card"><div class="chart" id="c_attachment"></div></div></section>
+
+<section><span class="sec-no">02 · 同一句话，两种语言</span><h2>同一句话，两种语言</h2>
+<div class="grid2">
+<div class="card"><h3>语气词对比</h3><div class="chart-sm" id="c_tone"></div></div>
+<div class="card"><h3>人称与句式</h3>
+<table><tr><th></th><th class="num">你</th><th class="num">TA</th><th>解读</th></tr>
+<tr><td>「我」字</td><td class="num">{{PN_ME}}</td><td class="num hl-her">{{PN_HER}}</td><td>TA自我表露多</td></tr>
+<tr><td>「你」字</td><td class="num hl-me">{{PY_ME}}</td><td class="num">{{PY_HER}}</td><td>你更指向TA</td></tr>
+<tr><td>问句数</td><td class="num hl-me">{{Q_ME2}}</td><td class="num">{{Q_HER2}}</td><td>你更爱提问</td></tr>
+</table></div>
+</div></section>
+
+<section><span class="sec-no">03 · 谁在推，谁在接</span><h2>谁在推，谁在接</h2>
+<div class="card"><div class="chart" id="c_volume"></div><p class="note">逐月消息量。断联期为0。</p></div>
+<div class="grid2">
+<div class="card"><h3>对话开启</h3>
+<table><tr><th>会话段</th><th class="num">你</th><th class="num">TA</th></tr>
+<tr><td>由谁开启</td><td class="num">{{OPEN_ME}}</td><td class="num hl-her">{{OPEN_HER}}</td></tr>
+<tr><td>占比</td><td class="num"></td><td class="num">{{OPEN_PCT}}% TA</td></tr>
+</table></div>
+<div class="card"><h3>回复速度</h3>
+<table><tr><th></th><th class="num">你→TA</th><th class="num">TA→你</th></tr>
+<tr><td>中位回复</td><td class="num hl-me">{{ME_MED}}分</td><td class="num hl-her">{{HER_MED}}分</td></tr>
+<tr><td>1分钟内</td><td class="num">{{ME_FAST}}%</td><td class="num">{{HER_FAST}}%</td></tr>
+</table></div>
+</div>
+<div class="card"><h3>连发模式</h3>
+<table><tr><th>连发行为</th><th class="num">你</th><th class="num">TA</th></tr>
+<tr><td>最长连发</td><td class="num">{{MAX_BURST_ME}}条</td><td class="num hl-her">{{MAX_BURST_HER}}条</td></tr>
+<tr><td>≥3条次数</td><td class="num">{{BURST3_ME}}</td><td class="num">{{BURST3_HER}}</td></tr>
+<tr><td>≥5条次数</td><td class="num">{{BURST5_ME}}</td><td class="num">{{BURST5_HER}}</td></tr>
+</table></div></section>
+
+<section><span class="sec-no">04 · 感情波动</span><h2>感情波动</h2>
+<div class="card"><div class="chart" id="c_mood"></div></div>
+<div class="grid2">
+<div class="card"><h3>情绪低点 Top5</h3><table><tr><th>日期</th><th class="num">情感分</th></tr>{{LOW_ROWS}}</table></div>
+<div class="card"><h3>情绪高点 Top5</h3><table><tr><th>日期</th><th class="num">情感分</th></tr>{{HIGH_ROWS}}</table></div>
+</div></section>
+
+<section><span class="sec-no">05 · 吵架是怎么结束的</span><h2>吵架是怎么结束的</h2>
+<div class="card"><h3>冲突统计</h3>
+<table><tr><th>指标</th><th class="num">你</th><th class="num">TA</th></tr>
+<tr><td>冲突段总数</td><td class="num" colspan="2">{{CONFLICT}} 个</td></tr>
+<tr><td>主动修复次数</td><td class="num hl-me">{{REPAIR_ME}} 次</td><td class="num hl-her">{{REPAIR_HER}} 次</td></tr>
+<tr><td>平均静默(小时)</td><td class="num">{{SIL_ME}} h</td><td class="num">{{SIL_HER}} h</td></tr>
+<tr><td>「分手」出现</td><td class="num">{{FS_ME}} 次</td><td class="num hl-red">{{FS_HER}} 次</td></tr>
+</table></div></section>
+
+<section><span class="sec-no">06 · 节奏与逐月变化</span><h2>节奏、理性与情绪</h2>
+<div class="card"><h3>24小时聊天生物钟</h3><div class="chart" id="c_clock"></div></div>
+<div class="grid2">
+<div class="card"><h3>理性指数逐月</h3><div class="chart-sm" id="c_rational"></div></div>
+<div class="card"><h3>批评频率（每千条）</h3><div class="chart-sm" id="c_critic"></div></div>
+</div></section>
+
+<section><span class="sec-no">07 · 心理学框架</span><h2>关系科学的尺子</h2>
+<div class="card"><h3>Gottman 比率趋势</h3><div class="chart" id="c_gottman"></div><p class="note">积极÷消极。5:1健康，1:1警戒。</p></div>
+<div class="grid2">
+<div class="card"><h3>四骑士</h3><div class="chart-sm" id="c_horsemen"></div></div>
+<div class="card"><h3>亲密行为对比</h3><div class="chart-sm" id="c_love"></div></div>
+</div>
+<div class="card"><h3>称谓温度计</h3><div class="chart" id="c_names"></div></div></section>
+
+<section><span class="sec-no">08 · 谁更爱谁</span><h2>谁更爱谁</h2>
+<div class="card"><table>
+<tr><th>投入维度</th><th class="num">你</th><th class="num">TA</th><th>谁更投入</th></tr>
+<tr><td>消息条数</td><td class="num">{{ME_COUNT}}</td><td class="num hl-her">{{HER_COUNT}}</td><td class="hl-her">TA多</td></tr>
+<tr><td>主动开场</td><td class="num">{{OPEN_ME}}</td><td class="num hl-her">{{OPEN_HER}}</td><td class="hl-her">TA {{OPEN_PCT}}%</td></tr>
+<tr><td>关心/问候</td><td class="num">{{CA_M}}</td><td class="num hl-her">{{CA_H}}</td><td class="hl-her">TA多</td></tr>
+<tr><td>爱称次数</td><td class="num">{{NK_M}}</td><td class="num">{{NK_H}}</td><td class="hl-her">TA多</td></tr>
+<tr><td>「爱你」</td><td class="num">{{LOVE_ME}}</td><td class="num">{{LOVE_HER}}</td><td class="hl-her">TA多</td></tr>
+<tr><td>「想你」</td><td class="num">{{MISS_ME}}</td><td class="num">{{MISS_HER}}</td><td class="hl-me">你多</td></tr>
+</table></div></section>
+
+<section><span class="sec-no">09 · 最终药方</span><h2>她要改什么，你要改什么</h2>
+<div class="grid2">
+<div class="card" style="border-top:3px solid var(--her)"><h3 style="color:var(--her)">TA 需要改的</h3><p>1. 把「分手」从情绪砝码里拿掉——说多了，真分手那一次就没人当真了。<br><br>2. 情绪上来时先缓24小时再发——连发是宣泄，但不是沟通。<br><br>3. 别用蔑视/阴阳怪气——讽刺比吵架更伤人。</p></div>
+<div class="card" style="border-top:3px solid var(--me)"><h3 style="color:var(--me)">你 需要改的</h3><p>1. 把「算了」换成具体诉求——回避疏离是慢性毒药。<br><br>2. 主动开口——TA承担了大部分开场。<br><br>3. 别太被动——情绪需要回应，不是等待。</p></div>
+</div></section>
+
+<p style="font-size:11px;color:#5f7285;text-align:center;margin-top:30px">本报告为统计推断，非心理诊断。所有数据均在本地处理。</p>
+</div>
+
+<script>
+var AX={axisLine:{lineStyle:{color:'rgba(255,255,255,.2)'}},axisLabel:{color:'#8fa1b4',fontSize:11},splitLine:{lineStyle:{color:'rgba(255,255,255,.06)'}}};
+function mk(id,opt){var el=document.getElementById(id);if(el)echarts.init(el).setOption(opt)}
+mk('c_attachment',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:['焦虑追问','回避疏离','情绪要挟','安全表达']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[{{J_ANX_M}},{{J_AV_M}},{{J_TH_M}},{{J_SE_M}}],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[{{J_ANX_H}},{{J_AV_H}},{{J_TH_H}},{{J_SE_H}}],itemStyle:{color:'#f06292'}}]});
+mk('c_tone',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:['哈','嗯','吧','哦','呀','呢','啊','嘛']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:{{J_TONE_M}},itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:{{J_TONE_H}},itemStyle:{color:'#f06292'}}]});
+mk('c_volume',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:{{J_MONTHS}}},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:{{J_DME}},smooth:true,showSymbol:false,lineStyle:{color:'#5b8def'},areaStyle:{opacity:0.1}},{name:'TA',type:'line',data:{{J_DHE}},smooth:true,showSymbol:false,lineStyle:{color:'#f06292'},areaStyle:{opacity:0.1}}]});
+mk('c_mood',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:{{J_MONTHS}}},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:{{J_MME}},smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:{{J_MHE}},smooth:true,lineStyle:{color:'#f06292'}}]});
+mk('c_clock',{tooltip:{trigger:'axis'},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:['0','2','4','6','8','10','12','14','16','18','20','22']},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:{{J_HOUR}}.filter(function(_,i){return i%2===0}),smooth:true,areaStyle:{opacity:0.15},lineStyle:{color:'#f06292',width:3}}]});
+mk('c_rational',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:{{J_MONTHS}}},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:{{J_RME}},smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:{{J_RHE}},smooth:true,lineStyle:{color:'#f06292'}}]});
+mk('c_critic',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:{{J_MONTHS}}},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'line',data:{{J_CME}},smooth:true,lineStyle:{color:'#5b8def'}},{name:'TA',type:'line',data:{{J_CHE}},smooth:true,lineStyle:{color:'#f06292'}}]});
+mk('c_gottman',{tooltip:{trigger:'axis'},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:{{J_MONTHS}}},AX),yAxis:Object.assign({type:'value'},AX),series:[{type:'line',data:{{J_GOTTMAN}},smooth:true,lineStyle:{width:3,color:'#a78bfa'},markLine:{data:[{yAxis:5,lineStyle:{color:'#07c160',type:'dashed'}},{yAxis:1,lineStyle:{color:'#ff5c5c',type:'dotted'}}]}}]});
+mk('c_horsemen',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:['批评','防御','蔑视','筑墙']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[{{J_CR_M}},{{J_DF_M}},{{J_CT_M}},{{J_ST_M}}],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[{{J_CR_H}},{{J_DF_H}},{{J_CT_H}},{{J_ST_H}}],itemStyle:{color:'#f06292'}}]});
+mk('c_love',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:['关心','爱称','积极词']},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'你',type:'bar',data:[{{J_CA_M}},{{J_NK_M}},{{J_MP}}],itemStyle:{color:'#5b8def'}},{name:'TA',type:'bar',data:[{{J_CA_H}},{{J_NK_H}},{{J_HP}}],itemStyle:{color:'#f06292'}}]});
+mk('c_names',{tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4'},top:0},grid:{left:44,right:20,top:30,bottom:26,containLabel:true},xAxis:Object.assign({type:'category',data:{{J_MONTHS}}},AX),yAxis:Object.assign({type:'value'},AX),series:[{name:'老公',type:'line',data:{{J_NH}},smooth:true,lineStyle:{color:'#f06292'}},{name:'老婆',type:'line',data:{{J_NW}},smooth:true,lineStyle:{color:'#5b8def'}},{name:'宝宝',type:'line',data:{{J_NB}},smooth:true,lineStyle:{color:'#ffb648'}}]});
+</script>
+</body>
+</html>
