@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>关系分析器 · 在线版（纯本地，不上传数据）</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f1115;color:#e9eef4;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:40px 20px}
+.hero{text-align:center;padding:60px 20px 40px}
+.hero h1{font-size:32px;margin-bottom:16px;background:linear-gradient(135deg,#60a5fa,#a78bfa,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:#8a93a6;font-size:15px;max-width:600px;margin:0 auto 32px}
+.privacy-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;padding:8px 16px;border-radius:20px;font-size:13px;margin-bottom:32px}
+.upload-zone{border:2px dashed #2a2d35;border-radius:16px;padding:60px 20px;text-align:center;cursor:pointer;transition:all .3s;background:#1a1d24}
+.upload-zone:hover,.upload-zone.dragover{border-color:#7c3aed;background:rgba(124,58,237,0.05)}
+.upload-zone .icon{font-size:48px;margin-bottom:16px}
+.upload-zone h3{font-size:18px;margin-bottom:8px}
+.upload-zone p{color:#8a93a6;font-size:13px}
+.format-help{background:#1a1d24;border-radius:12px;padding:24px;margin-top:24px;font-size:13px}
+.format-help h4{color:#a78bfa;margin-bottom:12px;font-size:14px}
+.format-help pre{background:#0f1115;padding:12px;border-radius:8px;overflow-x:auto;font-size:12px;color:#8a93a6;margin:8px 0}
+.format-help li{margin-bottom:6px;color:#8a93a6}
+.report{display:none}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+.kpi{background:#1a1d24;padding:20px;border-radius:12px;text-align:center}
+.kpi .v{font-size:28px;font-weight:700;margin-bottom:4px}
+.kpi .l{font-size:11px;color:#8a93a6}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.card{background:#1a1d24;padding:16px;border-radius:12px}
+.card h4{font-size:13px;color:#8a93a6;margin-bottom:8px}
+.card .big{font-size:18px;font-weight:600;margin-bottom:6px}
+.chart{width:100%;height:320px;background:#1a1d24;border-radius:12px;padding:12px;margin:16px 0}
+.section{margin:32px 0}
+.section h2{font-size:20px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #2a2d35}
+.hl-me{color:#60a5fa}.hl-her{color:#f778ba}.hl-green{color:#4ade80}.hl-red{color:#f87171}.hl-gold{color:#fbbf24}.hl-purple{color:#a78bfa}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.verdict{background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(247,120,186,0.1));border:1px solid rgba(124,58,237,0.3);border-radius:16px;padding:24px;margin:24px 0}
+.verdict h3{font-size:18px;margin-bottom:12px;color:#a78bfa}
+.verdict p{font-size:14px;line-height:1.8}
+.back-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.back-bar button{padding:8px 16px;background:#2a2d35;color:#e9eef4;border:none;border-radius:6px;font-size:13px;cursor:pointer}
+.back-bar a{padding:8px 16px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600}
+@media(max-width:768px){.kpi-grid,.cards,.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<div id="uploadPage">
+<div class="hero">
+<h1>💬 关系分析器</h1>
+<div class="privacy-badge">🔒 纯本地运行 · 数据不上传 · 关闭即消失</div>
+<p>上传你的微信聊天记录导出文件，自动分析你们的互动模式、情感趋势和关系健康度。所有计算都在你的浏览器里完成，不会发送到任何服务器。</p>
+</div>
+<div class="upload-zone" id="dropZone">
+<div class="icon">📂</div>
+<h3>点击或拖拽聊天记录文件到这里</h3>
+<p>支持 .txt / .csv 格式</p>
+</div>
+<input type="file" id="fileInput" accept=".txt,.csv" style="display:none">
+<div class="format-help">
+<h4>📋 文件格式要求</h4>
+<p style="margin-bottom:12px;color:#8a93a6">每行一条消息，用竖线 | 分隔三个字段：</p>
+<pre>时间 | 发送者 | 内容
+2024-01-01 10:00 | 我 | 你吃饭了吗
+2024-01-01 10:05 | TA | 吃了，你呢</pre>
+<ul>
+<li>发送者写"我"和"TA"（或"对方"、"她"、"他"）</li>
+<li>时间格式：2024-01-01 10:00 即可</li>
+<li>用提取工具导出的CSV可以直接改一下列名就能用</li>
+</ul>
+</div>
+</div>
+<div id="reportPage" class="report">
+<div class="back-bar">
+<button onclick="location.reload()">← 分析新文件</button>
+<a href="index.html">案例主页</a>
+</div>
+<div class="verdict">
+<h3 id="verdictTitle"></h3>
+<p id="verdictText"></p>
+</div>
+<div class="kpi-grid" id="kpiGrid"></div>
+<div class="cards" id="roleCards"></div>
+<div class="section"><h2>📈 Gottman 比率趋势</h2><div class="chart" id="c_gottman"></div><p style="font-size:12px;color:#8a93a6">积极词÷消极词。健康约5:1以上，低于1:1危险。</p></div>
+<div class="section"><h2>⏱️ 回复延迟</h2><div class="chart" id="c_reply"></div><p style="font-size:12px;color:#8a93a6">谁回得快谁回得慢。</p></div>
+<div class="section"><h2>🔥 高频词对比</h2><div class="chart" id="c_words"></div></div>
+<div class="section"><h2>🕐 24小时分布</h2><div class="chart" id="c_hour"></div></div>
+<div class="section"><h2>💝 情感趋势</h2><div class="chart" id="c_sentiment"></div></div>
+<div class="section"><h2>⚔️ 四骑士统计</h2><div class="chart" id="c_conflict"></div><div class="two-col" style="margin-top:16px">
+<div class="card"><h4>TA 该改什么</h4><p id="adviceHer" style="font-size:13px;line-height:1.8"></p></div>
+<div class="card"><h4>你 该改什么</h4><p id="adviceMe" style="font-size:13px;line-height:1.8"></p></div>
+</div></div>
+<p style="font-size:11px;color:#8a93a6;text-align:center;margin-top:40px">本报告为统计推断，非心理诊断。所有数据均在你的浏览器本地处理。</p>
+</div>
+</div>
+<script>
+var POSITIVE=['喜欢','爱','想你','开心','哈哈','谢谢','好的','嗯呢','宝贝','宝宝','亲爱的','晚安','早安','辛苦','好吃','好看','可爱','加油','棒棒','爱你','亲亲','抱抱','嘿嘿','幸福','温暖','心疼','乖','么么'];
+var NEGATIVE=['分手','算了','随便','烦','累','生气','讨厌','滚','再见','不想','难过','哭','失望','伤心','委屈','不理','为什么','怎么办','无所谓','哦','嗯','呵呵','心累','绝望','崩溃','窒息','压抑','痛苦','冷战','沉默','无语','离谱','过分','不爱了','没感觉'];
+var STONEWALL=['嗯','哦','不说了','随便','忙','呵呵','无所谓'];
+var CRITICISM=['你总是','你从来','你怎么又','为什么你不能','你每次','你就知道'];
+var DEFENSIVE=['我没有','不是我','是你先','凭什么'];
+var CONTEMPT=['呵呵','切','可笑','你真行','有病','幼稚'];
+
+function parseFile(text){
+  var lines=text.split(/\n/).filter(function(l){return l.trim()});
+  var messages=[];
+  lines.forEach(function(line){
+    var parts;
+    if(line.indexOf('|')>=0){parts=line.split('|').map(function(s){return s.trim()})}
+    else if(line.indexOf(',')>=0){parts=line.split(',').map(function(s){return s.trim()})}
+    else{return}
+    if(parts.length<3)return;
+    var timeStr=parts[0],senderStr=parts[1],content=parts.slice(2).join(',').trim();
+    var time=new Date(timeStr).getTime();
+    if(isNaN(time))return;
+    var sender=/^(我|me|自己)/i.test(senderStr)?'me':'her';
+    messages.push({time:time,sender:sender,content:content});
+  });
+  return messages.sort(function(a,b){return a.time-b.time});
+}
+
+function countWords(arr,words){
+  var c=0;
+  arr.forEach(function(m){words.forEach(function(w){if(m.content.indexOf(w)>=0)c++})});
+  return c;
+}
+
+function median(arr){
+  if(!arr.length)return 0;
+  var s=arr.slice().sort(function(a,b){return a-b});
+  var mid=Math.floor(s.length/2);
+  return s.length%2?s[mid]:(s[mid-1]+s[mid])/2;
+}
+
+function analyze(messages){
+  var total=messages.length;
+  var me=messages.filter(function(m){return m.sender==='me'});
+  var her=messages.filter(function(m){return m.sender==='her'});
+  var meCount=me.length,herCount=her.length;
+  var times=messages.map(function(m){return m.time}).sort();
+  var days=Math.max(1,Math.round((times[times.length-1]-times[0])/86400000));
+  var mePos=countWords(me,POSITIVE),herPos=countWords(her,POSITIVE);
+  var meNeg=countWords(me,NEGATIVE),herNeg=countWords(her,NEGATIVE);
+  var gottman=(mePos+herPos)/Math.max(1,meNeg+herNeg);
+  var byDay={};
+  messages.forEach(function(m){var d=new Date(m.time).toISOString().slice(0,10);if(!byDay[d])byDay[d]={me:0,her:0};byDay[d][m.sender]++});
+  var daysArr=Object.keys(byDay);
+  var meStart=daysArr.filter(function(d){return byDay[d].me>0}).length;
+  var herStart=daysArr.filter(function(d){return byDay[d].her>0}).length;
+  var meDelays=[],herDelays=[];
+  for(var i=1;i<messages.length;i++){
+    var diff=messages[i].time-messages[i-1].time;
+    if(diff>60000&&diff<3600000&&messages[i].sender!==messages[i-1].sender){
+      if(messages[i].sender==='me')meDelays.push(diff/60000);else herDelays.push(diff/60000);
+    }
+  }
+  var byHour=new Array(24).fill(0);
+  messages.forEach(function(m){byHour[new Date(m.time).getHours()]++});
+  var byMonth={};
+  messages.forEach(function(m){
+    var mk=new Date(m.time).toISOString().slice(0,7);
+    if(!byMonth[mk])byMonth[mk]={mePos:0,meNeg:0,herPos:0,herNeg:0};
+    var s=m.sender;
+    var isPos=POSITIVE.some(function(w){return m.content.indexOf(w)>=0});
+    var isNeg=NEGATIVE.some(function(w){return m.content.indexOf(w)>=0});
+    if(s==='me'){if(isPos)byMonth[mk].mePos++;if(isNeg)byMonth[mk].meNeg++}
+    else{if(isPos)byMonth[mk].herPos++;if(isNeg)byMonth[mk].herNeg++}
+  });
+  var months=Object.keys(byMonth).sort();
+  var gottmanByMonth=months.map(function(mk){return (byMonth[mk].mePos+byMonth[mk].herPos)/Math.max(1,byMonth[mk].meNeg+byMonth[mk].herNeg)});
+  var maxGap=0;
+  for(var i=1;i<times.length;i++){var g=times[i]-times[i-1];if(g>maxGap)maxGap=g}
+  var maxGapDays=Math.round(maxGap/86400000);
+  var meLen=me.reduce(function(s,m){return s+m.content.length},0)/Math.max(1,meCount);
+  var herLen=her.reduce(function(s,m){return s+m.content.length},0)/Math.max(1,herCount);
+  var topWords={};
+  messages.forEach(function(m){
+    m.content.split(/[\s，。！？、,.!?~～]+/).forEach(function(w){
+      if(w.length>=2&&w.length<=6)topWords[w]=(topWords[w]||0)+1;
+    });
+  });
+  var topW=Object.keys(topWords).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,7);
+  var critMe=countWords(me,CRITICISM),critHer=countWords(her,CRITICISM);
+  var defMe=countWords(me,DEFENSIVE),defHer=countWords(her,DEFENSIVE);
+  var contMe=countWords(me,CONTEMPT),contHer=countWords(her,CONTEMPT);
+  var stoneMe=countWords(me,STONEWALL),stoneHer=countWords(her,STONEWALL);
+  return{total:total,mePct:(meCount/total*100).toFixed(1),herPct:(herCount/total*100).toFixed(1),
+    days:days,herStartPct:(herStart/days*100).toFixed(1),gottman:gottman.toFixed(1),
+    meMed:median(meDelays).toFixed(0),herMed:median(herDelays).toFixed(0),
+    meLen:meLen.toFixed(1),herLen:herLen.toFixed(1),maxGapDays:maxGapDays,
+    byHour:byHour,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x.toFixed(1)}),
+    topW:topW,stoneMe:stoneMe,stoneHer:stoneHer,critMe:critMe,critHer:critHer,
+    defMe:defMe,defHer:defHer,contMe:contMe,contHer:contHer,
+    mePos:mePos,herPos:herPos,meNeg:meNeg,herNeg:herNeg};
+}
+
+function renderReport(d){
+  document.getElementById('uploadPage').style.display='none';
+  document.getElementById('reportPage').style.display='block';
+  var verdict;
+  if(d.gottman>=5&&d.maxGapDays<=3)verdict={t:'💚 健康甜蜜型',x:'你们的Gottman比率是'+d.gottman+':1，远高于健康线5:1。双方互动均衡，没有长时间断联。这是一段健康、稳定的关系。'};
+  else if(d.mePct>60)verdict={t:'💙 单向投入型',x:'你发了'+d.mePct+'%的消息，TA只发了'+d.herPct+'%。你在关系里投入更多。Gottman比率'+d.gottman+':1。最长断联'+d.maxGapDays+'天。你一直在追，TA一直在退。'};
+  else if(d.gottman<1.5)verdict={t:'💔 高风险型',x:'Gottman比率只有'+d.gottman+':1，低于危险线。消极词多于积极词。最长断联'+d.maxGapDays+'天。这段关系需要认真对待了。'};
+  else verdict={t:'💛 波动型',x:'Gottman比率'+d.gottman+':1，关系有波动。最长断联'+d.maxGapDays+'天。需要关注沟通方式。'};
+  document.getElementById('verdictTitle').textContent=verdict.t;
+  document.getElementById('verdictText').textContent=verdict.x;
+  document.getElementById('kpiGrid').innerHTML='<div class="kpi"><div class="v hl-purple">'+d.total.toLocaleString()+'</div><div class="l">总消息数</div></div><div class="kpi"><div class="v hl-her">'+d.herStartPct+'%</div><div class="l">TA主动开场</div></div><div class="kpi"><div class="v hl-gold">'+d.maxGapDays+'天</div><div class="l">最长断联</div></div><div class="kpi"><div class="v '+(d.gottman>=5?'hl-green':d.gottman>=2?'hl-gold':'hl-red')+'">'+d.gottman+':1</div><div class="l">Gottman比率</div></div>';
+  var meType=d.meLen>12&&d.meMed<30?'深情焦虑者':d.meLen<6&&d.meMed>60?'冷淡被动者':'均衡沟通者';
+  var herType=d.herLen>12&&d.herMed<30?'温暖主动者':d.herLen<6&&d.herMed>60?'冷淡被动者':'均衡沟通者';
+  document.getElementById('roleCards').innerHTML='<div class="card"><h4>关系总断</h4><div class="big hl-purple">'+verdict.t.replace(/^\S+\s/,'')+'</div><p style="font-size:12px;color:#8a93a6">'+d.days+'天 · Gottman '+d.gottman+':1</p></div><div class="card"><h4>TA 画像</h4><div class="big hl-her">'+herType+'</div><p style="font-size:12px;color:#8a93a6">平均'+d.herLen+'字/条 · 回复'+d.herMed+'分钟</p></div><div class="card"><h4>你 画像</h4><div class="big hl-me">'+meType+'</div><p style="font-size:12px;color:#8a93a6">平均'+d.meLen+'字/条 · 回复'+d.meMed+'分钟</p></div>';
+  var aH=[],aM=[];
+  if(d.herMed>60)aH.push('回复从'+d.herMed+'分钟降到30分钟内');
+  if(d.herStartPct<35)aH.push('多主动开场，从'+d.herStartPct+'%提到40%');
+  if(d.stoneHer>20)aH.push('别筑墙，有情绪直接说');
+  if(!aH.length)aH.push('保持现状，继续表达');
+  if(d.mePct>60)aM.push('别太主动，你发了'+d.mePct+'%的消息');
+  if(d.meMed<15&&d.meLen>15)aM.push('别连发小作文，简洁一点');
+  if(d.critMe>20)aM.push('减少批评，多用肯定');
+  if(!aM.length)aM.push('保持现状，继续表达');
+  document.getElementById('adviceHer').innerHTML='• '+aH.join('<br>• ');
+  document.getElementById('adviceMe').innerHTML='• '+aM.join('<br>• ');
+  renderCharts(d);
+  window.scrollTo(0,0);
+}
+
+function renderCharts(d){
+  function mk(id,opt){echarts.init(document.getElementById(id)).setOption(opt)}
+  mk('c_gottman',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},xAxis:{type:'category',data:d.months,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{type:'line',data:d.gottmanByMonth,smooth:true,lineStyle:{width:3,color:'#a78bfa'},markLine:{data:[{yAxis:5,lineStyle:{color:'#4ade80',type:'dashed'}},{yAxis:1,lineStyle:{color:'#f87171',type:'dotted'}}]}}]});
+  mk('c_reply',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'}},xAxis:{type:'category',data:['中位数'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',name:'分钟',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'bar',data:[parseInt(d.meMed)],itemStyle:{color:'#60a5fa'}},{name:'TA',type:'bar',data:[parseInt(d.herMed)],itemStyle:{color:'#f778ba'}}]});
+  mk('c_words',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},xAxis:{type:'category',data:d.topW,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{type:'bar',data:d.topW.map(function(w){return Math.floor(topWordCount(w))}),itemStyle:{color:'#a78bfa'}}]});
+  mk('c_hour',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},xAxis:{type:'category',data:['0','2','4','6','8','10','12','14','16','18','20','22'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{type:'line',data:d.byHour.filter(function(_,i){return i%2===0}),smooth:true,lineStyle:{color:'#f778ba'}}]});
+  mk('c_sentiment',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['积极','消极'],textStyle:{color:'#8a93a6'}},xAxis:{type:'category',data:d.months,axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{name:'积极',type:'line',data:d.gottmanByMonth,smooth:true,lineStyle:{color:'#4ade80'}},{name:'消极',type:'bar',data:d.gottmanByMonth.map(function(x){return (100/Math.max(1,parseFloat(x))).toFixed(0)}),itemStyle:{color:'#f87171'}}]});
+  mk('c_conflict',{tooltip:{trigger:'axis',triggerOn:'click',confine:true},legend:{data:['你','TA'],textStyle:{color:'#8a93a6'}},xAxis:{type:'category',data:['批评','防御','蔑视','筑墙'],axisLabel:{color:'#8a93a6'}},yAxis:{type:'value',axisLabel:{color:'#8a93a6'}},series:[{name:'你',type:'bar',data:[d.critMe,d.defMe,d.contMe,d.stoneMe],itemStyle:{color:'#60a5fa'}},{name:'TA',type:'bar',data:[d.critHer,d.defHer,d.contHer,d.stoneHer],itemStyle:{color:'#f778ba'}}]});
+}
+
+var dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput');
+dz.onclick=function(){fi.click()};
+fi.onchange=function(e){if(e.target.files[0])handleFile(e.target.files[0])};
+dz.ondragover=function(e){e.preventDefault();dz.classList.add('dragover')};
+dz.ondragleave=function(){dz.classList.remove('dragover')};
+dz.ondrop=function(e){e.preventDefault();dz.classList.remove('dragover');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])};
+
+function handleFile(file){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var messages=parseFile(e.target.result);
+      if(messages.length<10){alert('至少需要10条消息才能分析');return}
+      var data=analyze(messages);
+      window._lastMessages=messages;
+      renderReport(data);
+    }catch(err){alert('解析失败：'+err.message)}
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function topWordCount(w){
+  var c=0;
+  if(window._lastMessages){window._lastMessages.forEach(function(m){if(m.content.indexOf(w)>=0)c++})}
+  return c;
+}
+</script>
+</body>
+</html>
