@@ -315,59 +315,79 @@ function countWords(arr,words){var c=0;arr.forEach(function(m){words.forEach(fun
 function countWord(arr,w){var c=0;arr.forEach(function(m){if(m.content.indexOf(w)>=0)c++});return c}
 function median(arr){if(!arr.length)return 0;var s=arr.slice().sort(function(a,b){return a-b});var mid=Math.floor(s.length/2);return s.length%2?s[mid]:(s[mid-1]+s[mid])/2}
 
-// ===== 主分析 =====
+// ===== 主分析（优化版：单次遍历统计所有词频）=====
 function analyze(messages){
   var total=messages.length;
-  var me=messages.filter(function(m){return m.sender==='me'});
-  var her=messages.filter(function(m){return m.sender==='her'});
-  var meCount=me.length,herCount=her.length;
-  var times=messages.map(function(m){return m.time}).sort();
+  var meCount=0,herCount=0;
+  var times=[];
+  var mePos=0,herPos=0,meNeg=0,herNeg=0;
+  var anxMe=0,anxHer=0,avoidMe=0,avoidHer=0,threatMe=0,threatHer=0,secureMe=0,secureHer=0;
+  var critMe=0,critHer=0,defMe=0,defHer=0,contMe=0,contHer=0,stoneMe=0,stoneHer=0;
+  var careMe=0,careHer=0,nickMe=0,nickHer=0,loveMe=0,loveHer=0,missMe=0,missHer=0;
+  var rationalMe=0,rationalHer=0;
+  var pnMe=0,pnHer=0,pyMe=0,pyHer=0,qMe=0,qHer=0;
+  var fsMe=0,fsHer=0;
+  var toneCountMe=[0,0,0,0,0,0,0,0],toneCountHer=[0,0,0,0,0,0,0,0];
+  var byHour=new Array(24).fill(0);
+  var byDay={},byMonth={};
+  var nightPos=0,nightNeg=0,nightTotal=0,dayPos=0,dayNeg=0,dayTotal=0;
+  var topWords={};
+
+  for(var i=0;i<messages.length;i++){
+    var m=messages[i];var c=m.content;var s=m.sender;
+    times.push(m.time);
+    if(s==='me')meCount++;else herCount++;
+    var h=new Date(m.time).getHours();byHour[h]++;
+    var mk=new Date(m.time).toISOString().slice(0,7);
+    var dk=new Date(m.time).toISOString().slice(0,10);
+    if(!byDay[dk])byDay[dk]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0};
+    byDay[dk][s]++;
+    if(!byMonth[mk])byMonth[mk]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0,rationalMe:0,rationalHer:0,critMe:0,critHer:0};
+    byMonth[mk][s]++;
+    var isNight=(h>=23||h<6);
+    if(isNight)nightTotal++;else dayTotal++;
+    var wds=c.split(/[ \s\uff0c\u3002\uff01\uff1f\u3001,.!?~\u301c]+/);
+    for(var wi=0;wi<wds.length;wi++){var w=wds[wi];if(w.length>=2&&w.length<=6)topWords[w]=(topWords[w]||0)+1}
+    for(var p=0;p<POSITIVE.length;p++){if(c.indexOf(POSITIVE[p])>=0){if(s==='me'){mePos++;byDay[dk].mePos++;byMonth[mk].mePos++}else{herPos++;byDay[dk].herPos++;byMonth[mk].herPos++};if(isNight)nightPos++;else dayPos++;break}}
+    for(var n=0;n<NEGATIVE.length;n++){if(c.indexOf(NEGATIVE[n])>=0){if(s==='me'){meNeg++;byDay[dk].meNeg++;byMonth[mk].meNeg++}else{herNeg++;byDay[dk].herNeg++;byMonth[mk].herNeg++};if(isNight)nightNeg++;else dayNeg++;break}}
+    for(var a=0;a<ANXIOUS.length;a++){if(c.indexOf(ANXIOUS[a])>=0){if(s==='me')anxMe++;else anxHer++;break}}
+    for(var av=0;av<AVOID.length;av++){if(c.indexOf(AVOID[av])>=0){if(s==='me')avoidMe++;else avoidHer++;break}}
+    for(var t=0;t<THREAT.length;t++){if(c.indexOf(THREAT[t])>=0){if(s==='me')threatMe++;else threatHer++;break}}
+    for(var se=0;se<SECURE.length;se++){if(c.indexOf(SECURE[se])>=0){if(s==='me')secureMe++;else secureHer++;break}}
+    for(var cr=0;cr<CRITICISM.length;cr++){if(c.indexOf(CRITICISM[cr])>=0){if(s==='me'){critMe++;byMonth[mk].critMe++}else{critHer++;byMonth[mk].critHer++};break}}
+    for(var df=0;df<DEFENSIVE.length;df++){if(c.indexOf(DEFENSIVE[df])>=0){if(s==='me')defMe++;else defHer++;break}}
+    for(var ct=0;ct<CONTEMPT.length;ct++){if(c.indexOf(CONTEMPT[ct])>=0){if(s==='me')contMe++;else contHer++;break}}
+    for(var st=0;st<STONEWALL.length;st++){if(c.indexOf(STONEWALL[st])>=0){if(s==='me')stoneMe++;else stoneHer++;break}}
+    for(var ca=0;ca<CARE.length;ca++){if(c.indexOf(CARE[ca])>=0){if(s==='me')careMe++;else careHer++;break}}
+    for(var nk=0;nk<NICKNAMES.length;nk++){if(c.indexOf(NICKNAMES[nk])>=0){if(s==='me')nickMe++;else nickHer++;break}}
+    for(var ra=0;ra<RATIONAL.length;ra++){if(c.indexOf(RATIONAL[ra])>=0){if(s==='me'){rationalMe++;byMonth[mk].rationalMe++}else{rationalHer++;byMonth[mk].rationalHer++};break}}
+    for(var lv=0;lv<LOVE_WORDS.length;lv++){if(c.indexOf(LOVE_WORDS[lv])>=0){if(s==='me')loveMe++;else loveHer++;break}}
+    for(var ms=0;ms<MISS_WORDS.length;ms++){if(c.indexOf(MISS_WORDS[ms])>=0){if(s==='me')missMe++;else missHer++;break}}
+    if(c.indexOf('我')>=0){if(s==='me')pnMe++;else pnHer++}
+    if(c.indexOf('你')>=0){if(s==='me')pyMe++;else pyHer++}
+    if(c.indexOf('？')>=0||c.indexOf('?')>=0){if(s==='me')qMe++;else qHer++}
+    if(c.indexOf('分手')>=0){if(s==='me')fsMe++;else fsHer++}
+    for(var tw=0;tw<TONE_WORDS.length;tw++){if(c.indexOf(TONE_WORDS[tw])>=0){if(s==='me')toneCountMe[tw]++;else toneCountHer[tw]++}}
+  }
+  times.sort(function(a,b){return a-b});
   var days=Math.max(1,Math.round((times[times.length-1]-times[0])/86400000));
-  
-  // 基础词频
-  var mePos=countWords(me,POSITIVE),herPos=countWords(her,POSITIVE);
-  var meNeg=countWords(me,NEGATIVE),herNeg=countWords(her,NEGATIVE);
   var gottman=(mePos+herPos)/Math.max(1,meNeg+herNeg);
-  
-  // 会话切分（间隔>6h）
   var sessions=[],cur=[];
-  messages.forEach(function(m,i){if(i===0){cur.push(m)}else{var gap=m.time-messages[i-1].time;if(gap>21600000){sessions.push(cur);cur=[m]}else{cur.push(m)}}});
+  for(var i=0;i<messages.length;i++){if(i===0)cur.push(messages[i]);else{var gap=messages[i].time-messages[i-1].time;if(gap>21600000){sessions.push(cur);cur=[messages[i]]}else cur.push(messages[i])}}
   if(cur.length)sessions.push(cur);
   var sessionCount=sessions.length;
   var openMe=0,openHer=0,closeMe=0,closeHer=0;
   sessions.forEach(function(s){if(s[0].sender==='me')openMe++;else openHer++;if(s[s.length-1].sender==='me')closeMe++;else closeHer++});
-  
-  // 回复延迟
   var meDelays=[],herDelays=[],meFast=0,herFast=0;
   for(var i=1;i<messages.length;i++){var diff=messages[i].time-messages[i-1].time;if(diff>60000&&diff<3600000&&messages[i].sender!==messages[i-1].sender){if(messages[i].sender==='me'){meDelays.push(diff/60000);if(diff<60000)meFast++}else{herDelays.push(diff/60000);if(diff<60000)herFast++}}}
-  
-  // 连发模式
   var maxBurstMe=0,maxBurstHer=0,burst3Me=0,burst3Her=0,burst5Me=0,burst5Her=0;
   var curSender=null,curBurst=0;
-  messages.forEach(function(m){if(m.sender===curSender){curBurst++;if(curBurst===3){if(m.sender==='me')burst3Me++;else burst3Her++}if(curBurst===5){if(m.sender==='me')burst5Me++;else burst5Her++}if(curBurst>maxBurstMe&&m.sender==='me')maxBurstMe=curBurst;if(curBurst>maxBurstHer&&m.sender==='her')maxBurstHer=curBurst}else{curSender=m.sender;curBurst=1}});
-  
-  // 按天
-  var byDay={};
-  messages.forEach(function(m){var d=new Date(m.time).toISOString().slice(0,10);if(!byDay[d])byDay[d]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0};byDay[d][m.sender]++;if(POSITIVE.some(function(w){return m.content.indexOf(w)>=0}))byDay[d][m.sender+'Pos']++;if(NEGATIVE.some(function(w){return m.content.indexOf(w)>=0}))byDay[d][m.sender+'Neg']++});
+  for(var i=0;i<messages.length;i++){var m=messages[i];if(m.sender===curSender){curBurst++;if(curBurst===3){if(m.sender==='me')burst3Me++;else burst3Her++}if(curBurst===5){if(m.sender==='me')burst5Me++;else burst5Her++}if(curBurst>maxBurstMe&&m.sender==='me')maxBurstMe=curBurst;if(curBurst>maxBurstHer&&m.sender==='her')maxBurstHer=curBurst}else{curSender=m.sender;curBurst=1}}
   var daysArr=Object.keys(byDay).sort();
   var herStartDays=daysArr.filter(function(d){return byDay[d].her>0}).length;
-  
-  // 情感高低点
   var daySent=daysArr.map(function(d){return(byDay[d].mePos+byDay[d].herPos-byDay[d].meNeg-byDay[d].herNeg)/Math.max(1,byDay[d].me+byDay[d].her)});
   var daySentPairs=daysArr.map(function(d,i){return{d:d,v:daySent[i]}}).sort(function(a,b){return a.v-b.v});
   var low5=daySentPairs.slice(0,5),high5=daySentPairs.slice(-5).reverse();
-  
-  // 深夜情感
-  var nightMsgs=messages.filter(function(m){var h=new Date(m.time).getHours();return h>=23||h<6});
-  var nightPos=countWords(nightMsgs,POSITIVE),nightNeg=countWords(nightMsgs,NEGATIVE);
-  var nightSent=(nightPos-nightNeg)/Math.max(1,nightMsgs.length);
-  var dayMsgs=messages.filter(function(m){var h=new Date(m.time).getHours();return h<23&&h>=6});
-  var dayPos=countWords(dayMsgs,POSITIVE),dayNeg=countWords(dayMsgs,NEGATIVE);
-  var daySentAvg=(dayPos-dayNeg)/Math.max(1,dayMsgs.length);
-  
-  // 按月
-  var byMonth={};
-  messages.forEach(function(m){var mk=new Date(m.time).toISOString().slice(0,7);if(!byMonth[mk])byMonth[mk]={me:0,her:0,mePos:0,meNeg:0,herPos:0,herNeg:0,rationalMe:0,rationalHer:0,critMe:0,critHer:0};var s=m.sender;byMonth[mk][s]++;if(POSITIVE.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk][s+'Pos']++;if(NEGATIVE.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk][s+'Neg']++;if(RATIONAL.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk]['rational'+(s==='me'?'Me':'Her')]++;if(CRITICISM.some(function(w){return m.content.indexOf(w)>=0}))byMonth[mk]['crit'+(s==='me'?'Me':'Her')]++});
   var months=Object.keys(byMonth).sort();
   var gottmanByMonth=months.map(function(mk){return(byMonth[mk].mePos+byMonth[mk].herPos)/Math.max(1,byMonth[mk].meNeg+byMonth[mk].herNeg)});
   var rationalMeByMonth=months.map(function(mk){return byMonth[mk].rationalMe/Math.max(1,byMonth[mk].me)});
@@ -376,81 +396,17 @@ function analyze(messages){
   var critHerByMonth=months.map(function(mk){return byMonth[mk].critHer/Math.max(1,byMonth[mk].her)*1000});
   var moodMeByMonth=months.map(function(mk){return(byMonth[mk].mePos-byMonth[mk].meNeg)/Math.max(1,byMonth[mk].me)*100});
   var moodHerByMonth=months.map(function(mk){return(byMonth[mk].herPos-byMonth[mk].herNeg)/Math.max(1,byMonth[mk].her)*100});
-  
-  // 冲突段检测（优化：直接索引，不用indexOf，避免O(n²)卡死）
   var conflictCount=0,repairMe=0,repairHer=0,totalSilenceMe=0,totalSilenceHer=0;
   var curConflictLen=0,curConflictLastIdx=-1;
-  for(var ci=0;ci<messages.length;ci++){
-    var cm=messages[ci];
-    var isNeg=false;
-    for(var nw=0;nw<NEGATIVE.length;nw++){if(cm.content.indexOf(NEGATIVE[nw])>=0){isNeg=true;break}}
-    if(isNeg){
-      if(curConflictLen===0)curConflictLastIdx=ci;
-      curConflictLen++;
-    }else{
-      if(curConflictLen>=2){
-        conflictCount++;
-        var silence=messages[ci].time-messages[curConflictLastIdx].time;
-        if(messages[ci].sender==='me'){repairMe++;totalSilenceMe+=silence/3600000}
-        else{repairHer++;totalSilenceHer+=silence/3600000}
-      }
-      curConflictLen=0;
-    }
-  }
+  for(var ci=0;ci<messages.length;ci++){var cm=messages[ci];var isNeg=false;for(var nw=0;nw<NEGATIVE.length;nw++){if(cm.content.indexOf(NEGATIVE[nw])>=0){isNeg=true;break}}if(isNeg){if(curConflictLen===0)curConflictLastIdx=ci;curConflictLen++}else{if(curConflictLen>=2){conflictCount++;var silence=messages[ci].time-messages[curConflictLastIdx].time;if(messages[ci].sender==='me'){repairMe++;totalSilenceMe+=silence/3600000}else{repairHer++;totalSilenceHer+=silence/3600000}}curConflictLen=0}}
   if(curConflictLen>=2)conflictCount++;
-  
-  // 断联
   var maxGap=0;for(var i=1;i<times.length;i++){var g=times[i]-times[i-1];if(g>maxGap)maxGap=g}var maxGapDays=Math.round(maxGap/86400000);
-  
-  // 人称
-  var pnMe=countWord(me,'我'),pnHer=countWord(her,'我');
-  var pyMe=countWord(me,'你'),pyHer=countWord(her,'你');
-  var qMe=me.filter(function(m){return m.content.indexOf('？')>=0||m.content.indexOf('?')>=0}).length;
-  var qHer=her.filter(function(m){return m.content.indexOf('？')>=0||m.content.indexOf('?')>=0}).length;
-  
-  // 语气词
-  var toneMe=TONE_WORDS.map(function(w){return countWord(me,w)});
-  var toneHer=TONE_WORDS.map(function(w){return countWord(her,w)});
-  
-  // 依恋
-  var anxMe=countWords(me,ANXIOUS),anxHer=countWords(her,ANXIOUS);
-  var avoidMe=countWords(me,AVOID),avoidHer=countWords(her,AVOID);
-  var threatMe=countWords(me,THREAT),threatHer=countWords(her,THREAT);
-  var secureMe=countWords(me,SECURE),secureHer=countWords(her,SECURE);
-  
-  // 四骑士
-  var critMe=countWords(me,CRITICISM),critHer=countWords(her,CRITICISM);
-  var defMe=countWords(me,DEFENSIVE),defHer=countWords(her,DEFENSIVE);
-  var contMe=countWords(me,CONTEMPT),contHer=countWords(her,CONTEMPT);
-  var stoneMe=countWords(me,STONEWALL),stoneHer=countWords(her,STONEWALL);
-  
-  // 关心/爱称
-  var careMe=countWords(me,CARE),careHer=countWords(her,CARE);
-  var nickMe=countWords(me,NICKNAMES),nickHer=countWords(her,NICKNAMES);
-  var loveMe=countWords(me,LOVE_WORDS),loveHer=countWords(her,LOVE_WORDS);
-  var missMe=countWords(me,MISS_WORDS),missHer=countWords(her,MISS_WORDS);
-  var fsMe=countWord(me,'分手'),fsHer=countWord(her,'分手');
-  
-  // 高频词
-  var topWords={};
-  messages.forEach(function(m){m.content.split(/[\s，。！？、,.!?~～]+/).forEach(function(w){if(w.length>=2&&w.length<=6)topWords[w]=(topWords[w]||0)+1})});
-  var topW=Object.keys(topWords).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,8);
-  
-  // 小时/周
-  var byHour=new Array(24).fill(0);messages.forEach(function(m){byHour[new Date(m.time).getHours()]++});
-  var byWeek=[0,0,0,0,0,0,0];messages.forEach(function(m){byWeek[new Date(m.time).getDay()]++});
-  
-  // 称谓逐月（优化：在byMonth遍历时顺便统计，不在循环里filter）
   var nameByMonth=months.map(function(){return{husband:0,wife:0,baby:0}});
   var monthIdx={};months.forEach(function(mk,i){monthIdx[mk]=i});
-  messages.forEach(function(m){
-    var mk=new Date(m.time).toISOString().slice(0,7);
-    var idx=monthIdx[mk];if(idx===undefined)return;
-    if(m.content.indexOf('老公')>=0)nameByMonth[idx].husband++;
-    if(m.content.indexOf('老婆')>=0)nameByMonth[idx].wife++;
-    if(m.content.indexOf('宝宝')>=0)nameByMonth[idx].baby++;
-  });
-  
+  for(var i=0;i<messages.length;i++){var mk=new Date(messages[i].time).toISOString().slice(0,7);var idx=monthIdx[mk];if(idx===undefined)continue;if(messages[i].content.indexOf('老公')>=0)nameByMonth[idx].husband++;if(messages[i].content.indexOf('老婆')>=0)nameByMonth[idx].wife++;if(messages[i].content.indexOf('宝宝')>=0)nameByMonth[idx].baby++}
+  var topW=Object.keys(topWords).sort(function(a,b){return topWords[b]-topWords[a]}).slice(0,8);
+  var nightSent=(nightPos-nightNeg)/Math.max(1,nightTotal);
+  var daySentAvg=(dayPos-dayNeg)/Math.max(1,dayTotal);
   return{total:total,mePct:(meCount/total*100).toFixed(1),herPct:(herCount/total*100).toFixed(1),
     days:days,herStartPct:(herStartDays/days*100).toFixed(1),gottman:gottman.toFixed(1),
     meMed:median(meDelays).toFixed(0),herMed:median(herDelays).toFixed(0),
@@ -459,7 +415,7 @@ function analyze(messages){
     openMe:openMe,openHer:openHer,closeMe:closeMe,closeHer:closeHer,
     maxBurstMe:maxBurstMe,maxBurstHer:maxBurstHer,burst3Me:burst3Me,burst3Her:burst3Her,burst5Me:burst5Me,burst5Her:burst5Her,
     low5:low5,high5:high5,nightSent:nightSent.toFixed(4),daySentAvg:daySentAvg.toFixed(4),
-    byHour:byHour,byWeek:byWeek,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x.toFixed(1)}),
+    byHour:byHour,months:months,gottmanByMonth:gottmanByMonth.map(function(x){return x.toFixed(1)}),
     rationalMeByMonth:rationalMeByMonth.map(function(x){return x.toFixed(2)}),rationalHerByMonth:rationalHerByMonth.map(function(x){return x.toFixed(2)}),
     critMeByMonth:critMeByMonth.map(function(x){return x.toFixed(1)}),critHerByMonth:critHerByMonth.map(function(x){return x.toFixed(1)}),
     moodMeByMonth:moodMeByMonth.map(function(x){return x.toFixed(1)}),moodHerByMonth:moodHerByMonth.map(function(x){return x.toFixed(1)}),
@@ -467,7 +423,7 @@ function analyze(messages){
     avgSilenceMe:(totalSilenceMe/Math.max(1,repairMe)).toFixed(1),avgSilenceHer:(totalSilenceHer/Math.max(1,repairHer)).toFixed(1),
     fsMe:fsMe,fsHer:fsHer,
     pnMe:pnMe,pnHer:pnHer,pyMe:pyMe,pyHer:pyHer,qMe:qMe,qHer:qHer,
-    toneMe:toneMe,toneHer:toneHer,
+    toneMe:toneCountMe,toneHer:toneCountHer,
     anxMe:anxMe,anxHer:anxHer,avoidMe:avoidMe,avoidHer:avoidHer,threatMe:threatMe,threatHer:threatHer,secureMe:secureMe,secureHer:secureHer,
     critMe:critMe,critHer:critHer,defMe:defMe,defHer:defHer,contMe:contMe,contHer:contHer,stoneMe:stoneMe,stoneHer:stoneHer,
     careMe:careMe,careHer:careHer,nickMe:nickMe,nickHer:nickHer,loveMe:loveMe,loveHer:loveHer,missMe:missMe,missHer:missHer,
