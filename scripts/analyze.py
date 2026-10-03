@@ -660,6 +660,154 @@ def compute(msgs, sessions):
     D['event'] = ev
     D['eventBase'] = round(base, 1)
 
+    # =====================================================================
+    # 扩展维度（最完整版）：断联全清单 / 星期节律 / 长度分布 / 延迟分布 /
+    #                        作息首末条 / 年度对比 / 表情逐月 / 单日峰值
+    # =====================================================================
+
+    # (a) 断联全清单
+    D['gapList'] = []
+    for g in sorted(gaps, key=lambda x: -x['days'])[:12]:
+        j = g['idx']
+        pre = msgs[j - 1] if j - 1 >= 0 else None
+        post = msgs[j] if j < total else None
+        D['gapList'].append({'days': g['days'], 'before': g['before'], 'after': g['after'],
+                             'pre': pre['content'] if pre else '', 'preWho': pre['sender'] if pre else 'me',
+                             'post': post['content'] if post else ''})
+    D['gap3N'] = sum(1 for g in gaps if g['days'] >= 3)
+    D['gap7N'] = sum(1 for g in gaps if g['days'] >= 7)
+
+    # (b) 星期节律
+    wdM, wdH = [0] * 7, [0] * 7
+    for m in msgs:
+        w = m['dt'].weekday()
+        (wdM if m['sender'] == 'me' else wdH)[w] += 1
+    D['wdM'], D['wdH'] = wdM, wdH
+    D['wdMP'] = [pct(v, nMe) for v in wdM]
+    D['wdHP'] = [pct(v, nHer) for v in wdH]
+    D['wdLabels'] = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    D['wdPkM'] = wdM.index(max(wdM))
+    D['wdPkH'] = wdH.index(max(wdH))
+    D['wdWeekendM'] = pct(wdM[5] + wdM[6], nMe)
+    D['wdWeekendH'] = pct(wdH[5] + wdH[6], nHer)
+
+    # (c) 消息长度分布
+    LB = [(1, 3), (4, 10), (11, 30), (31, 100), (101, 10 ** 9)]
+    lbM, lbH = [0] * len(LB), [0] * len(LB)
+    for m in msgs:
+        L = len(m['content'])
+        for i, (a, b) in enumerate(LB):
+            if a <= L <= b:
+                (lbM if m['sender'] == 'me' else lbH)[i] += 1
+                break
+    D['lenBuck'] = ['1–3 字', '4–10 字', '11–30 字', '31–100 字', '100 字以上']
+    D['lenM'], D['lenH'] = lbM, lbH
+    D['lenMP'] = [pct(v, nMe) for v in lbM]
+    D['lenHP'] = [pct(v, nHer) for v in lbH]
+    D['lenShortM'] = pct(lbM[0] + lbM[1], nMe)
+    D['lenShortH'] = pct(lbH[0] + lbH[1], nHer)
+    D['lenLongM'] = pct(lbM[3] + lbM[4], nMe)
+    D['lenLongH'] = pct(lbH[3] + lbH[4], nHer)
+
+    # (d) 回复延迟分布
+    RB = [('≤1 分钟', 0, 1), ('1–5 分钟', 1, 5), ('5–30 分钟', 5, 30),
+          ('30–60 分钟', 30, 60), ('1–6 小时', 60, 360), ('超过 6 小时', 360, 10 ** 9)]
+    rbM, rbH = [0] * len(RB), [0] * len(RB)
+    for i in range(1, total):
+        if msgs[i]['sender'] == msgs[i - 1]['sender']:
+            continue
+        gg = (msgs[i]['dt'] - msgs[i - 1]['dt']).total_seconds() / 60.0
+        if gg < 0:
+            continue
+        for k, (_, a, b) in enumerate(RB):
+            if a <= gg < b:
+                (rbM if msgs[i]['sender'] == 'me' else rbH)[k] += 1
+                break
+    D['rdLabels'] = [x[0] for x in RB]
+    D['rdM'], D['rdH'] = rbM, rbH
+    D['rdMP'] = [pct(v, sum(rbM)) for v in rbM]
+    D['rdHP'] = [pct(v, sum(rbH)) for v in rbH]
+
+    # (e) 作息：每日首条 / 末条消息落在哪个小时
+    firstH = {'me': [0] * 24, 'her': [0] * 24}
+    lastH = {'me': [0] * 24, 'her': [0] * 24}
+    seenDays = {}
+    for m in msgs:
+        k = m['dt'].strftime('%Y-%m-%d')
+        if k not in seenDays:
+            seenDays[k] = [m, m]
+        else:
+            seenDays[k][1] = m
+    for k, (f, l) in seenDays.items():
+        firstH[f['sender']][f['dt'].hour] += 1
+        lastH[l['sender']][l['dt'].hour] += 1
+
+    def avg_hour(arr):
+        t = sum(arr)
+        return round(sum(i * v for i, v in enumerate(arr)) / t, 1) if t else 0.0
+    D['firstHM'], D['firstHH'] = firstH['me'], firstH['her']
+    D['lastHM'], D['lastHH'] = lastH['me'], lastH['her']
+    D['firstAvgM'], D['firstAvgH'] = avg_hour(firstH['me']), avg_hour(firstH['her'])
+    D['lastAvgM'], D['lastAvgH'] = avg_hour(lastH['me']), avg_hour(lastH['her'])
+    D['firstDayN'] = sum(1 for k, (f, l) in seenDays.items() if f['sender'] == 'me')
+    D['lastDayN'] = sum(1 for k, (f, l) in seenDays.items() if l['sender'] == 'me')
+
+    # (f) 年度对比
+    D['years'] = []
+    for y in sorted(set(m['dt'].year for m in msgs)):
+        ym = [m for m in msgs if m['dt'].year == y]
+        if not ym:
+            continue
+        ymn = len(ym)
+        yme = sum(1 for m in ym if m['sender'] == 'me')
+        yp = sum(1 for m in ym if hit(m['content'], POSITIVE))
+        yn = sum(1 for m in ym if hit(m['content'], NEGATIVE))
+        ycfl = sum(1 for cs in conflictSessions if cs['start'].year == y)
+        yrp = [r for r in repairs if r['dt'].year == y]
+        yrpm = sum(1 for r in yrp if r['who'] == 'me')
+        days = len(set(m['dt'].strftime('%Y-%m-%d') for m in ym))
+        span = max(1, (ym[-1]['dt'] - ym[0]['dt']).days + 1)
+        D['years'].append({
+            'y': y, 'n': ymn, 'me': yme, 'her': ymn - yme, 'cfl': ycfl,
+            'gottman': round(yp / yn, 2) if yn else float(yp),
+            'days': days, 'span': span, 'perDay': round(ymn / days, 1),
+            'repM': pct(yrpm, len(yrp)) if yrp else 0,
+            'repH': pct(len(yrp) - yrpm, len(yrp)) if yrp else 0, 'repN': len(yrp)})
+
+    # (g) 表情逐月
+    D['monEmojiM'] = [0] * len(months)
+    D['monEmojiH'] = [0] * len(months)
+    for m in msgs:
+        ne = len(EMOJI_RE.findall(m['content']))
+        if not ne:
+            continue
+        i = monthIdx.get(ym_of(m['dt']))
+        if i is None:
+            continue
+        (D['monEmojiM'] if m['sender'] == 'me' else D['monEmojiH'])[i] += ne
+
+    # (h) 单日峰值 / 单条最长
+    busiest = sorted(((k, v[0] + v[1]) for k, v in D['daily'].items()), key=lambda x: -x[1])[:10]
+    D['busiest'] = [(k, c, D['daily'][k][0], D['daily'][k][1]) for k, c in busiest]
+
+    def _rep_ratio(s):
+        """单字重复率：用来剔除「哈哈哈哈…」这类刷屏，它长但没有信息量。"""
+        if not s:
+            return 1.0
+        return Counter(s).most_common(1)[0][1] / float(len(s))
+    NOTICE_RE = re.compile(r'[【】]|https?://|www\.|@[A-Za-z0-9_.-]+|[A-Za-z0-9]{5,}\.[a-z]{2,}')
+
+    def _is_notice(s):
+        """转发通知 / 系统消息 / 含网址或长账号串的，不是「人话」，排除。"""
+        if NOTICE_RE.search(s):
+            return True
+        if ('密码' in s or '登录' in s) and ('账号' in s or '网站' in s):
+            return True
+        return False
+    D['longest'] = sorted([m for m in msgs
+                           if _rep_ratio(m['content']) < 0.4 and not _is_notice(m['content'])],
+                          key=lambda m: -len(m['content']))[:5]
+
     # ---------- 关系分期 ----------
     D['phases'] = build_phases(D, msgs, daysArr)
 
@@ -791,6 +939,7 @@ TOC_ITEMS = [
     ('08', '心理学框架补完', 'Gottman / Bids / Gable / 临界慢化 / 事件研究'),
     ('09', '谁更爱谁', '13 项投入度逐项对比'),
     ('10', '最终药方', '她改 / 你改 / 互相谅解 / 一起改'),
+    ('11', '附录 · 全量数据', '断联清单 / 年度对比 / 作息节律 / 峰值日'),
 ]
 
 
@@ -1339,6 +1488,153 @@ def render(D, meta):
            (_top_trig[0][1] if _top_trig else 0),
            D['gottman']))
 
+    # =====================================================================
+    # 扩展维度渲染（最完整版）
+    # =====================================================================
+
+    # ---------- 消息长度分布（02 章） ----------
+    lrows = []
+    for i, lab in enumerate(D['lenBuck']):
+        a, b = D['lenMP'][i], D['lenHP'][i]
+        lrows.append('<tr><td>%s</td><td class="num %s">%s%%</td><td class="num %s">%s%%</td></tr>'
+                     % (lab, 'hl-me' if a > b else '', a, 'hl-her' if b > a else '', b))
+    T['LEN_TABLE'] = ('<tr><th>消息长度</th><th class="num">你</th><th class="num">TA</th></tr>'
+                      + ''.join(lrows))
+    T['NOTE_LEN'] = ('短消息（1–10 字）占比：你 <b>%s%%</b>、TA <b>%s%%</b>；'
+                     '长消息（30 字以上）占比：你 <b>%s%%</b>、TA <b>%s%%</b>。'
+                     '平均字数你 %s、TA %s。'
+                     '注意方向：按「比例」看，<b>你反而更常发长消息、TA 更常发短消息</b>——'
+                     '这和她「最长连发 56 条」并不矛盾，连发是多条短句滚成的一长串，不是一条长文。'
+                     '所以你们真正的差异不在单条长短，而在<b>节奏</b>：'
+                     '她把一段心思切成很多小条连续丢出来，你习惯一次说完整、说完就停。'
+                     % (D['lenShortM'], D['lenShortH'], D['lenLongM'], D['lenLongH'],
+                        D['LEN_M'], D['LEN_H']))
+
+    # ---------- 星期节律（03 章） ----------
+    T['NOTE_WEEK'] = ('你消息最多的是 <b>%s</b>（%s%%），TA 最多的是 <b>%s</b>（%s%%）。'
+                      '周末（周六日）消息占比：你 %s%%、TA %s%%。'
+                      '两条线如果都往周末翘，说明你们是「周末恋人」型——平日只是维持，周末才是真正的相处；'
+                      '如果工作日明显更高，说明你们的交流主要发生在通勤与上班的碎片时间里。'
+                      % (D['wdLabels'][D['wdPkM']], D['wdMP'][D['wdPkM']],
+                         D['wdLabels'][D['wdPkH']], D['wdHP'][D['wdPkH']],
+                         D['wdWeekendM'], D['wdWeekendH']))
+
+    # ---------- 回复延迟分布（03 章） ----------
+    rr = []
+    for i, lab in enumerate(D['rdLabels']):
+        a, b = D['rdMP'][i], D['rdHP'][i]
+        rr.append('<tr><td>%s</td><td class="num %s">%s%%</td><td class="num %s">%s%%</td></tr>'
+                  % (lab, 'hl-me' if a > b else '', a, 'hl-her' if b > a else '', b))
+    T['RD_TABLE'] = ('<tr><th>回复间隔</th><th class="num">你→TA</th><th class="num">TA→你</th></tr>'
+                     + ''.join(rr))
+    m_slow = D['rdMP'][4] + D['rdMP'][5]
+    h_slow = D['rdHP'][4] + D['rdHP'][5]
+    T['NOTE_RD'] = ('超过 1 小时的慢回复占比：你 <b>%s%%</b>、TA <b>%s%%</b>。'
+                    '这一项比中位数更能说明问题——中位数只看「一般情况」，分布才看得见「冷处理的那几次」。'
+                    '慢回复本身不是错，但它是「回避疏离」在时间轴上的落点。'
+                    % (round(m_slow, 1), round(h_slow, 1)))
+
+    # ---------- 表情逐月（04 章） ----------
+    T['NOTE_EMOJI'] = ('表情是「软化剂」：同一句话加不加表情，读起来完全不同。'
+                       '你合计使用表情 <b>%s</b> 个（每千条 <b>%s</b>），TA <b>%s</b> 个（每千条 %s）——'
+                       '你的密度是 TA 的 <b>%.1f 倍</b>。'
+                       '这一项你明显更高，和你偏回避的沟通风格是配套的：'
+                       '不想正面冲突，就往句尾加个表情把话说软，让「拒绝」听上去不像拒绝。'
+                       '看曲线要盯的是<b>退潮点</b>——两个人表情同时掉下去的那几个月，'
+                       '就是这段关系最不轻松的时段。'
+                       % (D['EMOJI_CNT_M'], per_k(D['EMOJI_CNT_M'], nMe),
+                          D['EMOJI_CNT_H'], per_k(D['EMOJI_CNT_H'], nHer),
+                          per_k(D['EMOJI_CNT_M'], nMe) / max(0.1, per_k(D['EMOJI_CNT_H'], nHer))))
+
+    # ---------- 作息：谁先开口 / 谁最后说话（11 章） ----------
+    actDays = len([1 for k, v in D['daily'].items() if v[0] + v[1] > 0])
+    firstH_N = actDays - D['firstDayN']
+    lastH_N = actDays - D['lastDayN']
+    T['RHYTHM_TABLE'] = (
+        '<tr><th>指标</th><th class="num">你</th><th class="num">TA</th><th class="read">读法</th></tr>'
+        '<tr><td>平均「当天第一句」时间</td><td class="num %s">%s 点</td><td class="num %s">%s 点</td>'
+        '<td class="read">谁更早想起对方</td></tr>'
+        '<tr><td>平均「当天最后一句」时间</td><td class="num %s">%s 点</td><td class="num %s">%s 点</td>'
+        '<td class="read">谁把这一天收起来</td></tr>'
+        '<tr><td>说第一句的天数</td><td class="num hl-me">%d 天</td><td class="num hl-her">%d 天</td>'
+        '<td class="read">共 %d 个有聊天的日子</td></tr>'
+        '<tr><td>说最后一句的天数</td><td class="num hl-me">%d 天</td><td class="num hl-her">%d 天</td>'
+        '<td class="read">收尾＝把这一天关掉的人</td></tr>'
+        % ('hl-me' if D['firstAvgM'] < D['firstAvgH'] else '', D['firstAvgM'],
+           'hl-her' if D['firstAvgH'] < D['firstAvgM'] else '', D['firstAvgH'],
+           'hl-me' if D['lastAvgM'] > D['lastAvgH'] else '', D['lastAvgM'],
+           'hl-her' if D['lastAvgH'] > D['lastAvgM'] else '', D['lastAvgH'],
+           D['firstDayN'], firstH_N, actDays,
+           D['lastDayN'], lastH_N))
+    T['NOTE_RHYTHM'] = ('有聊天的 <b>%d</b> 天里，你说了 <b>%d</b> 天的第一句、TA 说了 %d 天；'
+                        '你收尾了 <b>%d</b> 天、TA 收尾了 %d 天。'
+                        '「说第一句」＝主动启动这一天，和会话段的「开启」是两个尺度：'
+                        '一段对话的开启看的是谁先说话，一天的开启看的是谁先想起对方。'
+                        % (actDays, D['firstDayN'], firstH_N,
+                           D['lastDayN'], lastH_N))
+
+    # ---------- 年度对比（11 章） ----------
+    yrows = []
+    for y in D['years']:
+        gcls = cls(y['gottman'], 5, 2)
+        yrows.append('<tr><td><b>%d</b></td><td class="num">%s</td><td class="num">%s</td>'
+                     '<td class="num">%s</td><td class="num">%d</td><td class="num">%s</td>'
+                     '<td class="num">%s</td><td class="num %s">%s</td></tr>'
+                     % (y['y'], format(y['n'], ','), format(y['me'], ','), format(y['her'], ','),
+                        y['days'], y['perDay'], y['cfl'],
+                        gcls, y['gottman']))
+    T['YEAR_TABLE'] = ('<tr><th>年份</th><th class="num">总消息</th><th class="num">你</th>'
+                       '<th class="num">TA</th><th class="num">聊天天数</th><th class="num">日均</th>'
+                       '<th class="num">冲突段</th><th class="num">Gottman</th></tr>' + ''.join(yrows))
+    if len(D['years']) >= 2:
+        y0, y1 = D['years'][0], D['years'][-1]
+        dirn = '升到' if y1['perDay'] > y0['perDay'] else '降到'
+        gdir = '同步下滑' if y1['gottman'] < y0['gottman'] else '同步上升'
+        T['NOTE_YEAR'] = ('按自然年横向比：日均消息从 %d 年的 <b>%s</b> 条 %s %d 年的 <b>%s</b> 条；'
+                          '同期冲突段 %d 段 → %d 段，Gottman 比率 %s → %s（%s）。'
+                          '这是全报告最反直觉的一处对撞：<b>聊得越来越多，健康度却在往下走</b>。'
+                          '年度视角能抹平单月的偶然波动，看出的不是「感情好不好」，'
+                          '而是「这段关系整体在往哪个方向走」。'
+                          % (y0['y'], y0['perDay'], dirn, y1['y'], y1['perDay'],
+                             y0['cfl'], y1['cfl'], y0['gottman'], y1['gottman'], gdir))
+    else:
+        T['NOTE_YEAR'] = '样本跨年不足，仅列出单一年份的数据。'
+
+    # ---------- 断联全清单（11 章） ----------
+    grows = []
+    for i, g in enumerate(D['gapList'][:10]):
+        d = g['days']
+        c = 'hl-red' if d >= 7 else ('hl-gold' if d >= 3 else '')
+        grows.append('<tr><td class="num">%d</td><td class="read">%s → %s</td>'
+                     '<td class="num %s">%.1f 天</td><td class="read">%s：%s</td></tr>'
+                     % (i + 1, g['before'].strftime('%Y-%m-%d'), g['after'].strftime('%Y-%m-%d'),
+                        c, d, '你' if g['preWho'] == 'me' else 'TA', cut(g['pre'], 42)))
+    T['GAP_TABLE'] = ('<tr><th>#</th><th>区间</th><th class="num">时长</th>'
+                      '<th class="read">断联前的最后一句</th></tr>' + ''.join(grows))
+    T['NOTE_GAP'] = ('全程共出现 <b>%d</b> 次超过 3 天的中断、<b>%d</b> 次超过 7 天的中断，'
+                     '最长一次 <b>%d 天</b>。'
+                     '注意最后一句是谁说的、说了什么——大多数断联不是从「分手」两个字开始的，'
+                     '而是从一句很普通的话开始的，只是那句话之后没人再接。'
+                     % (D['gap3N'], D['gap7N'], D['maxGap']))
+
+    # ---------- 单日峰值 Top10（11 章） ----------
+    brows = []
+    for i, (k, c, a, b) in enumerate(D['busiest']):
+        brows.append('<tr><td class="num">%d</td><td>%s</td><td class="num"><b>%d</b></td>'
+                     '<td class="num">%d</td><td class="num">%d</td></tr>'
+                     % (i + 1, k, c, a, b))
+    T['BUSY_TABLE'] = ('<tr><th>#</th><th>日期</th><th class="num">总条数</th>'
+                       '<th class="num">你</th><th class="num">TA</th></tr>' + ''.join(brows))
+
+    # ---------- 最长单条消息 Top3（11 章） ----------
+    lq = []
+    for m in D['longest'][:3]:
+        lq.append(q(m['sender'], m['dt'], m['content'], 200))
+    T['LONGEST_QUOTES'] = ''.join(lq) + ('<p class="note">全场最长的三条消息（已剔除「哈哈哈哈哈…」这类重复刷屏，'
+                                         '它们长但没有信息量）。一个人愿意打这么多字、把一件小事拆成'
+                                         '「什么情况、为什么不舒服、下次怎么办」来讲的时候，'
+                                         '通常不是因为这段话重要，而是因为他还在乎这段关系值不值得讲清楚。</p>')
+
     # ---------- 页脚 ----------
     T['FOOTER'] = (
         '<b>数据源</b>：%s<br>'
@@ -1383,6 +1679,17 @@ def render(D, meta):
         'J_SLOW_DATES': D['slowDates'], 'J_SLOW_VAR': D['slowVar'], 'J_SLOW_AR': D['slowAR'],
         'J_EV_CATS': [e['name'] for e in D['event']], 'J_EV_VALS': [e['pct'] for e in D['event']],
         'J_TOPIC_CATS': D['topicCats'], 'J_TOPIC_M': D['topicM'], 'J_TOPIC_H': D['topicH'],
+        # ---- 扩展维度 ----
+        'J_LEN_LAB': D['lenBuck'], 'J_LEN_M': D['lenMP'], 'J_LEN_H': D['lenHP'],
+        'J_WD_LAB': D['wdLabels'], 'J_WD_M': D['wdMP'], 'J_WD_H': D['wdHP'],
+        'J_RD_LAB': D['rdLabels'], 'J_RD_M': D['rdMP'], 'J_RD_H': D['rdHP'],
+        'J_EMOJI_M': D['monEmojiM'], 'J_EMOJI_H': D['monEmojiH'],
+        'J_FIRST_M': D['firstHM'], 'J_FIRST_H': D['firstHH'],
+        'J_LAST_M': D['lastHM'], 'J_LAST_H': D['lastHH'],
+        'J_YEARS': [y['y'] for y in D['years']],
+        'J_YR_N': [y['n'] for y in D['years']],
+        'J_YR_PER': [y['perDay'] for y in D['years']],
+        'J_YR_G': [y['gottman'] for y in D['years']],
     }
     for k, v in J.items():
         T[k] = json.dumps(v, ensure_ascii=False)

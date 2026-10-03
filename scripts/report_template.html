@@ -132,6 +132,10 @@ footer b{color:var(--muted)}
 <div class="card"><h3>高频词 Top8</h3><table>{{TOPWORD_TABLE}}</table><p class="note">已剔除两人共用的语气词与占位符，只看有信息量的词。</p></div>
 <div class="card"><h3>表情策略</h3><table>{{EMOJI_TABLE}}</table><p class="note">口径：微信表情标记（[xx]）。表情是行为不是文本情绪，单独计数，不参与情感分。</p></div>
 </div>
+<div class="grid2">
+<div class="card"><h3>消息长度分布</h3><div class="chart-sm" id="c_len"></div><table>{{LEN_TABLE}}</table><p class="note">{{NOTE_LEN}}</p></div>
+<div class="card"><h3>表情逐月变化</h3><div class="chart-sm" id="c_emoji"></div><p class="note">{{NOTE_EMOJI}}</p></div>
+</div>
 <div class="card"><h3>证据 · 同一件事，两种说法</h3>{{TONE_QUOTES}}</div>
 </section>
 
@@ -144,6 +148,10 @@ footer b{color:var(--muted)}
 <div class="card"><h3>回复速度</h3><table>{{REPLY_TABLE}}</table><p class="note">只统计换说话人处的间隔，长间隔样本不丢弃（丢弃会把「冷处理」洗成「回得快」）。</p></div>
 </div>
 <div class="card"><h3>连发模式</h3><table>{{BURST_TABLE}}</table><p class="note">「连发后被堵回」＝你连发 ≥3 条之后，对方只回了 1~2 个字。这一项是全报告最值得注意的不对称指标。</p></div>
+<div class="grid2">
+<div class="card"><h3>回复延迟分布</h3><div class="chart-sm" id="c_rd"></div><table>{{RD_TABLE}}</table><p class="note">{{NOTE_RD}}</p></div>
+<div class="card"><h3>星期节律</h3><div class="chart-sm" id="c_week"></div><p class="note">{{NOTE_WEEK}}</p></div>
+</div>
 </section>
 
 <!-- ==================== 04 ==================== -->
@@ -224,6 +232,24 @@ footer b{color:var(--muted)}
 <div class="card" style="border-top:3px solid var(--gold)"><h3 class="hl-gold">一起改的</h3>{{RX_TOGETHER}}</div>
 </section>
 
+<!-- ==================== 11 ==================== -->
+<section id="s11"><span class="sec-no">11 · 附录 · 全量数据与延伸维度</span><h2>把余下的证据全部摊开</h2>
+<p class="sub">这一章是「数据附录」：不做新判断，只把所有能算出来的原始对比一次放齐，方便你自己复核、也方便以后回看时对照。</p>
+
+<div class="card"><h3>断联全清单 · 最长的 10 次中断</h3><table>{{GAP_TABLE}}</table><p class="note">{{NOTE_GAP}}</p></div>
+
+<div class="card"><h3>年度对比 · 每一年的样子</h3><div class="chart" id="c_year"></div><table>{{YEAR_TABLE}}</table><p class="note">{{NOTE_YEAR}}</p></div>
+
+<div class="card"><h3>作息节律 · 谁先开口，谁最后说话</h3><div class="grid2">
+<div class="chart-sm" id="c_first"></div>
+<div class="chart-sm" id="c_last"></div>
+</div><table>{{RHYTHM_TABLE}}</table><p class="note">{{NOTE_RHYTHM}}</p></div>
+
+<div class="card"><h3>最热闹的 10 天</h3><table>{{BUSY_TABLE}}</table><p class="note">消息量的峰值日。把这些天和「情绪低点 Top5」对照着看——峰值和低点经常重合，聊得最多的时候，往往也是吵得最凶的时候。</p></div>
+
+<div class="card"><h3>最长的三条消息</h3>{{LONGEST_QUOTES}}</div>
+</section>
+
 <footer>{{FOOTER}}</footer>
 </div>
 
@@ -235,6 +261,7 @@ function legend(){return {legend:{textStyle:{color:'#8fa1b4',fontSize:11},top:0}
 function grid(t,b){return {grid:{left:48,right:22,top:(t||34),bottom:(b||30),containLabel:true}}}
 var C_MONTHS={{J_MONTHS}};
 var C_GAPS={{J_GAPS}};
+var HOURS24=[];for(var _i=0;_i<24;_i++)HOURS24.push(''+_i);
 
 mk('c_attach',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(),{xAxis:Object.assign({type:'category',data:['焦虑追问','回避疏离','情绪要挟','安全表达']},AX),yAxis:Object.assign({type:'value',name:'每千条',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'bar',data:{{J_ATT_M}},itemStyle:{color:ME_C},barMaxWidth:26},{name:'TA',type:'bar',data:{{J_ATT_H}},itemStyle:{color:HER_C},barMaxWidth:26}]}));
 mk('c_tone',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(),{xAxis:Object.assign({type:'category',data:['哈','嗯','吧','哦','呀','呢','啊','嘛']},AX),yAxis:Object.assign({type:'value',name:'每千条',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'bar',data:{{J_TONE_M}},itemStyle:{color:ME_C},barMaxWidth:20},{name:'TA',type:'bar',data:{{J_TONE_H}},itemStyle:{color:HER_C},barMaxWidth:20}]}));
@@ -254,6 +281,13 @@ mk('c_stern',{tooltip:{},legend:{textStyle:{color:'#8fa1b4',fontSize:11},bottom:
 mk('c_slow',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(),{xAxis:Object.assign({type:'category',data:{{J_SLOW_DATES}}},AX),yAxis:[Object.assign({type:'value',name:'滚动方差',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),Object.assign({type:'value',name:'AR(1)',nameTextStyle:{color:'#ffb648',fontSize:10}},AX)],series:[{name:'日消息量·滚动方差',type:'line',data:{{J_SLOW_VAR}},smooth:true,symbol:'none',lineStyle:{color:'#f06292',width:2},itemStyle:{color:'#f06292'},areaStyle:{opacity:.10}},{name:'AR(1) 一阶自相关',type:'line',yAxisIndex:1,data:{{J_SLOW_AR}},smooth:true,symbol:'none',lineStyle:{color:'#ffb648',width:2},itemStyle:{color:'#ffb648'}}]}));
 mk('c_event',Object.assign({tooltip:{trigger:'axis'},grid:{left:48,right:22,top:34,bottom:30,containLabel:true}},{xAxis:Object.assign({type:'category',data:{{J_EV_CATS}}},AX),yAxis:Object.assign({type:'value',name:'相对基线 %',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{type:'bar',data:{{J_EV_VALS}},itemStyle:{color:function(p){return p.value>=0?'#5b8def':'#ff5c5c'}},barMaxWidth:34,label:{show:true,position:'top',color:'#8fa1b4',fontSize:10,formatter:'{c}%'}}]}));
 mk('c_topic',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(),{xAxis:Object.assign({type:'category',data:{{J_TOPIC_CATS}},axisLabel:{color:'#8fa1b4',fontSize:10,interval:0,rotate:{{TOPIC_ROTATE}}}},AX),yAxis:Object.assign({type:'value',name:'占比%',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'bar',data:{{J_TOPIC_M}},itemStyle:{color:ME_C},barMaxWidth:18},{name:'TA',type:'bar',data:{{J_TOPIC_H}},itemStyle:{color:HER_C},barMaxWidth:18}]}));
+mk('c_len',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(30,26),{xAxis:Object.assign({type:'category',data:{{J_LEN_LAB}},axisLabel:{color:'#8fa1b4',fontSize:10,interval:0}},AX),yAxis:Object.assign({type:'value',name:'占比%',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'bar',data:{{J_LEN_M}},itemStyle:{color:ME_C},barMaxWidth:22},{name:'TA',type:'bar',data:{{J_LEN_H}},itemStyle:{color:HER_C},barMaxWidth:22}]}));
+mk('c_emoji',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(30,26),{xAxis:Object.assign({type:'category',data:C_MONTHS},AX),yAxis:Object.assign({type:'value',name:'个数',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'line',data:{{J_EMOJI_M}},smooth:true,symbolSize:3,lineStyle:{color:ME_C,width:2},itemStyle:{color:ME_C},areaStyle:{opacity:.10}},{name:'TA',type:'line',data:{{J_EMOJI_H}},smooth:true,symbolSize:3,lineStyle:{color:HER_C,width:2},itemStyle:{color:HER_C}}]}));
+mk('c_rd',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(30,26),{xAxis:Object.assign({type:'category',data:{{J_RD_LAB}},axisLabel:{color:'#8fa1b4',fontSize:10,interval:0,rotate:20}},AX),yAxis:Object.assign({type:'value',name:'占比%',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你→TA',type:'bar',data:{{J_RD_M}},itemStyle:{color:ME_C},barMaxWidth:20},{name:'TA→你',type:'bar',data:{{J_RD_H}},itemStyle:{color:HER_C},barMaxWidth:20}]}));
+mk('c_week',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(30,26),{xAxis:Object.assign({type:'category',data:{{J_WD_LAB}}},AX),yAxis:Object.assign({type:'value',name:'每千条',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'bar',data:{{J_WD_M}},itemStyle:{color:ME_C},barMaxWidth:22},{name:'TA',type:'bar',data:{{J_WD_H}},itemStyle:{color:HER_C},barMaxWidth:22}]}));
+mk('c_year',Object.assign({tooltip:{trigger:'axis'}},legend(),grid(),{xAxis:Object.assign({type:'category',data:{{J_YEARS}}},AX),yAxis:[Object.assign({type:'value',name:'日均条数',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),Object.assign({type:'value',name:'Gottman',nameTextStyle:{color:'#a78bfa',fontSize:10}},AX)],series:[{name:'你',type:'bar',data:{{J_YR_PER}},itemStyle:{color:ME_C},barMaxWidth:34},{name:'Gottman 比率',type:'line',yAxisIndex:1,data:{{J_YR_G}},smooth:true,lineStyle:{color:'#a78bfa',width:3},itemStyle:{color:'#a78bfa'},markLine:{silent:true,symbol:'none',data:[{yAxis:5,lineStyle:{color:'#07c160',type:'dashed'},label:{formatter:'健康线 5:1',color:'#07c160',fontSize:10}}]}}]}));
+mk('c_first',Object.assign({title:{text:'当天第一句 · 落在几点',left:'center',textStyle:{color:'#8fa1b4',fontSize:11,fontWeight:'normal'}},tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4',fontSize:11},bottom:0},grid:{left:40,right:16,top:34,bottom:40,containLabel:true}},{xAxis:Object.assign({type:'category',data:HOURS24,axisLabel:{color:'#8fa1b4',fontSize:10,interval:1}},AX),yAxis:Object.assign({type:'value',name:'天数',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'line',data:{{J_FIRST_M}},smooth:true,symbolSize:3,lineStyle:{color:ME_C,width:2},itemStyle:{color:ME_C},areaStyle:{opacity:.10}},{name:'TA',type:'line',data:{{J_FIRST_H}},smooth:true,symbolSize:3,lineStyle:{color:HER_C,width:2},itemStyle:{color:HER_C}}]}));
+mk('c_last',Object.assign({title:{text:'当天最后一句 · 落在几点',left:'center',textStyle:{color:'#8fa1b4',fontSize:11,fontWeight:'normal'}},tooltip:{trigger:'axis'},legend:{textStyle:{color:'#8fa1b4',fontSize:11},bottom:0},grid:{left:40,right:16,top:34,bottom:40,containLabel:true}},{xAxis:Object.assign({type:'category',data:HOURS24,axisLabel:{color:'#8fa1b4',fontSize:10,interval:1}},AX),yAxis:Object.assign({type:'value',name:'天数',nameTextStyle:{color:'#5f7285',fontSize:10}},AX),series:[{name:'你',type:'line',data:{{J_LAST_M}},smooth:true,symbolSize:3,lineStyle:{color:ME_C,width:2},itemStyle:{color:ME_C},areaStyle:{opacity:.10}},{name:'TA',type:'line',data:{{J_LAST_H}},smooth:true,symbolSize:3,lineStyle:{color:HER_C,width:2},itemStyle:{color:HER_C}}]}));
 window.addEventListener('resize',function(){document.querySelectorAll('.chart,.chart-sm').forEach(function(el){if(window.echarts&&echarts.getInstanceByDom(el))echarts.getInstanceByDom(el).resize()})});
 </script>
 </body>
