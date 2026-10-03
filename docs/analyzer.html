@@ -299,7 +299,7 @@ var MISS_WORDS=['想你','好想你','想念','惦记'];
 function parseFile(text){
   text=text.trim();var messages=[];
   // JSON格式
-  if(text[0]==='['){try{var data=JSON.parse(text);data.forEach(function(msg){var ts=msg.ts||msg.time||msg.timestamp||msg.CreateTime||0;if(typeof ts==='string')ts=new Date(ts).getTime();if(ts<1000000000)ts=ts*1000;var sender;if(msg.is_self!==undefined)sender=msg.is_self?'me':'her';else if(msg.sender){sender=/^(我|me|自己)/i.test(msg.sender)?'me':'her'}else sender='her';var content=msg.content||msg.message||msg.text||'';if(!content||!ts)return;messages.push({time:ts,sender:sender,content:String(content)})});if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time})}catch(e){}}
+  if(text[0]==='['){try{var data=JSON.parse(text);data.forEach(function(msg){var ts=msg.ts||msg.time||msg.timestamp||msg.CreateTime||0;if(typeof ts==='string')ts=new Date(ts).getTime();if(ts>0&&ts<94668480000)ts=ts*1000;var sender;if(msg.is_self!==undefined)sender=msg.is_self?'me':'her';else if(msg.sender){sender=/^(我|me|自己)/i.test(msg.sender)?'me':'her'}else sender='her';var content=msg.content||msg.message||msg.text||'';if(!content||!ts)return;messages.push({time:ts,sender:sender,content:String(content)})});if(messages.length>0)return messages.sort(function(a,b){return a.time-b.time})}catch(e){}}
   var allLines=text.split('\n').filter(function(l){return l.trim()});
   // 检测分隔符：统计前20行里竖线vs逗号
   var pipeCount=0,commaCount=0;
