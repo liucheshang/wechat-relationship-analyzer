@@ -96,6 +96,25 @@ tr.hi td{background:rgba(91,141,239,.07)}
 .bar-her{height:100%;background:var(--her)}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);font-size:11.5px;color:var(--dim);line-height:1.9}
 footer b{color:var(--muted)}
+/* ---- 综合健康分 ---- */
+.hscore{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.hnum{font-size:46px;font-weight:800;line-height:1}
+.hgrade{font-size:20px;font-weight:700}
+.hweights{font-size:11px;color:var(--dim)}
+.hdim{margin:10px 0}
+.hdim .hl{display:flex;justify-content:space-between;font-size:12.8px;color:var(--text);margin-bottom:4px}
+.hdim .hl .num{font-weight:700}
+.hdim .hdesc{font-size:11px;color:var(--dim);margin-top:4px}
+/* ---- 日历热力图 ---- */
+.heat-scroll{overflow-x:auto;padding:6px 2px}
+.heat-inner{display:inline-block;min-width:100%}
+.heat-months{display:flex;font-size:10px;color:var(--dim);margin:0 0 5px 2px;white-space:nowrap}
+.heat-grid{display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;grid-auto-columns:11px;gap:2px}
+.hcell{display:inline-block;width:11px;height:11px;border-radius:2.5px;background:#1c2733}
+.hcell.lv1{background:#22406b}.hcell.lv2{background:#2f5fa8}.hcell.lv3{background:#5b8def}.hcell.lv4{background:#ffb648}
+.hcell.hmask{background:transparent}
+.heat-legend{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--dim);margin-top:9px}
+.heat-legend .hcell{width:10px;height:10px}
 </style>
 </head>
 <body>
@@ -104,8 +123,11 @@ footer b{color:var(--muted)}
 <!-- ==================== HERO ==================== -->
 <div class="hero-title">{{HERO_TITLE}}</div>
 <p class="lead">{{HEADLINE}}</p>
+<p class="note" style="border:none;padding:0;margin-top:-6px">{{SENDER_NOTE}}</p>
 
 <div class="kpi-row">{{KPI_ROW}}</div>
+
+{{HEALTH_BLOCK}}
 
 <div class="verdict">{{VERDICT}}</div>
 
@@ -178,6 +200,7 @@ footer b{color:var(--muted)}
 <section id="s06"><span class="sec-no">06 · 节奏与逐月变化</span><h2>节奏、理性与情绪的逐月变化</h2>
 <p class="sub">把三个月的均值铺开成时间轴，才能看见变化；只看全程均值，会把最重要的东西抹掉。</p>
 <div class="card"><h3>24 小时聊天生物钟</h3><div class="chart" id="c_clock"></div><p class="note">{{NOTE_CLOCK}}</p></div>
+<div class="card"><h3>全年节奏 · 日历热力图</h3>{{HEATMAP}}<p class="note">{{HEATMAP_NOTE}}</p></div>
 <div class="grid2">
 <div class="card"><h3>修复率逐月</h3><div class="chart-sm" id="c_repair"></div><p class="note">冲突段结束后由谁先发出非冲突消息。断联月无冲突段，记为空。</p></div>
 <div class="card"><h3>理性指数逐月</h3><div class="chart-sm" id="c_rational"></div><p class="note">理性指数＝含「因为/所以/其实/应该」等推演词的消息占比。越高越像在解决问题，越低越像在表达情绪。</p></div>

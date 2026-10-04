@@ -2,6 +2,12 @@
 """
 微信聊天记录深度分析 · 本地版（深度报告）
 用法:  python analyze.py 聊天记录.txt [输出报告.html]
+       python analyze.py 聊天记录.txt 报告.html --me 张三 --her 李四
+
+发送者列支持三种写法：
+  1. 文件标注「我 / TA」（兼容旧格式，直接跑）
+  2. 真名（张三/李四…）：自动统计消息量，多的记为我、少的记为 TA
+  3. --me / --her 手动指定（覆盖前两种）
 
 纯 Python 标准库实现，不联网、不装包、数据不出本机。
 输出一份 10 章深度报告：从"是谁"到"怎么相处"到"怎么办"。
@@ -159,21 +165,25 @@ def cls(val, good, warn, reverse=False):
 # 2. 第 1 步 · 清洗 & 解析
 # =====================================================================
 
-def parse(path):
+ME_ALIASES = ('我', 'me', 'Me', 'ME', '自己', '本人', 'self', '我(发送)')
+
+def parse(path, me_name=None, her_name=None):
     raw_total, dropped = 0, 0
     lines = None
-    for enc in ('utf-8-sig', 'utf-8', 'gbk'):
+    for enc in ('utf-8-sig', 'utf-8', 'gbk', 'gb18030', 'big5'):
         try:
             with open(path, 'r', encoding=enc) as f:
                 lines = f.readlines()
+            print('编码: %s' % enc)
             break
         except UnicodeDecodeError:
             continue
     if lines is None:
-        print('错误: 无法识别文件编码，请另存为 UTF-8 后重试')
+        print('错误: 无法识别文件编码（已尝试 utf-8 / gbk / gb18030 / big5），请另存为 UTF-8 后重试')
         sys.exit(1)
 
-    msgs = []
+    rows = []
+    who_cnt = Counter()
     for line in lines:
         line = line.strip().replace('\ufeff', '')
         if not line:
@@ -198,11 +208,83 @@ def parse(path):
             dropped += 1
             continue
         who = parts[1].strip()
-        sender = 'me' if who in ('我', 'me', 'Me', 'ME', '自己', '本人') else 'her'
-        msgs.append({'dt': dt, 'sender': sender, 'content': content})
+        who_cnt[who] += 1
+        rows.append((dt, who, content))
+
+    # ---- 发送者识别 ----
+    # 优先级：--me/--her 指定 > 文件标注（我/me/自己…）> 自动（取消息数最多的两人，
+    # 多的记为「我」、少的记为 TA；条数相同按文件中首次出现顺序）。
+    named = {}
+    if me_name:
+        named[me_name] = 'me'
+    if her_name:
+        named[her_name] = 'her'
+
+    ranked = [w for w, _ in who_cnt.most_common()]
+
+    def top_rest(excl):
+        for w in ranked:
+            if w not in excl:
+                return w
+        return None
+
+    ident = {'mode': '指定' if (me_name or her_name) else '', 'others': 0}
+    if me_name or her_name:
+        excl = {me_name, her_name} | set(ME_ALIASES)
+        if me_name and not her_name:
+            h = top_rest(excl)
+            if h:
+                named[h] = 'her'
+        elif her_name and not me_name:
+            m = top_rest(excl)
+            if m:
+                named[m] = 'me'
+    else:
+        alias_hits = [w for w in ranked if w in ME_ALIASES]
+        if alias_hits:
+            ident['mode'] = '标注'
+            for w in alias_hits:
+                named.setdefault(w, 'me')
+            h = top_rest(set(ME_ALIASES))
+            if h:
+                named.setdefault(h, 'her')
+        else:
+            ident['mode'] = '自动'
+            top2 = who_cnt.most_common(2)
+            if len(top2) >= 2:
+                (a, ca), (b, cb) = top2
+                if ca >= cb:
+                    named[a], named[b] = 'me', 'her'
+                else:
+                    named[a], named[b] = 'her', 'me'
+            elif len(top2) == 1:
+                named[top2[0][0]] = 'me'
+
+    msgs = []
+    me_n = her_n = 0
+    me_names, her_names = [], []
+    for dt, who, content in rows:
+        side = named.get(who)
+        if side == 'me':
+            me_n += 1
+            if who not in me_names:
+                me_names.append(who)
+        else:
+            if side is None:
+                ident['others'] += 1
+                if who not in her_names:
+                    her_names.append(who)
+            elif who not in her_names:
+                her_names.append(who)
+            her_n += 1
+        msgs.append({'dt': dt, 'sender': side if side == 'me' else 'her', 'content': content})
+
+    ident['me'] = '、'.join(me_names) if me_names else '（无）'
+    ident['her'] = '、'.join(her_names) if her_names else 'TA'
+    ident['me_n'], ident['her_n'] = me_n, her_n
 
     msgs.sort(key=lambda m: m['dt'])
-    return msgs, raw_total, dropped
+    return msgs, raw_total, dropped, ident
 
 # =====================================================================
 # 3. 第 2 步 · 切会话段（相邻间隔 > 6 小时切一刀）
@@ -974,6 +1056,153 @@ def topn(lst, key, n=5, rev=False):
 # 6. 渲染层
 # =====================================================================
 
+# =====================================================================
+# 6.5 综合健康分（0~100，五维加权）与日历热力图
+# =====================================================================
+
+def _clamp(x, lo=0, hi=100):
+    return max(lo, min(hi, x))
+
+
+def build_health(D):
+    """五维加权健康分。每维 0~100 分，权重合计 100。
+    全部为词典近似口径的确定性映射：阈值写在各维说明里，可复核、可复现。"""
+    dims = []
+
+    # 1) 情绪基调 30%：Gottman 比率。5:1 满分，1:1 以下急降。
+    r = float(D['gottman'])
+    s = 100.0 if r >= 5 else (0.0 if r <= 0.5 else (r - 0.5) / 4.5 * 100)
+    dims.append(('情绪基调', 30, round(s), 'Gottman 比率 %s:1（健康线 5:1，警戒线 1:1）' % D['gottman']))
+
+    # 2) 冲突与修复 25%：冲突段占比越低越好 + 吵完僵持（静默中位数）越短越好。
+    cd = D['conflictN'] / max(1, D['sessions'])
+    s_conf = _clamp(100 - cd * 250)                    # 占比 40% → 0 分
+    med_sil = float(D['silAll'])
+    s_sil = 100.0 if med_sil <= 2 else (0.0 if med_sil >= 48 else (48 - med_sil) / 46 * 100)
+    s = 0.5 * s_conf + 0.5 * s_sil
+    dims.append(('冲突与修复', 25, round(s),
+                 '冲突段占会话 %.0f%% · 吵完后僵持中位数 %.1f 小时' % (cd * 100, med_sil)))
+
+    # 3) 四骑士控制 20%：批评/防御/蔑视/筑墙每千条合计，≤10 满分，≥60 零分。
+    tot = sum(D[k] for k in ('CR_MP', 'CR_HP', 'DF_MP', 'DF_HP', 'CT_MP', 'CT_HP', 'ST_MP', 'ST_HP'))
+    s = _clamp(100 - (tot - 10) / 50 * 100)
+    dims.append(('四骑士控制', 20, round(s), '双向四骑士合计每千条 %.1f 次（≤10 满分线）' % tot))
+
+    # 4) 依恋安全 15%：焦虑追问 + 回避疏离每千条合计，≤10 满分，≥80 零分。
+    anx = D['ANX_MP'] + D['ANX_HP'] + D['AV_MP'] + D['AV_HP']
+    s = _clamp(100 - (anx - 10) * 1.3)
+    dims.append(('依恋安全', 15, round(s), '焦虑 + 回避行为每千条 %.1f 次（≤10 满分线）' % anx))
+
+    # 5) 连接稳定 10%：有聊天日的占比（15% 以下零分，75% 以上满分）。
+    act = sum(1 for v in D['daily'].values() if v[0] + v[1] > 0) / max(1, D['days'])
+    s = _clamp((act - 0.15) / 0.60 * 100)
+    dims.append(('连接稳定', 10, round(s), '有聊天日占 %.0f%%（%d / %d 天）' % (act * 100,
+                 sum(1 for v in D['daily'].values() if v[0] + v[1] > 0), D['days'])))
+
+    total = round(sum(sc * w for _, w, sc, _ in dims) / 100.0)
+    if total >= 85:
+        grade, gcol = '稳固', 'var(--green)'
+    elif total >= 70:
+        grade, gcol = '健康', 'var(--green)'
+    elif total >= 55:
+        grade, gcol = '摇晃', 'var(--gold)'
+    elif total >= 40:
+        grade, gcol = '紧张', 'var(--red)'
+    else:
+        grade, gcol = '预警', 'var(--red)'
+    return {'total': total, 'grade': grade, 'gcol': gcol, 'dims': dims}
+
+
+def build_health_html(H):
+    bars = []
+    for name, w, sc, desc in H['dims']:
+        color = 'var(--green)' if sc >= 70 else ('var(--gold)' if sc >= 45 else 'var(--red)')
+        bars.append(
+            '<div class="hdim"><div class="hl"><span>%s</span>'
+            '<span class="num" style="color:%s">%d</span></div>'
+            '<div class="bar-wrap"><div style="height:100%%;width:%d%%;background:%s"></div></div>'
+            '<div class="hdesc">%s · 权重 %d%%</div></div>'
+            % (name, color, sc, max(2, sc), color, desc, w))
+    return ('<div class="card" id="health"><h3>关系综合健康分</h3>'
+            '<div class="hscore"><span class="hnum" style="color:%s">%d</span>'
+            '<span class="hgrade" style="color:%s">%s</span>'
+            '<span class="hweights">情绪基调 30%% · 冲突与修复 25%% · 四骑士 20%% · 依恋安全 15%% · 连接稳定 10%%</span></div>'
+            '%s'
+            '<p class="note">口径：五个维度各自 0~100 分、按权重加权，映射阈值全部写在上面的维度说明里，'
+            '可复算可复核。这是<b>词典近似口径</b>下的描述性刻度，衡量的是聊天语言行为，'
+            '不是感情本身，更不构成任何心理学诊断。</p></div>'
+            % (H['gcol'], H['total'], H['gcol'], H['grade'], ''.join(bars)))
+
+
+HEAT_LV = ('hcell', 'hcell lv1', 'hcell lv2', 'hcell lv3', 'hcell lv4')
+
+def build_heatmap(D):
+    """GitHub 贡献图风格的日历热力图。列=周（周一开头），行=周一~周日。
+    没说话的日子（含断联）画灰格，绝不跳过。纯 HTML+CSS，无 JS。"""
+    days = D['daysArr']
+    if not days:
+        return ''
+    cnt = {k: v[0] + v[1] for k, v in D['daily'].items()}
+    vmax = max(cnt.values()) or 1
+
+    def d(s):
+        return datetime.strptime(s, '%Y-%m-%d').date()
+
+    # 补齐第一周开头到周一
+    cells = ['<i class="hcell hmask"></i>'] * d(days[0]).weekday()
+    for s in days:
+        v = cnt.get(s, 0)
+        if v == 0:
+            lv = 0
+        elif v >= vmax * 0.9:
+            lv = 4
+        elif v >= vmax * 0.5:
+            lv = 3
+        elif v >= vmax * 0.2:
+            lv = 2
+        else:
+            lv = 1
+        cells.append('<i class="%s" title="%s · %d 条"></i>' % (HEAT_LV[lv], s, v))
+    # 重排为逐列（每列 7 天，周一开头；首列用 None 补齐）
+    lead = d(days[0]).weekday()
+    per_col = []
+    col = [None] * lead
+    for s in days:
+        col.append(s)
+        if len(col) == 7:
+            per_col.append(col)
+            col = []
+    if col:
+        per_col.append(col)
+
+    # 月份标签：连续同月列合并
+    labels = []
+    run_m, run_n = None, 0
+    for c in per_col:
+        first_real = next((x for x in c if x), None)
+        m = first_real[:7] if first_real else (run_m or '')
+        if m == run_m:
+            run_n += 1
+        else:
+            if run_m is not None:
+                labels.append((run_m, run_n))
+            run_m, run_n = m, 1
+    if run_m is not None:
+        labels.append((run_m, run_n))
+    lab_html = ''.join('<span style="width:%dpx">%s</span>' % (n * 13, m.replace('-', '年') + '月' if m else '')
+                       for m, n in labels)
+
+    html = ('<div class="heat-scroll"><div class="heat-inner">'
+            '<div class="heat-months">%s</div>'
+            '<div class="heat-grid">%s</div>'
+            '<div class="heat-legend">少 '
+            '<i class="hcell"></i><i class="hcell lv1"></i><i class="hcell lv2"></i>'
+            '<i class="hcell lv3"></i><i class="hcell lv4"></i> 多'
+            '<span style="margin-left:14px">行：周一 → 周日 · 灰格 = 当天没说话（断联整段可见，不跳过）</span>'
+            '</div></div></div>' % (lab_html, ''.join(cells)))
+    return html
+
+
 def render(D, meta):
     T = {}
     msgs, me, her = meta['msgs'], meta['me'], meta['her']
@@ -1039,6 +1268,35 @@ def render(D, meta):
     T['INVEST_N'] = '13'
     T['SESSION_COUNT'] = str(D['sessions'])
     T['CONFLICT'] = str(D['conflictN'])
+
+    # ---------- 发送者识别说明 ----------
+    ident = meta.get('ident') or {}
+    if ident.get('mode') == '自动':
+        T['SENDER_NOTE'] = ('发送者自动识别：「%s」（%s 条，较多）记为 <b style="color:var(--me)">我</b> ·'
+                            '「%s」（%s 条）记为 <b style="color:var(--her)">TA</b>%s。'
+                            '可用 <code>--me 名字 --her 名字</code> 手动指定。'
+                            % (ident['me'], format(ident['me_n'], ','),
+                               ident['her'], format(ident['her_n'], ','),
+                               ('；其余 %d 条次要发送者并入 TA' % ident['others']) if ident['others'] else ''))
+    elif ident.get('mode') == '指定':
+        T['SENDER_NOTE'] = ('发送者（命令行指定）：「%s」→ <b style="color:var(--me)">我</b> ·'
+                            '「%s」→ <b style="color:var(--her)">TA</b>'
+                            % (ident['me'], ident['her']))
+    else:
+        T['SENDER_NOTE'] = ('发送者：按文件内标注识别（「我 / me / 自己」→ 我，其余 → TA）。'
+                            '也可用 <code>--me 名字 --her 名字</code> 指定真实称呼。')
+
+    # ---------- 综合健康分 ----------
+    T['HEALTH_BLOCK'] = build_health_html(build_health(D))
+
+    # ---------- 日历热力图（06 章） ----------
+    T['HEATMAP'] = build_heatmap(D)
+    top_day = max(D['daily'].items(), key=lambda kv: kv[1][0] + kv[1][1])
+    T['HEATMAP_NOTE'] = ('铺满 %s ~ %s 全部 %d 天（含没说话的日子）：颜色越深当天消息越多，'
+                         '最高峰是 <b>%s</b>（%d 条）。灰格＝零消息，最长断联的 %d 天在图上一目了然——'
+                         '这正是「跳过空日期」的图会藏掉的东西。'
+                         % (D['first'].strftime('%Y-%m-%d'), D['last'].strftime('%Y-%m-%d'),
+                            D['days'], top_day[0], top_day[1][0] + top_day[1][1], D['maxGap']))
 
     # ---------- 01 依恋 ----------
     rows = [('焦虑追问', D['ANX_M'], D['ANX_H'], D['ANX_MP'], D['ANX_HP'],
@@ -1735,6 +1993,34 @@ def _pause():
         pass
 
 
+def _parse_args(argv):
+    """极简参数解析：支持 --me 名字 --her 名字（空格或等号两种写法）。"""
+    me_name = her_name = None
+    pos = []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ('--me', '--her') and i + 1 < len(argv):
+            if a == '--me':
+                me_name = argv[i + 1]
+            else:
+                her_name = argv[i + 1]
+            i += 2
+        elif a.startswith('--me='):
+            me_name = a[5:]
+            i += 1
+        elif a.startswith('--her='):
+            her_name = a[6:]
+            i += 1
+        elif a in ('--me', '--her'):
+            print('错误: %s 后面要跟一个名字' % a)
+            sys.exit(1)
+        else:
+            pos.append(a)
+            i += 1
+    return pos, me_name, her_name
+
+
 def main():
     try:
         sys.stdout.reconfigure(encoding='utf-8')
@@ -1742,7 +2028,8 @@ def main():
         pass
 
     frozen = getattr(sys, 'frozen', False)
-    interactive = len(sys.argv) < 2
+    pos, me_name, her_name = _parse_args(sys.argv[1:])
+    interactive = not pos
 
     if interactive:
         print('=' * 56)
@@ -1761,9 +2048,9 @@ def main():
                 _pause()
             sys.exit(1)
     else:
-        path = sys.argv[1]
+        path = pos[0]
 
-    out = sys.argv[2] if len(sys.argv) > 2 else '深度分析报告.html'
+    out = pos[1] if len(pos) > 1 else '深度分析报告.html'
     if not os.path.isabs(out):
         out = os.path.join(os.path.dirname(os.path.abspath(path)), out)
     if not os.path.isfile(path):
@@ -1773,11 +2060,15 @@ def main():
         sys.exit(1)
 
     print('读取: %s' % path)
-    msgs, raw, dropped = parse(path)
+    msgs, raw, dropped, ident = parse(path, me_name=me_name, her_name=her_name)
     if len(msgs) < 50:
         print('错误: 有效消息只有 %d 条，至少需要 50 条才能出报告' % len(msgs))
         sys.exit(1)
     print('清洗: 原始 %d 行 → 有效 %d 条（剔除 %d 条）' % (raw, len(msgs), dropped))
+    print('发送者识别（%s）: 「%s」%s 条 → 我 · 「%s」%s 条 → TA%s'
+          % (ident['mode'], ident['me'], format(ident['me_n'], ','),
+             ident['her'], format(ident['her_n'], ','),
+             ('；其余 %d 条并入 TA' % ident['others']) if ident['others'] else ''))
 
     sessions = build_sessions(msgs)
     print('会话段: %d 段（间隔 > 6 小时切段）' % len(sessions))
@@ -1788,7 +2079,8 @@ def main():
 
     meta = {'msgs': msgs, 'me': [m for m in msgs if m['sender'] == 'me'],
             'her': [m for m in msgs if m['sender'] == 'her'],
-            'raw': format(raw, ','), 'dropped': format(dropped, ','), 'path': path}
+            'raw': format(raw, ','), 'dropped': format(dropped, ','), 'path': path,
+            'ident': ident}
     T = render(D, meta)
 
     tpl_path = os.path.join(_base_dir(), 'report_template.html')
