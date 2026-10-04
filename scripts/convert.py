@@ -138,34 +138,17 @@ def rows_from_csv(text):
     return [dict(r) for r in rdr if any(v for v in r.values())]
 
 
-def main():
-    if len(sys.argv) < 3:
-        print(__doc__)
-        sys.exit(1)
-
-    src, dst = sys.argv[1], sys.argv[2]
-    contact = None
-    self_names = ['我', '自己', 'me', 'self', '我(发送)', '本人', '我本人']
-    args = sys.argv[3:]
-    i = 0
-    while i < len(args):
-        if args[i] == '--contact' and i + 1 < len(args):
-            contact = args[i + 1]
-            i += 2
-        elif args[i] == '--self-names' and i + 1 < len(args):
-            self_names = [x.strip() for x in args[i + 1].split(',') if x.strip()]
-            i += 2
-        else:
-            i += 1
+def convert_file(src, dst, contact=None, self_names=None, log=print):
+    """把 src 转成 analyze.py 认的格式，写到 dst。返回统计 dict，失败抛 ValueError。"""
+    if self_names is None:
+        self_names = ['我', '自己', 'me', 'self', '我(发送)', '本人', '我本人']
 
     if not os.path.exists(src):
-        print('找不到文件：%s' % src)
-        sys.exit(1)
+        raise ValueError('找不到文件：%s' % src)
 
     text = read_any(src).strip()
     if not text:
-        print('文件是空的。')
-        sys.exit(1)
+        raise ValueError('文件是空的。')
 
     if text[0] in '[{':
         rows = rows_from_json(text)
@@ -173,8 +156,7 @@ def main():
         rows = rows_from_csv(text)
 
     if not rows or not isinstance(rows[0], dict):
-        print('读出来的不是消息列表，前 200 个字符长这样：\n%s' % text[:200])
-        sys.exit(1)
+        raise ValueError('读出来的不是消息列表，前 200 个字符长这样：\n%s' % text[:200])
 
     sample = rows[0]
     k_time, _ = pick(sample, TIME_KEYS)
@@ -184,17 +166,16 @@ def main():
     k_type, _ = pick(sample, TYPE_KEYS)
     k_room, _ = pick(sample, ROOM_KEYS)
 
-    print('识别到的字段：')
-    print('  时间   → %s' % (k_time or '❌ 没认出来'))
-    print('  内容   → %s' % (k_content or '❌ 没认出来'))
-    print('  发送者 → %s' % (k_self or k_sender or '❌ 没认出来（默认全部记为 TA）'))
-    print('  类型   → %s' % (k_type or '（没有，不过滤）'))
-    print('  会话   → %s' % (k_room or '（没有，不筛选）'))
-    print('共 %d 行' % len(rows))
+    log('识别到的字段：')
+    log('  时间   → %s' % (k_time or '❌ 没认出来'))
+    log('  内容   → %s' % (k_content or '❌ 没认出来'))
+    log('  发送者 → %s' % (k_self or k_sender or '❌ 没认出来（默认全部记为 TA）'))
+    log('  类型   → %s' % (k_type or '（没有，不过滤）'))
+    log('  会话   → %s' % (k_room or '（没有，不筛选）'))
+    log('共 %d 行' % len(rows))
 
     if not k_time or not k_content:
-        print('\n关键字段没认全，没法转。把文件头几行发我，我给你加规则。')
-        sys.exit(1)
+        raise ValueError('关键字段没认全，没法转。把文件头几行发我，我给你加规则。')
 
     out, skipped_time, skipped_type, skipped_contact = [], 0, 0, 0
     for r in rows:
@@ -238,18 +219,50 @@ def main():
     with open(dst, 'w', encoding='utf-8') as f:
         f.write('\n'.join(out))
 
-    print('\n转换完成 → %s' % dst)
-    print('  写入 %d 条' % len(out))
+    stat = {'rows': len(rows), 'written': len(out), 'skipped_time': skipped_time,
+            'skipped_type': skipped_type, 'skipped_contact': skipped_contact,
+            'me': sum(' | 我 | ' in x for x in out),
+            'ta': sum(' | TA | ' in x for x in out),
+            'first': out[0][:16] if out else '', 'last': out[-1][:16] if out else ''}
+    log('转换完成 → %s' % dst)
+    log('  写入 %d 条' % stat['written'])
     if out:
-        print('  时间范围 %s ~ %s' % (out[0][:16], out[-1][:16]))
-        print('  你 %d 条 / TA %d 条' % (sum(' | 我 | ' in x for x in out),
-                                        sum(' | TA | ' in x for x in out)))
+        log('  时间范围 %s ~ %s' % (stat['first'], stat['last']))
+        log('  你 %d 条 / TA %d 条' % (stat['me'], stat['ta']))
     if skipped_time:
-        print('  跳过 %d 条（时间认不出来）' % skipped_time)
+        log('  跳过 %d 条（时间认不出来）' % skipped_time)
     if skipped_type:
-        print('  跳过 %d 条（非文本消息）' % skipped_type)
+        log('  跳过 %d 条（非文本消息）' % skipped_type)
     if skipped_contact:
-        print('  跳过 %d 条（不是「%s」这个会话）' % (skipped_contact, contact))
+        log('  跳过 %d 条（不是「%s」这个会话）' % (skipped_contact, contact))
+    return stat
+
+
+def main():
+    if len(sys.argv) < 3:
+        print(__doc__)
+        sys.exit(1)
+
+    src, dst = sys.argv[1], sys.argv[2]
+    contact = None
+    self_names = None
+    args = sys.argv[3:]
+    i = 0
+    while i < len(args):
+        if args[i] == '--contact' and i + 1 < len(args):
+            contact = args[i + 1]
+            i += 2
+        elif args[i] == '--self-names' and i + 1 < len(args):
+            self_names = [x.strip() for x in args[i + 1].split(',') if x.strip()]
+            i += 2
+        else:
+            i += 1
+
+    try:
+        convert_file(src, dst, contact, self_names)
+    except ValueError as e:
+        print('\n%s' % e)
+        sys.exit(1)
     print('\n接下来：python analyze.py "%s" 报告.html' % dst)
 
 
