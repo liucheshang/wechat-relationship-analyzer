@@ -641,7 +641,7 @@ def compute(msgs, sessions):
     pre = [i for i in range(n) if daysArr[i] < D['gapBefore'].strftime('%Y-%m-%d')]
     pre60 = pre[-60:]
     # 基线用「紧邻且等长」的前一段（断联前 61~120 天），做匹配窗口对比。
-    # 旧口径用全期均值当基线：断联的 132 天方差为 0，会把基线拉低，方向失真。
+    # 旧口径用全期均值当基线：断联期间的方差为 0，会把基线拉低，方向失真。
     pre120 = pre[:-60][-60:] if len(pre) > 60 else []
     D['slowPreVar'] = round(sum(var7[i] for i in pre60) / max(1, len(pre60)), 1) if pre60 else 0
     arpre = [ar30[i] for i in pre60 if ar30[i] is not None]
@@ -658,8 +658,8 @@ def compute(msgs, sessions):
         D['slowBaseLabel'] = '全期均值'
 
     # ---------- 事件研究 ----------
-    # 基线用「有聊天的日子」的日均。全期日历日均值会被 132 天断联和 2025-07 熄火拉低，
-    # 把冲突后的涨幅夸大好几倍（旧口径曾得出 +309%，换基线后约为 +数成）。
+    # 基线用「有聊天的日子」的日均。全期日历日均值会被长断联和个别熄火月份拉低，
+    # 把冲突后的涨幅夸大好几倍（示例：旧口径曾得出 +309%，换基线后约为 +数成）。
     # 锚点 = 冲突段结束时刻。「冲突后」窗口不再把吵架本身算进去（旧口径从冲突开始算，虚高）。
     actCnt = [(D['daily'][k][0] + D['daily'][k][1]) for k in daysArr
               if (D['daily'][k][0] + D['daily'][k][1]) > 0]
