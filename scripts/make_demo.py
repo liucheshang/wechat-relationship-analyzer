@@ -111,6 +111,18 @@ def pick(rng, pool):
     return pool[rng.randrange(len(pool))]
 
 
+def _media_noise(rng, text):
+    """小概率替换为媒体占位符 / 撤回 / 拍一拍系统消息，供报告演示。"""
+    r = rng.random()
+    if r < 0.025:
+        return '[%s]' % rng.choice(('图片', '语音', '视频', '红包', '转账', '文件', '链接', '动画表情'))
+    if r < 0.030:
+        return '你撤回了一条消息'
+    if r < 0.036:
+        return '你拍了拍对方'
+    return text
+
+
 def gen_me(rng, ph, hour):
     sweet, friction = ph[3], ph[4]
     s = slot(hour)
@@ -133,7 +145,7 @@ def gen_me(rng, ph, hour):
         text = text + '，' + rng.choice(ME_NAME)
     if rng.random() < 0.08:
         text = text + rng.choice(EMOJI)
-    return text
+    return _media_noise(rng, text)
 
 
 def gen_her(rng, ph, hour):
@@ -158,7 +170,7 @@ def gen_her(rng, ph, hour):
         text = text + '，' + rng.choice(HER_NAME)
     if rng.random() < 0.12:
         text = text + rng.choice(EMOJI)
-    return text
+    return _media_noise(rng, text)
 
 
 def phase_of(day_idx):
@@ -254,7 +266,7 @@ def build_report(txt, out):
     A = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(A)
 
-    msgs, raw, dropped = A.parse(txt)
+    msgs, raw, dropped, _ident = A.parse(txt)
     if len(msgs) < 50:
         print('  跳过报告: 有效消息不足')
         return
