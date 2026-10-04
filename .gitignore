@@ -14,3 +14,5 @@ debug.log
 dist/
 _build/
 *.spec
+examples/demo_chat_深度分析报告.html
+examples/echarts.min.js
