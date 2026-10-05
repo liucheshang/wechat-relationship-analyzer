@@ -49,7 +49,93 @@ FILETYPES = [('聊天记录 / 数据文件', '*.txt *.csv *.json *.log'), ('所�
 TXT_EXT = ('.txt', '.log')
 LINE_RE = re.compile(r'^\s*(\d{4}[-/]\d{1,2}[-/]\d{1,2}).{0,60}?\|\s*[^|]+\|\s*\S')
 
-_DND_REFS = {}          # 拖放回调必须保活，否则被 GC 后窗口消息就崩了
+_DND_STATE = {'cb': None, 'olds': {}, 'on_files': None}   # 拖放回调必须保活，否则被 GC 后窗口消息就崩了
+WM_DROPFILES = 0x0233
+
+
+def _dnd_proc(h, msg, wp, lp):
+    """共享的窗口过程：任何被 hook 的窗口收到拖放都走这里。"""
+    if msg == WM_DROPFILES:
+        try:
+            import ctypes
+            shell32 = ctypes.windll.shell32
+            n = shell32.DragQueryFileW(wp, 0xFFFFFFFF, None, 0)
+            files = []
+            buf = ctypes.create_unicode_buffer(2048)
+            for i in range(n):
+                shell32.DragQueryFileW(wp, i, buf, 2048)
+                files.append(buf.value)
+            shell32.DragFinish(wp)
+            if _DND_STATE['on_files'] and files:
+                _DND_STATE['on_files'](files)
+        except Exception:
+            pass
+        return 0
+    old = _DND_STATE['olds'].get(h)
+    if old:
+        import ctypes
+        return ctypes.windll.user32.CallWindowProcW(old, h, msg, wp, lp)
+    import ctypes
+    return ctypes.windll.user32.DefWindowProcW(h, msg, wp, lp)
+
+
+def enable_dnd_tree(root, on_files):
+    """对顶层窗口 + 所有子控件开启外壳拖放。
+
+    之前只 hook 顶层窗口：拖到按钮 / 文件列表等子控件上时消息发不到，表现
+    就是「拖拽不正常，有时有反应有时没有」。现在递归 hook 全部子窗口；
+    另外用 ChangeWindowMessageFilterEx 放行 WM_DROPFILES，exe 以管理员
+    运行时（UIPI 拦截拖放）也能正常接收。失败则静默降级为「仅点击选择」。"""
+    if sys.platform != 'win32':
+        return False
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        user32 = ctypes.windll.user32
+        shell32 = ctypes.windll.shell32
+
+        proto = getattr(enable_dnd_tree, '_proto', None)
+        if proto is None:
+            proto = ctypes.WINFUNCTYPE(ctypes.c_ssize_t, wintypes.HWND, ctypes.c_uint,
+                                       ctypes.c_size_t, ctypes.c_ssize_t)
+            enable_dnd_tree._proto = proto      # 必须保活，局部变量会连同回调一起被 GC
+        cb = proto(_dnd_proc)
+        _DND_STATE['cb'] = cb
+        _DND_STATE['on_files'] = on_files
+
+        try:
+            set_long = user32.SetWindowLongPtrW
+        except AttributeError:
+            set_long = user32.SetWindowLongW
+        set_long.restype = ctypes.c_ssize_t
+        set_long.argtypes = [wintypes.HWND, ctypes.c_int, ctypes.c_ssize_t]
+
+        def hook(hwnd):
+            if not hwnd:
+                return
+            shell32.DragAcceptFiles(wintypes.HWND(hwnd), True)
+            try:                                # 管理员进程也能接收普通进程拖来的文件
+                user32.ChangeWindowMessageFilterEx(wintypes.HWND(hwnd), WM_DROPFILES, 1, None)
+            except Exception:
+                pass
+            if hwnd not in _DND_STATE['olds']:
+                old = set_long(wintypes.HWND(hwnd), -4, cb)   # GWLP_WNDPROC
+                _DND_STATE['olds'][hwnd] = old
+
+        def walk(w):
+            try:
+                hook(w.winfo_id())
+            except Exception:
+                pass
+            for ch in w.winfo_children():
+                walk(ch)
+
+        hook(user32.GetParent(root.winfo_id()))   # 真正的顶层窗口框
+        walk(root)
+        return True
+    except Exception:
+        return False
 
 
 # ---------------------------------------------------------------- 小工具
@@ -60,58 +146,24 @@ def res_dir():
     return os.path.dirname(os.path.abspath(__file__))
 
 
-def enable_dnd(hwnd, on_files):
-    """Windows 外壳拖放（WM_DROPFILES）。失败则静默降级为「仅点击选择」。"""
+def ensure_dpi_awareness():
+    """必须在创建 Tk 窗口【之前】调用。
+
+    不声明 DPI 感知时，Windows 会把整个窗口按位图拉伸：字体模糊、显小、
+    界面发虚——这是「字体太小、不够美观」的最大单一原因。"""
     if sys.platform != 'win32':
-        return False
+        return
     try:
         import ctypes
-        from ctypes import wintypes
-
-        user32 = ctypes.windll.user32
-        shell32 = ctypes.windll.shell32
-        shell32.DragAcceptFiles(wintypes.HWND(hwnd), True)
-
-        WM_DROPFILES = 0x0233
-        GWLP_WNDPROC = -4
-        proto = ctypes.WINFUNCTYPE(ctypes.c_ssize_t, wintypes.HWND, ctypes.c_uint,
-                                   ctypes.c_size_t, ctypes.c_ssize_t)
         try:
-            set_long = user32.SetWindowLongPtrW
-        except AttributeError:
-            set_long = user32.SetWindowLongW
-        set_long.restype = ctypes.c_ssize_t
-        set_long.argtypes = [wintypes.HWND, ctypes.c_int, ctypes.c_ssize_t]
-        call_proc = user32.CallWindowProcW
-        call_proc.restype = ctypes.c_ssize_t
-        call_proc.argtypes = [ctypes.c_ssize_t, wintypes.HWND, ctypes.c_uint,
-                              ctypes.c_size_t, ctypes.c_ssize_t]
-
-        buf = ctypes.create_unicode_buffer(1024)
-        holder = {'old': None}
-
-        def proc(h, msg, wp, lp):
-            if msg == WM_DROPFILES:
-                try:
-                    n = shell32.DragQueryFileW(wp, 0xFFFFFFFF, None, 0)
-                    files = []
-                    for i in range(n):
-                        shell32.DragQueryFileW(wp, i, buf, 1024)
-                        files.append(buf.value)
-                    shell32.DragFinish(wp)
-                    on_files(files)
-                except Exception:
-                    pass
-                return 0
-            return call_proc(holder['old'], h, msg, wp, lp)
-
-        cb = proto(proc)
-        holder['old'] = set_long(wintypes.HWND(hwnd), GWLP_WNDPROC, cb)
-        _DND_REFS['cb'] = cb          # 防 GC
-        _DND_REFS['old'] = holder['old']
-        return True
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)   # per-monitor v1
+        except Exception:
+            try:
+                ctypes.windll.shcore.SetProcessDpiAwareness(1)
+            except Exception:
+                ctypes.windll.user32.SetProcessDPIAware()
     except Exception:
-        return False
+        pass
 
 
 # ---------------------------------------------------------------- 控件
@@ -119,8 +171,8 @@ class HoverButton(tk.Label):
     """用 Label 实现的按钮：配色和悬停效果完全可控。"""
 
     def __init__(self, master, text, cmd, bg=PANEL2, fg=TEXT, hover=HOVER,
-                 font=None, padx=16, pady=7, **kw):
-        super().__init__(master, text=text, bg=bg, fg=fg, font=font or (FONT, 10),
+                 font=None, padx=16, pady=8, **kw):
+        super().__init__(master, text=text, bg=bg, fg=fg, font=font or (FONT, 11),
                          padx=padx, pady=pady, cursor='hand2', **kw)
         self._bg, self._hover, self._fg = bg, hover, fg
         self._cmd = cmd
@@ -216,13 +268,7 @@ class App(tk.Tk):
         super().__init__()
         self.title('聊天记录深度分析器')
         self.configure(bg=BG)
-        self.minsize(700, 600)
-
-        try:
-            import ctypes
-            ctypes.windll.shcore.SetProcessDpiAwareness(1)
-        except Exception:
-            pass
+        self.minsize(760, 640)
 
         ico = os.path.join(res_dir(), 'app.ico')
         if os.path.isfile(ico):
@@ -243,7 +289,7 @@ class App(tk.Tk):
             sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
         except Exception:
             sw, sh = 1440, 900
-        w, h = 880, min(780, sh - 80)
+        w, h = 960, min(860, sh - 60)
         self.geometry('%dx%d+%d+%d' % (w, h, max(0, (sw - w) // 2),
                                        max(0, (sh - h) // 2 - 10)))
 
@@ -260,16 +306,16 @@ class App(tk.Tk):
         head = tk.Frame(self, bg=BG)
         head.pack(fill='x', pady=(18, 2), **pad)
         tk.Label(head, text='聊天记录深度分析器', bg=BG, fg=TEXT,
-                 font=(FONT, 17, 'bold')).pack(anchor='w')
+                 font=(FONT, 20, 'bold')).pack(anchor='w')
         sub = tk.Frame(head, bg=BG)
         sub.pack(fill='x', pady=(2, 0))
         tk.Label(sub, text='纯本地统计 · 不联网 · 不上传任何数据 · 报告可直接分享',
-                 bg=BG, fg=MUTED, font=(FONT, 9)).pack(side='left')
-        tk.Label(sub, text='v2.0 GUI', bg=PANEL, fg=GOLD, font=(FONT, 8, 'bold'),
+                 bg=BG, fg=MUTED, font=(FONT, 10)).pack(side='left')
+        tk.Label(sub, text='v2.1 GUI', bg=PANEL, fg=GOLD, font=(FONT, 10, 'bold'),
                  padx=7, pady=2).pack(side='right')
 
         # ---- 拖放区 ----
-        self.zone = tk.Canvas(self, bg=PANEL, highlightthickness=0, height=92,
+        self.zone = tk.Canvas(self, bg=PANEL, highlightthickness=0, height=110,
                               cursor='hand2')
         self.zone.pack(fill='x', pady=(14, 0), **pad)
         self.zone.bind('<Button-1>', lambda e: self.pick_files())
@@ -281,32 +327,32 @@ class App(tk.Tk):
         lf = tk.Frame(self, bg=BG)
         lf.pack(fill='x', pady=(14, 4), **pad)
         tk.Label(lf, text='待分析', bg=BG, fg=MUTED,
-                 font=(FONT, 9, 'bold')).pack(side='left')
-        self.count_lbl = tk.Label(lf, text='', bg=BG, fg=DIM, font=(FONT, 9))
+                 font=(FONT, 10, 'bold')).pack(side='left')
+        self.count_lbl = tk.Label(lf, text='', bg=BG, fg=DIM, font=(FONT, 10))
         self.count_lbl.pack(side='left', padx=8)
         HoverButton(lf, '清空列表', self.clear_all, bg=BG, fg=DIM, hover=BG,
-                    font=(FONT, 9), pady=2).pack(side='right')
+                    font=(FONT, 10), pady=2).pack(side='right')
 
         self.box = ScrollBox(self, height=120, bg=PANEL)
         self.box.pack(fill='both', padx=26, expand=False)
         self.empty_hint = tk.Label(self.box.inner,
                                    text='   还没有文件 —— 把聊天记录拖到上面，或点上面选择',
-                                   bg=PANEL, fg=DIM, font=(FONT, 9), pady=14)
+                                   bg=PANEL, fg=DIM, font=(FONT, 10), pady=14)
         self.empty_hint.pack(fill='x')
 
         # ---- 输出目录 / 选项 ----
         of = tk.Frame(self, bg=BG)
         of.pack(fill='x', pady=(10, 0), **pad)
         tk.Label(of, text='输出到', bg=BG, fg=DIM,
-                 font=(FONT, 9)).pack(side='left')
+                 font=(FONT, 10)).pack(side='left')
         self.out_lbl = tk.Label(of, text='与聊天记录相同的文件夹', bg=BG, fg=MUTED,
-                                font=(FONT, 9))
+                                font=(FONT, 10))
         self.out_lbl.pack(side='left', padx=8)
         HoverButton(of, '更改', self.pick_outdir, bg=BG, fg=BLUE, hover=BG,
-                    font=(FONT, 9), pady=2).pack(side='right')
+                    font=(FONT, 10), pady=2).pack(side='right')
         self.auto_lbl = None
         self.btn_auto = HoverButton(of, '完成后自动打开报告：开', self.toggle_auto,
-                                    bg=BG, fg=MUTED, hover=BG, font=(FONT, 9), pady=2)
+                                    bg=BG, fg=MUTED, hover=BG, font=(FONT, 10), pady=2)
         self.btn_auto.pack(side='right', padx=(0, 16))
 
         # ---- 进度 ----
@@ -315,12 +361,12 @@ class App(tk.Tk):
         self.bar = Bar(pf)
         self.bar.pack(fill='x')
         self.status_lbl = tk.Label(pf, text='把聊天记录拖进来就能开始', anchor='w',
-                                   bg=BG, fg=MUTED, font=(FONT, 9))
+                                   bg=BG, fg=MUTED, font=(FONT, 10))
         self.status_lbl.pack(fill='x', pady=(6, 0))
 
         # ---- 日志 ----
         self.log_box = tk.Text(self, bg=PANEL, fg=MUTED, relief='flat', height=8,
-                               font=('Consolas', 9), state='disabled', wrap='word',
+                               font=('Consolas', 10), state='disabled', wrap='word',
                                padx=12, pady=9, selectbackground=HOVER,
                                selectforeground=TEXT)
         self.log_box.pack(fill='both', expand=True, pady=(10, 0), **pad)
@@ -332,8 +378,8 @@ class App(tk.Tk):
         bf = tk.Frame(self, bg=BG)
         bf.pack(fill='x', pady=(14, 4), **pad)
         self.btn_run = HoverButton(bf, '开 始 分 析', self.run, bg=GREEN, fg='#04240f',
-                                   hover=GREEN_D, font=(FONT, 11, 'bold'),
-                                   padx=30, pady=9)
+                                   hover=GREEN_D, font=(FONT, 12, 'bold'),
+                                   padx=30, pady=10)
         self.btn_run.pack(side='left')
         self.btn_report = HoverButton(bf, '打开报告', self.open_report, padx=18)
         self.btn_report.pack(side='left', padx=(14, 0))
@@ -343,7 +389,7 @@ class App(tk.Tk):
         self.btn_folder.set_enabled(False)
 
         tk.Label(self, text='分析在本机完成 · 生成的 HTML 报告用浏览器打开，断网也能看图',
-                 bg=BG, fg=DIM, font=(FONT, 8)).pack(side='bottom', pady=(0, 8))
+                 bg=BG, fg=DIM, font=(FONT, 9)).pack(side='bottom', pady=(0, 8))
 
         self.bind('<Control-o>', lambda e: self.pick_files())
 
@@ -357,18 +403,17 @@ class App(tk.Tk):
             w = 800
         c.create_rectangle(2, 2, w - 3, h - 3, outline=BLUE if hot else DIM,
                            dash=(5, 4), fill=PANEL if hot else PANEL2)
-        c.create_text(w / 2, h / 2 - 9, text='＋  把聊天记录拖到这里，或点击选择文件',
-                      fill=TEXT if hot else MUTED, font=(FONT, 11, 'bold'))
-        c.create_text(w / 2, h / 2 + 14,
+        c.create_text(w / 2, h / 2 - 10, text='＋  把聊天记录拖到这里，或点击选择文件',
+                      fill=TEXT if hot else MUTED, font=(FONT, 13, 'bold'))
+        c.create_text(w / 2, h / 2 + 16,
                       text='支持 .txt 标准格式；.csv / .json 自动识别转换 · 可一次选多个',
-                      fill=DIM, font=(FONT, 8))
+                      fill=DIM, font=(FONT, 10))
 
     def _setup_dnd(self):
         try:
-            import ctypes
-            hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
-            ok = enable_dnd(hwnd, self._on_drop)
-            self.log('拖放已启用' if ok else '（拖放不可用，用点击选择也一样）', 'dim')
+            ok = enable_dnd_tree(self, self._on_drop)
+            self.log('拖放已启用：窗口任意位置都能拖进来' if ok
+                     else '（拖放不可用，用点击选择也一样）', 'dim')
         except Exception:
             self.log('（拖放不可用，用点击选择也一样）', 'dim')
 
@@ -382,15 +427,15 @@ class App(tk.Tk):
         left = tk.Frame(f, bg=PANEL2)
         left.pack(side='left', fill='x', expand=True)
         name = tk.Label(left, text=os.path.basename(path), bg=PANEL2, fg=TEXT,
-                        font=(FONT, 10), anchor='w')
+                        font=(FONT, 11), anchor='w')
         name.pack(fill='x', padx=12, pady=(6, 0))
-        meta = tk.Label(left, text='正在读取…', bg=PANEL2, fg=DIM, font=(FONT, 8),
+        meta = tk.Label(left, text='正在读取…', bg=PANEL2, fg=DIM, font=(FONT, 9),
                         anchor='w')
         meta.pack(fill='x', padx=12, pady=(0, 6))
-        st = tk.Label(f, text='待分析', bg=PANEL2, fg=MUTED, font=(FONT, 9))
+        st = tk.Label(f, text='待分析', bg=PANEL2, fg=MUTED, font=(FONT, 10))
         st.pack(side='left', padx=12)
         x = HoverButton(f, '✕', lambda: self.remove(path), bg=PANEL2, fg=DIM,
-                        hover=PANEL2, font=(FONT, 9), pady=2)
+                        hover=PANEL2, font=(FONT, 10), pady=2)
         x.pack(side='right', padx=12)
         return {'path': path, 'frame': f, 'name': name, 'meta': meta,
                 'status': st, 'report': None}
@@ -672,6 +717,7 @@ class App(tk.Tk):
 
 # ---------------------------------------------------------------- 入口
 def main():
+    ensure_dpi_awareness()          # 必须在第一个窗口创建前
     files = []
     no_open = False
     for a in sys.argv[1:]:
