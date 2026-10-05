@@ -156,6 +156,23 @@ python convert.py 导出文件.json 聊天记录.txt --self-names 我,本人,me
 
 脚本会先把认到的字段打印出来给你确认。认不出来它会直说，把文件头几行发出来就能加规则。
 
+### 微信自带导出的txt，用 txt2json.py 转
+
+如果你是用微信手机版自带的「导出聊天记录」功能导出的txt（时间单独一行，正文在下一行那种格式），用 `scripts/txt2json.py` 转成标准JSON：
+
+```bash
+python scripts/txt2json.py --src 微信导出的记录.txt --out wechat_messages.json --me 你的微信昵称
+```
+
+自动识别三种常见格式：
+- **格式A**：微信导出风格（时间+名单独一行，正文在下一行）
+- **格式B**：一行一条（`2024-09-19 22:03:04 暖木: 在吗`）
+- **格式C**：CSV带表头
+
+转完之后，再用 `analyze.py` 分析那个JSON就行。
+
+> ⚠️ 微信自带导出的txt只有文字，图片/语音/表情都变成了占位符，所以「消息类型分布」这类指标会失真——只有文字统计是准的。想要完整类型分析，还是得用chatlog-keeper这类解密工具导出JSON。
+
 **在线版（analyzer.html）可以跳过这一步**——它上传时就自动认字段，CSV / JSON / TXT 都能直接拖进去。
 
 ### 数据量决定报告质量
@@ -226,4 +243,3 @@ python convert.py 导出文件.json 聊天记录.txt --self-names 我,本人,me
 ## License
 
 MIT
-
