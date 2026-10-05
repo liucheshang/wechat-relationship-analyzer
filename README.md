@@ -6,7 +6,7 @@
 
 ![报告首屏](docs/screenshot.png)
 
-*示例报告首屏（模拟数据）：综合健康分五维拆解 + KPI 总览 + 11 章深度分析。完整示例见 [docs/demo_report.html](docs/demo_report.html)。*
+*示例报告首屏（模拟数据）：综合健康分五维拆解 + KPI 总览 + 11 章深度分析。完整示例见 [在线示例报告](https://liucheshang.github.io/wechat-relationship-analyzer/docs/demo_report.html)。*
 
 ## 功能亮点
 
