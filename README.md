@@ -4,7 +4,7 @@
 
 **隐私零泄露**：所有分析都在你自己电脑上跑，聊天记录不上传任何服务器。
 
-![报告首屏](https://liucheshang.github.io/wechat-relationship-analyzer/docs/screenshot.png)
+![报告首屏](https://liucheshang.github.io/wechat-relationship-analyzer/screenshot.png)
 
 *示例报告首屏（模拟数据）：综合健康分五维拆解 + KPI 总览 + 11 章深度分析。*
 
