@@ -3,6 +3,7 @@
 微信聊天记录深度分析 · 本地版（深度报告）
 用法:  python analyze.py 聊天记录.txt [输出报告.html]
        python analyze.py 聊天记录.txt 报告.html --me 张三 --her 李四
+       python analyze.py 聊天记录.txt 报告.html --anonymize   # 真名替换成「我 / TA」
 
 发送者列支持三种写法：
   1. 文件标注「我 / TA」（兼容旧格式，直接跑）
@@ -19,6 +20,7 @@
 import sys, os, json, re
 from datetime import datetime, timedelta
 from collections import defaultdict, Counter
+from functools import lru_cache
 
 # =====================================================================
 # 0. 词典层
@@ -86,7 +88,7 @@ WORD_BANK = ['哈哈','哈哈哈','在吗','干嘛','吃饭','吃什么','睡觉
 
 EMOJI_RE = re.compile(r'\[([^\[\]]{1,10})\]')
 # 媒体占位符（整条消息就是 [图片] / [语音] 这种），与表情 [呲牙] 严格区分
-MEDIA_KEYS = ('图片', '语音', '视频', '红包', '转账', '文件', '链接', '动画表情')
+MEDIA_KEYS = ('图片', '语音', '视频', '通话', '红包', '转账', '文件', '链接', '动画表情')
 MEDIA_RE = re.compile(r'^\[\s*(' + '|'.join(MEDIA_KEYS) + r')\s*\]$')
 EMOJI_FOCUS = ['旺柴','捂脸','拥抱','破涕为笑','让我看看','呲牙','玫瑰','爱心','大哭','微笑','流泪','发怒','心碎','苦涩','害羞','撇嘴','抠鼻','得意','偷笑']
 SHORT_OK = ['嗯','嗯嗯','哦','哦哦','好','好的','好吧','行','行吧','是','对','哈哈','哈哈哈','在','ok','OK','收到','知道了','厉害','不错','棒','nice','可以','么么','亲亲','好嘞']
@@ -127,32 +129,74 @@ def is_cjk(ch):
 
 NEGATION_CHARS = '不没别无莫勿非'
 
+@lru_cache(maxsize=512)
+def _dict_rx(key):
+    """词典 → (首字预筛正则, 多字词并集正则, 单字词并集正则)，整张表只编译一次。
+
+    多字词必须用零宽前瞻 (?=词)：原实现是 text.find(w, start) 每次只推进
+    一个字符（被否定守卫挡住时还要接着找下一个出现位置），普通 finditer
+    非重叠会把「哈哈|哈哈」这种连续出现的位置整段吃掉，漏掉本该通过的那
+    个。零宽前瞻保证每个起点都被检查一遍，判定与原实现逐字推进一致。
+    两类词分成两张表各自扫描，避免互相抢位置。"""
+    longs = [w for w in key if len(w) >= 2]
+    shorts = [w for w in key if len(w) < 2]
+    heads = ''.join(sorted(set(w[0] for w in key)))
+    # 注意是字符类 [abc]，不是分组 (?:abc)——后者要求这些字依次出现，永远匹配不上
+    rx_head = re.compile('(?:[%s])' % re.escape(heads)) if heads else None
+    rx_long = re.compile('|'.join('(?=%s)' % re.escape(w) for w in longs)) if longs else None
+    rx_short = re.compile('|'.join(re.escape(w) for w in shorts)) if shorts else None
+    return rx_head, rx_long, rx_short
+
 def hit(text, words):
     """词典命中判断。单字词走边界判断，禁止子串误伤。
     否定守卫：命中位前一字（或前二字为「没有」）是否定词时不计——
-    「不开心 / 不喜欢 / 别哭了 / 没生气」不再被误计成正面或负面。"""
-    for w in words:
-        if len(w) >= 2:
-            start = 0
-            while True:
-                i = text.find(w, start)
-                if i < 0:
-                    break
-                prev1 = text[i - 1] if i > 0 else ''
-                prev2 = text[i - 2:i] if i >= 2 else ''
-                if prev1 not in NEGATION_CHARS and prev2 != '没有':
-                    return True
-                start = i + 1
-        else:
-            for m in re.finditer(re.escape(w), text):
-                i = m.start()
-                left = text[i - 1] if i > 0 else ''
-                right = text[i + 1] if i + 1 < len(text) else ''
-                prev2 = text[i - 2:i] if i >= 2 else ''
-                if (not (is_cjk(left) and is_cjk(right))
-                        and left not in NEGATION_CHARS and prev2 != '没有'):
-                    return True
+    「不开心 / 不喜欢 / 别哭了 / 没生气」不再被误计成正面或负面。
+
+    先用首字集合做一次廉价预筛（任何命中都必然以某个首字开头），绝大多数
+    消息会在这里被挡掉，省掉后面两次正则扫描；这层只是过滤，不改变判定。
+    真正扫描才是「一次遍历所有命中位置」，耗费从「消息数 × 词数」次 find
+    降到常数次正则扫描；判定条件与逐词 find 版逐字相同。"""
+    rx_head, rx_long, rx_short = _dict_rx(tuple(words))
+    if rx_head is not None and not rx_head.search(text):
+        return False
+    if rx_long is not None:
+        for m in rx_long.finditer(text):
+            i = m.start()
+            prev1 = text[i - 1] if i > 0 else ''
+            prev2 = text[i - 2:i] if i >= 2 else ''
+            if prev1 not in NEGATION_CHARS and prev2 != '没有':
+                return True
+    if rx_short is not None:
+        for m in rx_short.finditer(text):
+            i = m.start()
+            left = text[i - 1] if i > 0 else ''
+            right = text[i + 1] if i + 1 < len(text) else ''
+            prev2 = text[i - 2:i] if i >= 2 else ''
+            if (not (is_cjk(left) and is_cjk(right))
+                    and left not in NEGATION_CHARS and prev2 != '没有'):
+                return True
     return False
+
+def anonymize_names(msgs, ident):
+    """--anonymize：把正文里的双方真名换成「我 / TA」。
+    只动姓名，不动昵称词表——「宝宝/宝儿/老婆」这类爱称是报告要看的内容，
+    保留它们才能看出你们的亲密度。因此本函数是先换名再统计的：若真名恰好
+    也是爱称（比如她叫宝儿），正文里的那部分「宝儿」会被换掉，爱称使用量
+    统计会相应少算几条，这是换名的必然代价（人际对照仍能看出趋势）。"""
+    pairs = []
+    for real, fake in ((ident.get('me'), '我'), (ident.get('her'), 'TA')):
+        if real and real not in ('我', 'TA') and len(real) >= 2:
+            pairs.append((real, fake))
+    if not pairs:
+        return False
+    for m in msgs:
+        c = m['content']
+        for real, fake in pairs:
+            if real in c:
+                c = c.replace(real, fake)
+        m['content'] = c
+    ident['me'], ident['her'] = '我', 'TA'
+    return True
 
 def count_msg(lst, words):
     """命中该词典的消息条数（同一词典内多词命中只计一次）。"""
@@ -215,6 +259,15 @@ ME_ALIASES = ('我', 'me', 'Me', 'ME', '自己', '本人', 'self', '我(发送)'
 def parse(path, me_name=None, her_name=None):
     raw_total, dropped = 0, 0
     lines = None
+
+    # ---- 如果是 JSON 文件，自动先转换 ----
+    if path.lower().endswith('.json'):
+        print('检测到 JSON 文件，自动转换中...')
+        from convert import convert_file
+        tmp_txt = path + '.tmp.txt'
+        convert_file(path, tmp_txt, log=print)
+        path = tmp_txt
+
     for enc in ('utf-8-sig', 'utf-8', 'gbk', 'gb18030', 'big5'):
         try:
             with open(path, 'r', encoding=enc) as f:
@@ -402,13 +455,15 @@ def compute(msgs, sessions):
     D['patM'] = D['patH'] = 0            # 拍一拍
     for m in msgs:
         c = m['content']
+        # 系统消息（撤回/拍一拍）在库里 sender 恒为对方，归属只能看文字：
+        # 「你撤回/我拍了拍」= 我；「"某昵称" 撤回」= TA
         if '撤回了一条消息' in c:
-            if m['sender'] == 'me':
+            if re.search(r'你\s*撤回了一条消息', c):
                 D['recallM'] += 1
             else:
                 D['recallH'] += 1
         if '拍了拍' in c:
-            if m['sender'] == 'me':
+            if '我拍了拍' in c:
                 D['patM'] += 1
             else:
                 D['patH'] += 1
@@ -428,8 +483,8 @@ def compute(msgs, sessions):
     wh = [(w, sum(1 for m in her if w in m['content'])) for w in WORD_BANK]
     wm = [x for x in wm if x[1] > 0]
     wh = [x for x in wh if x[1] > 0]
-    D['TOPW_M'] = sorted(wm, key=lambda x: -x[1])[:8]
-    D['TOPW_H'] = sorted(wh, key=lambda x: -x[1])[:8]
+    D['TOPW_M'] = sorted(wm, key=lambda x: -x[1])[:10]
+    D['TOPW_H'] = sorted(wh, key=lambda x: -x[1])[:10]
 
     # ---------- 逐日 / 逐月骨架（断联月不跳过） ----------
     dayIdx = {}
@@ -1188,15 +1243,26 @@ def build_health_html(H):
             '<div class="bar-wrap"><div style="height:100%%;width:%d%%;background:%s"></div></div>'
             '<div class="hdesc">%s · 权重 %d%%</div></div>'
             % (name, color, sc, max(2, sc), color, desc, w))
+    # 档次刻度：把总分放到 0~100 的尺子上，并标出 60 / 80 两条分界线
+    scale = ('<div class="hscale"><div class="hs-track">'
+             '<div class="hs-fill" style="width:%d%%;background:%s"></div>'
+             '<i class="hs-mark" style="left:60%%"><span>60 · 及格线</span></i>'
+             '<i class="hs-mark" style="left:80%%"><span>80 · 健康线</span></i>'
+             '</div><div class="hs-legs">'
+             '<span class="hs-l hs-r">0–59 需关注</span>'
+             '<span class="hs-l hs-y">60–79 基本稳</span>'
+             '<span class="hs-l hs-g">80–100 良好</span>'
+             '</div></div>' % (max(0, min(100, H['total'])), H['gcol']))
     return ('<div class="card" id="health"><h3>关系综合健康分</h3>'
             '<div class="hscore"><span class="hnum" style="color:%s">%d</span>'
             '<span class="hgrade" style="color:%s">%s</span>'
             '<span class="hweights">情绪基调 30%% · 冲突与修复 25%% · 四骑士 20%% · 依恋安全 15%% · 连接稳定 10%%</span></div>'
             '%s'
+            '%s'
             '<p class="note">口径：五个维度各自 0~100 分、按权重加权，映射阈值全部写在上面的维度说明里，'
             '可复算可复核。这是<b>词典近似口径</b>下的描述性刻度，衡量的是聊天语言行为，'
             '不是感情本身，更不构成任何心理学诊断。</p></div>'
-            % (H['gcol'], H['total'], H['gcol'], H['grade'], ''.join(bars)))
+            % (H['gcol'], H['total'], H['gcol'], H['grade'], scale, ''.join(bars)))
 
 
 HEAT_LV = ('hcell', 'hcell lv1', 'hcell lv2', 'hcell lv3', 'hcell lv4')
@@ -1320,6 +1386,83 @@ def render(D, meta):
         ht = '热度没掉，但账一直没算清'
     T['HERO_TITLE'] = '一段 <em>%s</em> 的关系：%s' % (rel.split('：')[0], ht)
 
+    # ---------- 数据质量体检 ----------
+    # 1. 总条数得分
+    if total >= 10000:
+        qty_score = 100
+    elif total >= 3000:
+        qty_score = 75
+    else:
+        qty_score = 40
+
+    # 2. 时间跨度得分
+    days = D['days']
+    if days >= 365:
+        span_score = 100
+    elif days >= 180:
+        span_score = 80
+    else:
+        span_score = 50
+
+    # 3. 双方消息量平衡度
+    balance = abs(nMe - nHer) / max(1, total)
+    if balance < 0.15:
+        balance_score = 100
+    elif balance < 0.3:
+        balance_score = 80
+    else:
+        balance_score = 50
+
+    # 4. 缺失月份
+    all_months = []
+    cur = msgs[0]['dt'].replace(day=1)
+    end = msgs[-1]['dt'].replace(day=1)
+    while cur <= end:
+        all_months.append(cur.strftime('%Y-%m'))
+        cur = cur + timedelta(days=32)
+        cur = cur.replace(day=1)
+    present_months = set(D['monCnt'].keys())
+    missing_months = len(all_months) - len(present_months)
+    if missing_months == 0:
+        month_score = 100
+    elif missing_months <= 2:
+        month_score = 75
+    else:
+        month_score = 40
+
+    # 综合质量分
+    quality_score = round(qty_score * 0.3 + span_score * 0.25 + balance_score * 0.25 + month_score * 0.2)
+
+    # 置信等级
+    if total >= 10000:
+        confidence = '高'
+        confidence_color = 'var(--green)'
+    elif total >= 3000:
+        confidence = '中'
+        confidence_color = 'var(--gold)'
+    else:
+        confidence = '低'
+        confidence_color = 'var(--red)'
+
+    # 缺月警告
+    warn_html = ''
+    if missing_months > 0:
+        warn_html = '<div class="warn">⚠️ 数据缺失：有 %d 个月份没有聊天记录，部分趋势分析可能不准确</div>' % missing_months
+    if balance > 0.3:
+        warn_html += '<div class="warn">⚠️ 双方消息量偏差较大（你 %d 条 / TA %d 条），跨人对比时请注意口径</div>' % (nMe, nHer)
+
+    T['DATA_QUALITY'] = '''
+    <div class="quality-card">
+        <div class="q-score" style="color: %s">%d<span class="q-max">/100</span></div>
+        <div class="q-info">
+            <div class="q-title">数据质量 · 置信度 <b style="color:%s">%s</b></div>
+            <div class="q-detail">总消息 %s 条 · 跨度 %d 天 · 双方偏差 %.0f%% · 缺月 %d 个</div>
+            %s
+        </div>
+    </div>
+    ''' % (confidence_color, quality_score, confidence_color, confidence,
+           format(total, ','), days, balance * 100, missing_months, warn_html)
+
     kpi = [('总消息数', format(total, ','), 'var(--purple)', '你 %s%% · TA %s%%' % (D['pctMe'], D['pctHer'])),
            ('TA 主动开启的日子', '%s%%' % herStartPct, 'var(--her)', '有聊天的 %d 天里 TA 说第一句' % activeDays),
            ('最长断联', '%d 天' % D['maxGap'], 'var(--red)' if D['maxGap'] > 7 else 'var(--green)',
@@ -1415,7 +1558,7 @@ def render(D, meta):
                                     % (n, 'hl-me' if a > b else '', a, 'hl-her' if b > a else '', b, r)
                                     for n, a, b, r in prows))
     rows = []
-    for i in range(8):
+    for i in range(10):
         a = D['TOPW_M'][i] if i < len(D['TOPW_M']) else ('', '')
         b = D['TOPW_H'][i] if i < len(D['TOPW_H']) else ('', '')
         rows.append('<tr><td>%s <span class="hl-me">%s</span></td><td class="num">%s</td>'
@@ -1625,15 +1768,17 @@ def render(D, meta):
         seg.reverse()
         for m in seg:
             c = m['content']
-            k = 'red' if hit(c, CONFLICT) else ('gold' if '分手' in c else m['sender'])
+            tag = '冲突' if hit(c, CONFLICT) else ('转折' if '分手' in c else '日常')
+            k = 'red' if tag == '冲突' else ('gold' if tag == '转折' else m['sender'])
             tls.append('<div class="tl-item %s"><span class="tl-t">%s</span>'
-                       '<span class="tl-who %s">%s</span>%s</div>'
+                       '<span class="tl-who %s">%s</span>'
+                       '<span class="tl-tag">%s · %d 字</span></div>'
                        % (k, m['dt'].strftime('%Y-%m-%d %H:%M:%S'),
                           'hl-me' if m['sender'] == 'me' else 'hl-her',
-                          '你' if m['sender'] == 'me' else 'TA', cut(c, 80)))
-    T['GAP_TIMELINE'] = ('<div class="tl">%s</div><p class="note">断联前最后一段对话。红点＝冲突，金点＝转折，'
-                         '灰点＝日常。结论不下「谁对谁错」，只还原因果链：导火索往往不是大矛盾，'
-                         '而是一个没人接住的小动作。</p>' % ''.join(tls)) if tls else '<p class="note">样本不足，无法还原。</p>'
+                          '你' if m['sender'] == 'me' else 'TA', tag, len(c)))
+    T['GAP_TIMELINE'] = ('<div class="tl">%s</div><p class="note">断联前最后一段对话的<b>结构</b>（不展示原话）：'
+                         '红点＝冲突，金点＝转折，灰点＝日常。结论不下「谁对谁错」，只还原因果链：'
+                         '导火索往往不是大矛盾，而是一个没人接住的小动作。</p>' % ''.join(tls)) if tls else '<p class="note">样本不足，无法还原。</p>'
 
     trows = ''
     for name, _ in TRIGGER_RULES + [('其他 / 无法归类', None)]:
@@ -1649,15 +1794,25 @@ def render(D, meta):
     body = []
     for cs in top7:
         sil = next((r for r in D['repairs'] if r['date'] == cs['start'].strftime('%Y-%m-%d')), None)
+        # 导火索：扫该段全部冲突命中消息，取出现最多的那一类（只看第一条会大量落到「无法归类」）
+        tc = Counter()
+        for _, m in cs['hits']:
+            for name, kws in TRIGGER_RULES:
+                if hit(m['content'], kws):
+                    tc[name] += 1
+                    break
+        trig = tc.most_common(1)[0][0] if tc else '其他 / 无法归类'
         body.append('<div class="card hl-her-card"><h4>%s · 冲突词命中 %d 次 · 该段对话持续 %d 分钟</h4>'
-                    '<p class="read">导火索：%s</p>%s%s</div>'
+                    '<p class="read">导火索类型：<b>%s</b>（占该段冲突命中的 %s%%） ｜ 该段共 %d 条消息</p>'
+                    '<p class="note">→ %s</p></div>'
                     % (cs['start'].strftime('%Y-%m-%d %H:%M'), cs['n'],
                        max(1, int((cs['end'] - cs['start']).total_seconds() // 60)),
-                       cut(cs['first']['content'], 70),
-                       q(cs['first']['sender'], cs['first']['dt'], cs['first']['content']),
-                       ('<p class="note">→ %.1f 小时后，%s 先开口：%s</p>'
-                        % (sil['sil'], '你' if sil['who'] == 'me' else 'TA', cut(sil['reply'], 60))) if sil else ''))
-    T['REPLAY_TITLE'] = '最激烈的 %d 段冲突 · 逐段回放' % len(top7)
+                       trig, pct(tc.most_common(1)[0][1] if tc else 0, max(1, sum(tc.values()))),
+                       len(cs['msgs']),
+                       ('%.1f 小时后，%s 先开口（静默 %.1f 小时）'
+                        % (sil['sil'], '你' if sil['who'] == 'me' else 'TA', sil['sil']))
+                       if sil else '这一段没有识别到明确的「先低头」动作'))
+    T['REPLAY_TITLE'] = '最激烈的 %d 段冲突 · 逐段数据回放' % len(top7)
     T['REPLAY_BODY'] = ''.join(body)
 
     # ---------- 08 框架 ----------
@@ -1890,7 +2045,7 @@ def render(D, meta):
                           per_k(D['EMOJI_CNT_M'], nMe) / max(0.1, per_k(D['EMOJI_CNT_H'], nHer))))
 
     # ---------- 媒体消息（02 章） ----------
-    MEDIA_LABEL = {'图片': '图片', '语音': '语音', '视频': '视频', '红包': '红包',
+    MEDIA_LABEL = {'图片': '图片', '语音': '语音', '视频': '视频', '通话': '通话', '红包': '红包',
                    '转账': '转账', '文件': '文件', '链接': '链接', '动画表情': '动画表情'}
     mrows = []
     for k in MEDIA_KEYS:
@@ -2101,13 +2256,18 @@ def _pause():
 
 
 def _parse_args(argv):
-    """极简参数解析：支持 --me 名字 --her 名字（空格或等号两种写法）。"""
+    """极简参数解析：支持 --me 名字 --her 名字（空格或等号两种写法），
+    以及 --anonymize（脱敏，报告里只留「我 / TA」）。"""
     me_name = her_name = None
+    anonymize = False
     pos = []
     i = 0
     while i < len(argv):
         a = argv[i]
-        if a in ('--me', '--her') and i + 1 < len(argv):
+        if a == '--anonymize':
+            anonymize = True
+            i += 1
+        elif a in ('--me', '--her') and i + 1 < len(argv):
             if a == '--me':
                 me_name = argv[i + 1]
             else:
@@ -2125,7 +2285,7 @@ def _parse_args(argv):
         else:
             pos.append(a)
             i += 1
-    return pos, me_name, her_name
+    return pos, me_name, her_name, anonymize
 
 
 def main():
@@ -2135,7 +2295,12 @@ def main():
         pass
 
     frozen = getattr(sys, 'frozen', False)
-    pos, me_name, her_name = _parse_args(sys.argv[1:])
+    if '-h' in sys.argv[1:] or '--help' in sys.argv[1:]:
+        print('用法: python analyze.py 聊天记录.txt [输出报告.html]')
+        print('      可选: --me 我的名字 --her 对方名字 --anonymize')
+        print('不加参数直接跑会进交互式，把聊天记录拖进窗口就行。')
+        return
+    pos, me_name, her_name, anonymize = _parse_args(sys.argv[1:])
     interactive = not pos
 
     if interactive:
@@ -2160,6 +2325,12 @@ def main():
     out = pos[1] if len(pos) > 1 else '深度分析报告.html'
     if not os.path.isabs(out):
         out = os.path.join(os.path.dirname(os.path.abspath(path)), out)
+    # 报告是网页，扩展名必须是 .html/.htm：给 .docx / 没扩展名之类直接改名，
+    # 免得用户拿到一个打不开的文件还不知道哪错了。
+    stem, ext = os.path.splitext(out)
+    if ext.lower() not in ('.html', '.htm'):
+        out = stem + '.html'
+        print('提示: 报告必须是网页文件，输出已自动改成 %s' % os.path.basename(out))
     if not os.path.isfile(path):
         print('错误: 找不到文件 %s' % path)
         if frozen:
@@ -2171,6 +2342,8 @@ def main():
     if len(msgs) < 50:
         print('错误: 有效消息只有 %d 条，至少需要 50 条才能出报告' % len(msgs))
         sys.exit(1)
+    if anonymize and anonymize_names(msgs, ident):
+        print('脱敏: 双方真名已替换成「我 / TA」（统计口径不变）')
     print('清洗: 原始 %d 行 → 有效 %d 条（剔除 %d 条）' % (raw, len(msgs), dropped))
     print('发送者识别（%s）: 「%s」%s 条 → 我 · 「%s」%s 条 → TA%s'
           % (ident['mode'], ident['me'], format(ident['me_n'], ','),

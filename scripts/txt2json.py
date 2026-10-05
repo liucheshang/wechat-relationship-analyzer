@@ -6,7 +6,7 @@
 什么时候用它？
   拿不到密钥、或者不想用调试器的时候，你可以用别的方式弄到聊天记录文本
   （手机微信导出、手动复制、第三方工具导出的 txt/csv），
-  先用这个脚本转成标准格式，后面分析脚本照样能跑。
+  先用这个脚本转成标准格式，后面三个分析脚本照样能跑。
 
 支持三种输入（自动识别）：
 
@@ -43,6 +43,8 @@ ap.add_argument('--src', required=True, help='输入的 txt 或 csv 文件')
 ap.add_argument('--out', required=True, help='输出的 wechat_messages.json')
 ap.add_argument('--me', required=True, help='你自己的显示名（在记录里出现的那个）')
 ap.add_argument('--other', default='', help='对方显示名（可留空，自动取出现最多的另一个名字）')
+ap.add_argument('--me-left', action='store_true',
+                help='记录里你自己在左边（默认按 --me 的名字判断，不依赖位置）')
 A = ap.parse_args()
 
 # --------------------------------------------------------------- 时间解析
@@ -209,3 +211,5 @@ print('  时间范围：%s ~ %s' % (
     datetime.fromtimestamp(out[-1]['ts']).strftime('%Y-%m-%d %H:%M')))
 print('\n⚠️ 图片/语音/表情在这里都变成了空内容或被丢弃，'
       '所以「消息类型分布」「表情统计」这类指标会失真 —— 只有文字统计是准的。')
+print('\n下一步：')
+print('  python analyze_full.py --src "%s" --out "full_stats.json" --me %s --other %s' % (A.out, A.me, other))
