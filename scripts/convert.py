@@ -40,9 +40,18 @@ TYPE_KEYS = ['msg_type', 'msgtype', 'type', 'contenttype', 'mstype', '类型']
 ROOM_KEYS = ['chat_room', 'room', 'chatroom', 'conversation', 'chatname',
              'contact', 'remark', '备注', '群名', '聊天对象']
 
-# 微信/企业微信的文本类型码。认不出来就不筛，省得把数据筛没了。
-TEXT_TYPE_CODES = {'1', '0', 'text', 'txt', '文本'}
-SKIP_TYPE_CODES = {'10000', '10002'}   # 系统消息 / 撤回提示
+# 微信消息类型码 → 占位符文本
+MSG_TYPE_MAP = {
+    '1': None,        # 文本，保留原内容
+    '3': '[图片]',
+    '34': '[语音]',
+    '43': '[视频]',
+    '47': '[动画表情]',
+    '49': '[链接]',
+    '50': '[通话]',
+    '10000': None,    # 系统消息：撤回 / 拍一拍原文要保留，分析器靠它统计
+}
+SKIP_TYPE_CODES = {'10002'}   # 只有撤回提示这种纯系统噪声才跳过
 
 
 def norm(k):
@@ -189,10 +198,24 @@ def convert_file(src, dst, contact=None, self_names=None, log=print):
             if t in SKIP_TYPE_CODES:
                 skipped_type += 1
                 continue
-            # 只在类型码看起来是微信那套数字时才筛文本
-            if t and re.fullmatch(r'\d+', t) and t not in TEXT_TYPE_CODES:
-                skipped_type += 1
-                continue
+            # 非文本消息不跳过，替换成占位符；文本(1)与系统原文保留
+            if t in MSG_TYPE_MAP:
+                ph = MSG_TYPE_MAP[t]
+                if ph is None:
+                    c = str(r.get(k_content, ''))
+                    # 系统消息里的 XML：取出 <content> 正文（撤回/拍一拍通知在里面），
+                    # 纯噪声才降级为 [其他]
+                    if c.lstrip().startswith('<'):
+                        mm = re.search(r'<content>(.*?)</content>', c, re.S)
+                        c = mm.group(1).strip() if mm else '[其他]'
+                else:
+                    c = ph
+            elif t and re.fullmatch(r'\d+', t):
+                c = '[其他]'
+            else:
+                c = str(r.get(k_content, ''))
+        else:
+            c = str(r.get(k_content, ''))
         dt = parse_time(r.get(k_time))
         if dt is None:
             skipped_time += 1
@@ -209,7 +232,6 @@ def convert_file(src, dst, contact=None, self_names=None, log=print):
             who = '我' if any(n and n in s for n in self_names) else 'TA'
         if who is None:
             who = 'TA'
-        c = str(r.get(k_content, ''))
         c = c.replace('\r', ' ').replace('\n', ' ').strip()
         if not c:
             continue
