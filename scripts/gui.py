@@ -23,6 +23,25 @@ import threading
 import traceback
 import tempfile
 
+def _fix_tcl_paths():
+    """conda 版的 Python 打包 exe 时，PyInstaller 找不到 tcl/tk 脚本目录
+    （base 环境既没设 TCL_LIBRARY，sysconfig 也查不到），tk 那边只会把
+    tcl86t.dll / tk86t.dll 收进来、脚本目录丢掉，跑起来就是
+    "DLL load failed while importing _tkinter"。
+    这里在 import tkinter 之前把 TCL_LIBRARY / TK_LIBRARY 指向打包进去的
+    那两份脚本（--add-data 时分别放到了 _MEIPASS 下的 tcl/ 和 tk/）。"""
+    base = getattr(sys, '_MEIPASS', None)
+    if not base:
+        return
+    tcl_dir, tk_dir = os.path.join(base, 'tcl'), os.path.join(base, 'tk')
+    if os.path.isdir(tcl_dir):
+        os.environ.setdefault('TCL_LIBRARY', tcl_dir)
+    if os.path.isdir(tk_dir):
+        os.environ.setdefault('TK_LIBRARY', tk_dir)
+
+
+_fix_tcl_paths()
+
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
